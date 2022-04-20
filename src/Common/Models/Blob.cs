@@ -1,22 +1,12 @@
 namespace Common.Models; 
 
-public record Blob {
-	public Blob(Position Position, Velocity Velocity, int Diameter) {
-		this.Position = Position;
-		this.Velocity = Velocity;
-		this.Diameter = Diameter;
-	}
-	public Position Position { get; init; }
-	public Velocity Velocity { get; init; }
-	public int Diameter { get; init; }
+public record Blob(Position Position, Velocity Velocity, int Diameter, Color Color) {
 	public int Radius => Diameter / 2;
-	
-	public void Deconstruct(out Position Position, out Velocity Velocity, out int Diameter) {
-		Position = this.Position;
-		Velocity = this.Velocity;
-		Diameter = this.Diameter;
-	}
 }
 
 public record Position(int X, int Y);
 public record Velocity(int X, int Y);
+
+public record Color(byte R, byte G, byte B) {
+	public Color(Random random) : this((byte)random.Next(0, 255), (byte)random.Next(0, 255), (byte)random.Next(0, 255)) { }
+}

@@ -33,11 +33,11 @@ public static class SimulationMachine {
 
 	private static Blob CalculateVelocityFromWallCollisions(Blob blob, World world) {
 		// if we hit a wall, invert the velocity
-		if (blob.Position.X < 0 || blob.Position.X > world.Width) {
+		if (blob.Position.X - blob.Radius <= 0 || blob.Position.X + blob.Radius >= world.Width) {
 			blob = blob with { Velocity = blob.Velocity with {X =  -blob.Velocity.X } };
 		}
 		
-		if (blob.Position.Y < 0 || blob.Position.Y > world.Height) {
+		if (blob.Position.Y - blob.Radius<= 0 || blob.Position.Y + blob.Radius>= world.Height) {
 			blob = blob with { Velocity = blob.Velocity with {Y =  -blob.Velocity.Y } };
 		}
 
@@ -51,7 +51,7 @@ public static class SimulationMachine {
 			// check if blobs are colliding
 			// taking into account the diameter
 			var distance = CalculateDistance(blob, otherBlob);
-			if (distance < blob.Diameter + otherBlob.Diameter) {
+			if (distance < blob.Radius + otherBlob.Radius) {
 				// collision detected
 				// calculate the new velocity based on collision
 				blob = blob with { Velocity = CalculateNewVelocity(blob, otherBlob) };
