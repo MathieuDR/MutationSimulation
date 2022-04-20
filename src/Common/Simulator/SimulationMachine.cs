@@ -67,9 +67,9 @@ public static class SimulationMachine {
 			Y = blob.Velocity.Y - otherBlob.Velocity.Y
 		};
 	}
-
+	
 	private static Position CalculatePositionFromVelocity(Position position, Velocity velocity) {
-		return position with { X = position.X + velocity.X, Y = position.Y + velocity.Y };
+		return position with { X = position.X + (int)Math.Round(velocity.X, 0), Y = position.Y + (int)Math.Round(velocity.Y, 0) };
 	}
 	
 	private static double CalculateDistance(Blob blob, Blob otherBlob) {

@@ -9,13 +9,13 @@ var seed = 45124;
 var random = new Random(seed);
 var blobs = new Blob[2];
 
-int worldWidth = 256, worldHeight = 256, maxVelocity = 5, maxDiameter = 25;
+int worldWidth = 256, worldHeight = 256, maxVelocity = 20, maxDiameter = 25;
 
 // generate random blobs
 for (var i = 0; i < blobs.Length; i++) {
 	var diameter = random.Next(10, maxDiameter);
 	blobs[i] = new Blob(new Position(random.Next(diameter, worldWidth-diameter), random.Next(diameter, worldHeight-diameter)), 
-		new Velocity(random.Next(1, maxVelocity), random.Next(1, maxVelocity)), diameter, new Color(random));
+		new Velocity(random.NextDouble() * maxVelocity, random.NextDouble() * maxVelocity), diameter, new Color(random));
 }
 
 var world = new World(worldWidth, worldHeight, blobs);
