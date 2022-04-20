@@ -24,15 +24,8 @@ public static class SkiaHelpers {
 	
 	public static void SaveToPath(this SKSurface surface, string path, SKEncodedImageFormat format = SKEncodedImageFormat.Png, int quality = 100) {
 		// create directory if it doesn't exist
-		EnsureDirectory(path);
+		FileHelper.EnsurePath(path);
 		using var stream = File.OpenWrite(path);
 		surface.SaveToStream(stream, format, quality);
-	}
-
-	private static void EnsureDirectory(string path) {
-		var dir = Path.GetDirectoryName(path);
-		if (dir is not null && !Directory.Exists(dir)) {
-			Directory.CreateDirectory(dir);
-		}
 	}
 }
