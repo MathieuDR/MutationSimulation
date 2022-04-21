@@ -5,7 +5,7 @@ namespace Graphics;
 
 public static class Giffer {
 
-	public static string CreateGif(IEnumerable<string> paths, string outputPath, int delay = 100) {
+	public static string CreateGif(IEnumerable<string> paths, string outputPath, int delay = 7) {
 		FileHelper.EnsurePath(outputPath);
 		var pathsList = paths.ToArray();
 		
