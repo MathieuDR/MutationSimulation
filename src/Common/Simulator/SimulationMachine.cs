@@ -62,10 +62,19 @@ public static class SimulationMachine {
 	}
 
 	private static Velocity CalculateNewVelocity(Blob blob, Blob otherBlob) {
+		// calculate the new velocity based on collision
 		return blob.Velocity with {
-			X = blob.Velocity.X - otherBlob.Velocity.X,
-			Y = blob.Velocity.Y - otherBlob.Velocity.Y
+			X = CalculateVelocity(blob.Diameter, otherBlob.Diameter, blob.Velocity.X, otherBlob.Velocity.X),
+			Y = CalculateVelocity(blob.Diameter, otherBlob.Diameter, blob.Velocity.Y, otherBlob.Velocity.Y)
 		};
+	}
+
+	private static double CalculateVelocity(int d1, int d2, double v1, double v2) {
+		return v1 * -1;
+	}
+
+	private static int CalculateMass(int d1, int dMult = 10) {
+		return d1*dMult;
 	}
 	
 	private static Position CalculatePositionFromVelocity(Position position, Velocity velocity) {

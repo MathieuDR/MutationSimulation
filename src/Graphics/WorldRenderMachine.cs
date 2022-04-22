@@ -30,9 +30,9 @@ public class WorldRenderMachine {
 		using var canvas = surface.Canvas;
 
 		canvas.Clear(SKColors.White);
-		DrawBorder(canvas, SKColors.DarkRed, world.Width, world.Height);
+		
 		DrawBlobs(canvas, world.Blobs);
-
+        DrawBorder(canvas, SKColors.DarkRed, world.Width, world.Height);
 
 		return SaveFrame(surface);
 	}
@@ -44,7 +44,7 @@ public class WorldRenderMachine {
 				Color = new SKColor(blob.Color.R, blob.Color.G, blob.Color.B)
 			};
 
-			canvas.DrawCircle(blob.Position.X + _borderWidth, blob.Position.Y + _borderWidth, blob.Radius, fillPaint);
+			canvas.DrawCircle(blob.Position.PixelX + _borderWidth, blob.Position.PixelY + _borderWidth, blob.Radius, fillPaint);
 		}
 	}
 
