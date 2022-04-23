@@ -18,16 +18,10 @@ public static class HexHelper {
 		return BitConverter.ToUInt16(bytes, 0).ToHex();
 	}
 	
-	public static float FromHex(this string hex) {
+	public static float ToFloat(this string hex) {
 		var i = Convert.ToInt32(hex, 16);
 		var bytes = BitConverter.GetBytes(i);
 		return BitConverter.ToSingle(bytes, 0);
-	}
-
-	public static Neuron FromHex(this string hex, NeuronType externalType) {
-		var i = Convert.ToUInt16(hex, 16);
-		var bytes = BitConverter.GetBytes(i);
-		return Neuron.FromBytes(bytes, externalType);
 	}
 
 }

@@ -150,7 +150,7 @@ public class NeuronTests {
 		
 
 		//Act
-		var neuron = hex.FromHex(externalType);
+		var neuron = Neuron.FromHex(hex, externalType);
 
 		//Assert
 		neuron.Id.Should().Be(id);

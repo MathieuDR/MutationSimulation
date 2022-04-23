@@ -96,7 +96,7 @@ public class HexTests {
 	public void FromHex_ReturnsCorrectFloat_FromHex(float expected, string value) {
 		//Arrange
 		//Act
-		var result = value.FromHex();
+		var result = value.ToFloat();
 
 		//Assert
 		result.Should().Be(expected);

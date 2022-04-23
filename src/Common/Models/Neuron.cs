@@ -12,27 +12,6 @@ public record Neuron {
 		this.Id = Id;
 		this.NeuronType = NeuronType;
 	}
-	public override string ToString() => this.ToHex();
-
-	public byte[] ToBytes() {
-		var idBytes = BitConverter.GetBytes(Id);
-		
-		// If it's an internal neuron, the leftmost bit is unset
-		if(NeuronType != NeuronType.Internal) {
-			idBytes[^1] |= TypeMask;
-		}
-		
-		return idBytes;
-	}
-	
-	
-	public static Neuron FromBytes(byte[] bytes, NeuronType externalType) {
-		var type = (bytes[^1] & TypeMask) != 0 ? externalType : NeuronType.Internal;
-		bytes[^1] &= IdAndMask;
-		var id = BitConverter.ToUInt16(bytes, 0);
-		return new Neuron(id, type);
-	}
-
 	public ushort Id {
 		get => _id;
 		init {
@@ -44,8 +23,35 @@ public record Neuron {
 	}
 
 	public NeuronType NeuronType { get; init; }
+	
 	public void Deconstruct(out ushort Id, out NeuronType NeuronType) {
 		Id = this.Id;
 		NeuronType = this.NeuronType;
+	}
+	
+	public override string ToString() => this.ToHex();
+	
+	public byte[] ToBytes() {
+		var idBytes = BitConverter.GetBytes(Id);
+		
+		// If it's an internal neuron, the leftmost bit is unset
+		if(NeuronType != NeuronType.Internal) {
+			idBytes[^1] |= TypeMask;
+		}
+		
+		return idBytes;
+	}
+
+	public static Neuron FromBytes(byte[] bytes, NeuronType externalType) {
+		var type = (bytes[^1] & TypeMask) != 0 ? externalType : NeuronType.Internal;
+		bytes[^1] &= IdAndMask;
+		var id = BitConverter.ToUInt16(bytes, 0);
+		return new Neuron(id, type);
+	}
+	
+	public static Neuron FromHex(string hex, NeuronType externalType) {
+		var i = Convert.ToUInt16(hex, 16);
+		var bytes = BitConverter.GetBytes(i);
+		return Neuron.FromBytes(bytes, externalType);
 	}
 }
