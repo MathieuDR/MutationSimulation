@@ -55,6 +55,22 @@ public class HexTests {
 		result.Should().Be(expected);
 	}
 	
+	[Theory]
+	[InlineData(0xFF, "00FF")]
+	[InlineData(0x10, "0010")]
+	[InlineData(0xA0A, "0A0A")]
+	[InlineData(0x5ABF, "5ABF")]
+	[InlineData(32768, "8000")]
+	[InlineData(65535, "FFFF")]
+	public void ToHex_ReturnsCorrectHex_FromUshort(ushort value, string expected) {
+		//Arrange
+		//Act
+		var result = value.ToHex();
+
+		//Assert
+		result.Should().Be(expected);
+	}
+	
 	// https://www.h-schmidt.net/FloatConverter/IEEE754.html
 	[Theory]
 	[InlineData(123444f, "47F11A00")]

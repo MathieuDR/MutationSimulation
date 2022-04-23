@@ -11,9 +11,11 @@ public static class HexHelper {
 
 	public static string ToHex(this int source) => source.ToString("X8");
 	public static string ToHex(this short source) => source.ToString("X4");
+	public static string ToHex(this ushort source) => source.ToString("X4");
 	public static string ToHex(this byte source) => source.ToString("X1");
 	public static string ToHex(this Neuron neuron) {
-		return neuron.ToByte().ToHex();
+		var bytes = neuron.ToBytes();
+		return BitConverter.ToUInt16(bytes, 0).ToHex();
 	}
 	
 	public static float FromHex(this string hex) {
@@ -23,8 +25,9 @@ public static class HexHelper {
 	}
 
 	public static Neuron FromHex(this string hex, NeuronType externalType) {
-		var i = Convert.ToByte(hex, 16);
-		return Neuron.FromByte(i, externalType);
+		var i = Convert.ToUInt16(hex, 16);
+		var bytes = BitConverter.GetBytes(i);
+		return Neuron.FromBytes(bytes, externalType);
 	}
 
 }
