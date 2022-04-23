@@ -62,7 +62,7 @@ public class NeuronTests {
 		var neuron = new Neuron(1, NeuronType.Input);
 
 		//Act
-		var b = neuron.ToBytes()[^1];
+		var b = neuron.GetBytes()[^1];
 
 		//Assert
 		b.Should().Be(0b10000000);
@@ -74,7 +74,7 @@ public class NeuronTests {
 		var neuron = new Neuron(1, NeuronType.Output);
 
 		//Act
-		var b = neuron.ToBytes()[^1];
+		var b = neuron.GetBytes()[^1];
 
 		//Assert
 		b.Should().Be(0b10000000);
@@ -86,7 +86,7 @@ public class NeuronTests {
 		var neuron = new Neuron(1, NeuronType.Internal);
 
 		//Act
-		var b = neuron.ToBytes()[^1];
+		var b = neuron.GetBytes()[^1];
 
 		//Assert
 		b.Should().Be(0b00000000);
@@ -101,7 +101,7 @@ public class NeuronTests {
 		var neuron = new Neuron(id, NeuronType.Internal);
 
 		//Act
-		var b = neuron.ToBytes();
+		var b = neuron.GetBytes();
 		var actual = BitConverter.ToUInt16(b, 0);
 
 		//Assert
@@ -117,7 +117,7 @@ public class NeuronTests {
 		var neuron = new Neuron(id, NeuronType.Output);
 
 		//Act
-		var b = neuron.ToBytes();
+		var b = neuron.GetBytes();
 		var actual = BitConverter.ToUInt16(b, 0);
 
 		//Assert

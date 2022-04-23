@@ -7,8 +7,8 @@ public static class SimulationMachine {
 		return world with { Blobs = Simulate(world), Tick = world.Tick + 1 };
 	}
 
-	private static Blob[] Simulate(World world) {
-		var blobs = new Blob[world.Blobs.Length];
+	private static PhysicBlob[] Simulate(World world) {
+		var blobs = new PhysicBlob[world.Blobs.Length];
 		
 		for (var i = 0; i < world.Blobs.Length; i++) {
 			var blob = world.Blobs[i];
@@ -18,54 +18,54 @@ public static class SimulationMachine {
 		return blobs;
 	}
 
-	private static Blob CalculatePosition(Blob blob, World world) {
-		blob = CalculateVelocity(blob, world);
-		blob = blob with { Position = CalculatePositionFromVelocity(blob.Position, blob.Velocity) };
+	private static PhysicBlob CalculatePosition(PhysicBlob physicBlob, World world) {
+		physicBlob = CalculateVelocity(physicBlob, world);
+		physicBlob = physicBlob with { Position = CalculatePositionFromVelocity(physicBlob.Position, physicBlob.Velocity) };
 
-		return blob;
+		return physicBlob;
 	}
 
-	private static Blob CalculateVelocity(Blob blob, World world) {
-		blob = CalculateVelocityFromBlobCollisions(blob, world.Blobs);
-		blob = CalculateVelocityFromWallCollisions(blob, world);
-		return blob;
+	private static PhysicBlob CalculateVelocity(PhysicBlob physicBlob, World world) {
+		physicBlob = CalculateVelocityFromBlobCollisions(physicBlob, world.Blobs);
+		physicBlob = CalculateVelocityFromWallCollisions(physicBlob, world);
+		return physicBlob;
 	}
 
-	private static Blob CalculateVelocityFromWallCollisions(Blob blob, World world) {
+	private static PhysicBlob CalculateVelocityFromWallCollisions(PhysicBlob physicBlob, World world) {
 		// if we hit a wall, invert the velocity
-		if (blob.Position.X - blob.Radius <= 0 || blob.Position.X + blob.Radius >= world.Width) {
-			blob = blob with { Velocity = blob.Velocity with {X =  -blob.Velocity.X } };
+		if (physicBlob.Position.X - physicBlob.Radius <= 0 || physicBlob.Position.X + physicBlob.Radius >= world.Width) {
+			physicBlob = physicBlob with { Velocity = physicBlob.Velocity with {X =  -physicBlob.Velocity.X } };
 		}
 		
-		if (blob.Position.Y - blob.Radius<= 0 || blob.Position.Y + blob.Radius>= world.Height) {
-			blob = blob with { Velocity = blob.Velocity with {Y =  -blob.Velocity.Y } };
+		if (physicBlob.Position.Y - physicBlob.Radius<= 0 || physicBlob.Position.Y + physicBlob.Radius>= world.Height) {
+			physicBlob = physicBlob with { Velocity = physicBlob.Velocity with {Y =  -physicBlob.Velocity.Y } };
 		}
 
-		return blob;
+		return physicBlob;
 	}
 
-	private static Blob CalculateVelocityFromBlobCollisions(Blob blob, Blob[] blobs) {
+	private static PhysicBlob CalculateVelocityFromBlobCollisions(PhysicBlob physicBlob, PhysicBlob[] blobs) {
 		foreach (var otherBlob in blobs) {
-			if (blob == otherBlob) continue;
+			if (physicBlob == otherBlob) continue;
 
 			// check if blobs are colliding
 			// taking into account the diameter
-			var distance = CalculateDistance(blob, otherBlob);
-			if (distance < blob.Radius + otherBlob.Radius) {
+			var distance = CalculateDistance(physicBlob, otherBlob);
+			if (distance < physicBlob.Radius + otherBlob.Radius) {
 				// collision detected
 				// calculate the new velocity based on collision
-				blob = blob with { Velocity = CalculateNewVelocity(blob, otherBlob) };
+				physicBlob = physicBlob with { Velocity = CalculateNewVelocity(physicBlob, otherBlob) };
 			}
 		}
 
-		return blob;
+		return physicBlob;
 	}
 
-	private static Velocity CalculateNewVelocity(Blob blob, Blob otherBlob) {
+	private static Velocity CalculateNewVelocity(PhysicBlob physicBlob, PhysicBlob otherPhysicBlob) {
 		// calculate the new velocity based on collision
-		return blob.Velocity with {
-			X = CalculateVelocity(blob.Diameter, otherBlob.Diameter, blob.Velocity.X, otherBlob.Velocity.X),
-			Y = CalculateVelocity(blob.Diameter, otherBlob.Diameter, blob.Velocity.Y, otherBlob.Velocity.Y)
+		return physicBlob.Velocity with {
+			X = CalculateVelocity(physicBlob.Diameter, otherPhysicBlob.Diameter, physicBlob.Velocity.X, otherPhysicBlob.Velocity.X),
+			Y = CalculateVelocity(physicBlob.Diameter, otherPhysicBlob.Diameter, physicBlob.Velocity.Y, otherPhysicBlob.Velocity.Y)
 		};
 	}
 
@@ -81,7 +81,7 @@ public static class SimulationMachine {
 		return position with { X = position.X + (int)Math.Round(velocity.X, 0), Y = position.Y + (int)Math.Round(velocity.Y, 0) };
 	}
 	
-	private static double CalculateDistance(Blob blob, Blob otherBlob) {
-		return Math.Sqrt(Math.Pow(blob.Position.X - otherBlob.Position.X, 2) + Math.Pow(blob.Position.Y - otherBlob.Position.Y, 2));
+	private static double CalculateDistance(PhysicBlob physicBlob, PhysicBlob otherPhysicBlob) {
+		return Math.Sqrt(Math.Pow(physicBlob.Position.X - otherPhysicBlob.Position.X, 2) + Math.Pow(physicBlob.Position.Y - otherPhysicBlob.Position.Y, 2));
 	}
 }

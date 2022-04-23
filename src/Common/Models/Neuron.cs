@@ -28,10 +28,10 @@ public record Neuron {
 		Id = this.Id;
 		NeuronType = this.NeuronType;
 	}
-	
-	public override string ToString() => this.ToHex();
-	
-	public byte[] ToBytes() {
+
+	public override string ToString() => BitConverter.ToUInt16(GetBytes(), 0).ToHex();
+
+	public byte[] GetBytes() {
 		var idBytes = BitConverter.GetBytes(Id);
 		
 		// If it's an internal neuron, the leftmost bit is unset

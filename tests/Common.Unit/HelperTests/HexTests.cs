@@ -22,6 +22,23 @@ public class HexTests {
 	}
 	
 	[Theory]
+	[InlineData(0xFF, "00000000000000FF")]
+	[InlineData(0x10, "0000000000000010")]
+	[InlineData(0xA0A, "0000000000000A0A")]
+	[InlineData(0x12345ABF, "0000000012345ABF")]
+	[InlineData(-5, "FFFFFFFFFFFFFFFB")]
+	[InlineData(-523123, "FFFFFFFFFFF8048D")]
+	[InlineData(long.MaxValue, "7FFFFFFFFFFFFFFF")]
+	public void ToHex_ReturnsCorrectHex_FromLong(long value, string expected) {
+		//Arrange
+		//Act
+		var result = value.ToHex();
+
+		//Assert
+		result.Should().Be(expected);
+	}
+	
+	[Theory]
 	[InlineData(0xF, "F")]
 	[InlineData(0x0, "0")]
 	[InlineData(0xA, "A")]

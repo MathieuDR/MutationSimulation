@@ -85,7 +85,7 @@ public class GenomeDecodingTests {
 		var genome = Genome.FromHex(hex);
 		
 		//Assert
-		genome.Weight.Should().Be(3.5f);
+		genome.Weight.Should().Be(3.5f/(float.MaxValue/4));
 	}
 	
 	[Fact]
@@ -97,6 +97,6 @@ public class GenomeDecodingTests {
 		var genome = Genome.FromHex(hex);
 
 		//Assert
-		genome.Weight.Should().Be(6.900000095367431640625f);
+		genome.Weight.Should().Be(6.900000095367431640625f/(float.MaxValue/4));
 	}
 }

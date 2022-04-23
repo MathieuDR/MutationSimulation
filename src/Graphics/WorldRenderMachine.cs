@@ -37,7 +37,7 @@ public class WorldRenderMachine {
 		return SaveFrame(surface);
 	}
 
-	private void DrawBlobs(SKCanvas canvas, Blob[] worldBlobs) {
+	private void DrawBlobs(SKCanvas canvas, PhysicBlob[] worldBlobs) {
 		foreach (var blob in worldBlobs) {
 			var fillPaint = new SKPaint {
 				Style = SKPaintStyle.Fill,

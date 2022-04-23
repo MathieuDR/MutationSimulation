@@ -1,7 +1,7 @@
 namespace Common.Models; 
 
-public record Blob(Position Position, Velocity Velocity, int Diameter, Color Color) {
-	public Blob(Random random, int maxVelocity, int maxDiameter, int worldWidth, int worldHeight) : 
+public record PhysicBlob(Position Position, Velocity Velocity, int Diameter, Color Color) {
+	public PhysicBlob(Random random, int maxVelocity, int maxDiameter, int worldWidth, int worldHeight) : 
 		this( new(0, 0), new Velocity(random, maxVelocity), random.Next(5, Math.Max(6, maxDiameter)), new Color(random)) {
 		Position = new Position(random, worldWidth, worldHeight, Diameter);
 	}

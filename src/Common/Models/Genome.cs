@@ -13,7 +13,16 @@ public record Genome {
 		this.Destination = Destination;
 		this.Weight = Weight;
 	}
-	public override string ToString() => $"{Source}{Destination}{Weight.ToHex()}";
+
+	public override string ToString() => BitConverter.ToInt64( GetBytes(),0).ToHex();
+
+	public byte[] GetBytes() {
+		return
+			BitConverter.GetBytes(Weight*Divider)
+			.Concat(Destination.GetBytes())
+			.Concat(Source.GetBytes())
+			.ToArray();
+	}
 	
 	public static Genome FromHex(string hex) {
 		// first 2 bytes are source neuron

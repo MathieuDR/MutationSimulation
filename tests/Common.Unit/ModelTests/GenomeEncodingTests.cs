@@ -28,9 +28,9 @@ public class GenomeEncodingTests {
 		var n1 = new Neuron(1, NeuronType.Input);
 		var n2 = new Neuron(2, NeuronType.Output);
 		var genome = new Genome(n1, n2, 2f);
-		var firstPart = n1.ToHex();
-		var secondPart = n2.ToHex();
-		var weightInHex = genome.Weight.ToHex();
+		var firstPart = n1.ToString();
+		var secondPart = n2.ToString();
+		var weightInHex = (genome.Weight * (float.MaxValue/4)).ToHex();
 		
 		var expectedHex = firstPart + secondPart + weightInHex;
 
@@ -47,9 +47,9 @@ public class GenomeEncodingTests {
 		var n1 = new Neuron(1, NeuronType.Input);
 		var n2 = new Neuron(2, NeuronType.Internal);
 		var genome = new Genome(n1, n2, 3f);
-		var firstPart = n1.ToHex();
-		var secondPart = n2.ToHex();
-		var weightInHex = genome.Weight.ToHex();
+		var firstPart = n1.ToString();
+		var secondPart = n2.ToString();
+		var weightInHex = (genome.Weight * (float.MaxValue/4)).ToHex();
 		
 		var expectedHex = firstPart + secondPart + weightInHex;
 
