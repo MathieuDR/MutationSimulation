@@ -21,6 +21,36 @@ public class HexTests {
 		result.Should().Be(expected);
 	}
 	
+	[Theory]
+	[InlineData(0xF, "F")]
+	[InlineData(0x0, "0")]
+	[InlineData(0xA, "A")]
+	[InlineData(0x4, "4")]
+	public void ToHex_ReturnsCorrectHex_FromByte(byte value, string expected) {
+		//Arrange
+		//Act
+		var result = value.ToHex();
+
+		//Assert
+		result.Should().Be(expected);
+	}
+	
+	[Theory]
+	[InlineData(0xFF, "00FF")]
+	[InlineData(0x10, "0010")]
+	[InlineData(0xA0A, "0A0A")]
+	[InlineData(0x5ABF, "5ABF")]
+	[InlineData(-5, "FFFB")]
+	[InlineData(-523, "FFF8048D")]
+	public void ToHex_ReturnsCorrectHex_FromShort(short value, string expected) {
+		//Arrange
+		//Act
+		var result = value.ToHex();
+
+		//Assert
+		result.Should().Be(expected);
+	}
+	
 	// https://www.h-schmidt.net/FloatConverter/IEEE754.html
 	[Theory]
 	[InlineData(123444f, "47F11A00")]
