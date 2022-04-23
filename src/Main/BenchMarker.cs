@@ -6,7 +6,6 @@ namespace Main;
 
 [MemoryDiagnoser(false)]
 public class BenchMarker {
-
 	public Neuron Neuron => new Neuron(4, NeuronType.Internal);
 	
 	[Benchmark]

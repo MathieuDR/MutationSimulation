@@ -15,6 +15,22 @@ public record GenomeSequence {
 	public string? HexSequence { get; init; }
 	public string LeftOverSequence { get; init; }
 
+	public byte[] GetBytes() {
+		var bytes = new List<byte>();
+		for (int i = Genomes.Length - 1; i >= 0; i--) {
+			bytes.AddRange(Genomes[i].GetBytes());
+		}
+
+		return bytes.ToArray();
+	}
+	
+	private byte[] GetReversedBytes() {
+		return Genomes.SelectMany(x => x.GetBytes()).ToArray();
+	}
+	
+	// Use reverse since ToHexString uses the first byte as the most significant byte.
+	public override string ToString() => Convert.ToHexString(GetReversedBytes());
+
 	public static GenomeSequence FromHex(string hex) {
 		var genomes = Enumerable.Range(0, hex.Length / GenomeSequenceLength)
 			.Select(i => hex.Substring(i * GenomeSequenceLength, GenomeSequenceLength))
