@@ -26,6 +26,10 @@ public class HexTests {
 	[InlineData(0x0, "0")]
 	[InlineData(0xA, "A")]
 	[InlineData(0x4, "4")]
+	[InlineData(0xFF, "FF")]
+	[InlineData(0x20, "20")]
+	[InlineData(0xA0, "A0")]
+	[InlineData(0x49, "49")]
 	public void ToHex_ReturnsCorrectHex_FromByte(byte value, string expected) {
 		//Arrange
 		//Act
@@ -41,7 +45,7 @@ public class HexTests {
 	[InlineData(0xA0A, "0A0A")]
 	[InlineData(0x5ABF, "5ABF")]
 	[InlineData(-5, "FFFB")]
-	[InlineData(-523, "FFF8048D")]
+	[InlineData(-523, "FDF5")]
 	public void ToHex_ReturnsCorrectHex_FromShort(short value, string expected) {
 		//Arrange
 		//Act

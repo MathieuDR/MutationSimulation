@@ -11,22 +11,19 @@ public record Neuron {
 	}
 	public override string ToString() => this.ToHex();
 
-	public Byte[] ToBytes() {
+	public byte ToByte() {
 		// If it's an internal neuron, the leftmost bit is unset
 		if(NeuronType != NeuronType.Internal) {
-			return new []{(byte)(Id | 0b1000_0000)};
+			return (byte)(Id | 0b1000_0000);
 		}
 		
-		return new []{Id};
+		return Id;
 	}
 	
-	public static Neuron FromBytes(byte[] bytes, NeuronType externalType) {
-		if(bytes.Length != 1) throw new ArgumentException("Invalid byte array length");
-		
-		byte @byte = bytes[0];
+	
+	public static Neuron FromByte(byte @byte, NeuronType externalType) {
 		var type = (@byte & 0b1000_0000) != 0 ? externalType : NeuronType.Internal;
-		
-		byte id = (byte)(@byte & 0b0111_1111);
+		var id = (byte)(@byte & 0b0111_1111);
 		return new Neuron(id, type);
 	}
 
