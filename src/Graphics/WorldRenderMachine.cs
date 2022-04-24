@@ -35,7 +35,7 @@ public class WorldRenderMachine {
 
 		canvas.Clear(SKColors.White);
 
-		DrawBlobs(canvas, world.Blobs);
+		DrawBlobs(canvas, world.Creatures);
 		DrawBorder(canvas, SKColors.DarkRed, world.Width, world.Height);
 
 		return SaveFrame(surface);

@@ -36,7 +36,7 @@ public record BouncingCreature(Position Position, Velocity Velocity, int Diamete
 	}
 
 	private static BouncingCreature CalculateVelocity(BouncingCreature bouncingCreature, World world) {
-		var otherBouncers = world.Blobs.Where(b=> b is BouncingCreature).Cast<BouncingCreature>();
+		var otherBouncers = world.Creatures.Where(b=> b is BouncingCreature).Cast<BouncingCreature>();
 		bouncingCreature = CalculateVelocityFromBlobCollisions(bouncingCreature, otherBouncers);
 		bouncingCreature = CalculateVelocityFromWallCollisions(bouncingCreature, world);
 		return bouncingCreature;
