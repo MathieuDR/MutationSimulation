@@ -13,12 +13,12 @@ var seed = 8923478;
 var watch = new Stopwatch();
 var random = new Random(seed);
 
-int worldWidth = 256, worldHeight = 256;
+int worldWidth = 150, worldHeight = 150;
 
-ICreature[] blobs =IntegerRange.FromMinMax(1, 7, 1).Select(_ => new BouncingCreature(random, 4, 20, worldWidth, worldHeight)).ToArray();
+var blobs = IntegerRange.FromMinMax(1, 7, 1).Select(_ => new BouncingCreature(random, 4, 20, worldWidth, worldHeight) as ICreature).ToArray();
 
 var world = new World(worldWidth, worldHeight, blobs);
-var renderMachine = new WorldRenderMachine("output", "world", randomSeed: seed, multiplier: 2);
+var renderMachine = new WorldRenderMachine("output", "world", randomSeed: seed);
 
 var images = new List<string>();
 watch.Start();
