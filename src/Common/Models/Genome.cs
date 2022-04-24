@@ -8,7 +8,7 @@ public record Genome {
 	private readonly float _weight;
 	private const float Divider = float.MaxValue / 4;
 	
-	public static float GetWeightInRange(float weight) {
+	public static float WeightToFloat(float weight) {
 		if(weight is < -4f or > 4f) {
 			throw new ArgumentOutOfRangeException(nameof(weight), "Weight must be in range [-4, 4]");
 		}

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Common.Models;
 using FluentAssertions;
@@ -73,9 +74,6 @@ public class GenomeSequenceTests {
 		var genome1Hex = genome.ToString();
 		var genome2Hex = genome2.ToString();
 		
-		//8032 0384 C396 0000 - 0384 0384 42C8 0000
-		//0000 96C3 8403 3280 - 0000 C842 8403 8403
-		
 
 		//Act
 		var hex = sequence.ToString();
@@ -93,9 +91,6 @@ public class GenomeSequenceTests {
 		var sequence = new GenomeSequence(new[] { genome });
 		var genome1Hex = genome.ToString();
 		
-		//8032 0384 C396 0000 - 0384 0384 42C8 0000
-		//0000 96C3 8403 3280 - 0000 C842 8403 8403
-		
 
 		//Act
 		var hex = sequence.ToString();
@@ -103,4 +98,45 @@ public class GenomeSequenceTests {
 		//Assert
 		hex.Should().Be(genome1Hex);
 	}
+	
+	[Theory]
+	[MemberData(nameof(Sequences))]
+	public void FromHex_ShouldResultInSameGenomeSequence_WhenGivenGenomeSequence(GenomeSequence sequence) {
+		//Arrange
+		var hex = sequence.ToString();
+
+		//Act
+		var result = GenomeSequence.FromHex(hex);
+		
+		//Assert
+		result.Should().BeEquivalentTo(sequence, options => options.Excluding(x => x.HexSequence));
+	}
+	
+	public static Neuron[] Neurons =>
+		new Neuron[]
+		{
+			new (1, NeuronType.Input), 
+			new (1, NeuronType.Output),
+			new (1, NeuronType.Internal),
+			new (2, NeuronType.Input),
+			new (2, NeuronType.Output)
+		};
+	
+	public static Genome[] Genomes =>
+		new Genome[]
+		{
+			new(Neurons[0], Neurons[2], Genome.WeightToFloat(3f)),
+			new(Neurons[2], Neurons[1], Genome.WeightToFloat(3f)),
+			new(Neurons[2], Neurons[4], Genome.WeightToFloat(-2.2f)),
+			new(Neurons[3], Neurons[2], Genome.WeightToFloat(-0.4f)),
+		};
+	
+	public static IEnumerable<object[]> Sequences =>
+		new List<object[]>
+		{
+			new object[] { new GenomeSequence(new []{Genomes[0], Genomes[1],Genomes[2] }) },
+			new object[] { new GenomeSequence(new []{Genomes[3], Genomes[1],Genomes[2] }) },
+			new object[] { new GenomeSequence(new []{Genomes[1],Genomes[2] }) },
+		};
+
 }

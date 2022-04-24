@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Diagnostics;
+using Common.Interfaces;
 using Common.Models;
 using Common.Simulator;
 using Graphics;
@@ -12,12 +13,12 @@ var seed = 8923478;
 var watch = new Stopwatch();
 var random = new Random(seed);
 
-int worldWidth = 200, worldHeight = 100;
+int worldWidth = 256, worldHeight = 256;
 
-var blobs = IntegerRange.FromMinMax(1, 7, 1).Select(_ => new PhysicBlob(random, 4, 20, worldWidth, worldHeight)).ToArray();
+ICreature[] blobs =IntegerRange.FromMinMax(1, 7, 1).Select(_ => new BouncingCreature(random, 4, 20, worldWidth, worldHeight)).ToArray();
 
 var world = new World(worldWidth, worldHeight, blobs);
-var renderMachine = new WorldRenderMachine("output", "world", randomSeed: seed);
+var renderMachine = new WorldRenderMachine("output", "world", randomSeed: seed, multiplier: 2);
 
 var images = new List<string>();
 watch.Start();

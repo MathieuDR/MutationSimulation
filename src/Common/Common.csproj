@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="LanguageExt.Core" Version="4.0.4" />
+      <PackageReference Include="SkiaSharp" Version="2.80.3" />
     </ItemGroup>
 
 </Project>

@@ -5,10 +5,9 @@ namespace Common.Models;
 public record GenomeSequence {
 	private readonly Genome[] _genomes;
 
-	public GenomeSequence(Genome[] Genomes, string? HexSequence = null, string? LeftOverSequence = null) {
+	public GenomeSequence(Genome[] Genomes, string? HexSequence = null) {
 		this.Genomes = Genomes;
 		this.HexSequence = HexSequence;
-		this.LeftOverSequence = LeftOverSequence;
 	}
 
 	// Genomes exist out of 2 neurons and a weight in float.
@@ -28,7 +27,6 @@ public record GenomeSequence {
 	}
 
 	public string? HexSequence { get; init; }
-	public string? LeftOverSequence { get; init; }
 
 	public byte[] GetBytes() {
 		return Genomes.SelectMany(x => x.GetBytes()).ToArray();
@@ -42,13 +40,11 @@ public record GenomeSequence {
 			.Select(Genome.FromHex)
 			.ToArray();
 		
-		var leftOver = hex.Substring(genomes.Length * GenomeSequenceLength);
-		return new GenomeSequence(genomes, hex, leftOver);
+		return new GenomeSequence(genomes, hex);
 	}
 
-	public void Deconstruct(out Genome[] Genomes, out string? HexSequence, out string LeftOverSequence) {
+	public void Deconstruct(out Genome[] Genomes, out string? HexSequence) {
 		Genomes = this.Genomes;
 		HexSequence = this.HexSequence;
-		LeftOverSequence = this.LeftOverSequence;
 	}
 };
