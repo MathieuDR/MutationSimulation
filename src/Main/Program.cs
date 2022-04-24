@@ -1,12 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Diagnostics;
-using BenchmarkDotNet.Running;
 using Common.Models;
 using Common.Simulator;
 using Graphics;
 using LanguageExt;
-using Main;
 
 // var mark = BenchmarkRunner.Run<BenchMarker>();
 

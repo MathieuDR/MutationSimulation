@@ -29,7 +29,7 @@ public record Neuron {
 		NeuronType = this.NeuronType;
 	}
 
-	public override string ToString() => BitConverter.ToUInt16(GetBytes(), 0).ToHex();
+	public override string ToString() => GetBytes().ToHex();
 
 	public byte[] GetBytes() {
 		var idBytes = BitConverter.GetBytes(Id);
@@ -49,9 +49,8 @@ public record Neuron {
 		return new Neuron(id, type);
 	}
 	
-	public static Neuron FromHex(string hex, NeuronType externalType) {
-		var i = Convert.ToUInt16(hex, 16);
-		var bytes = BitConverter.GetBytes(i);
-		return Neuron.FromBytes(bytes, externalType);
+	public static Neuron FromHex(string hex, NeuronType externalType) {	
+		var bytes = Convert.FromHexString(hex);
+		return FromBytes(bytes, externalType);
 	}
 }

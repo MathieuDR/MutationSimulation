@@ -28,11 +28,11 @@ public class GenomeEncodingTests {
 		var n1 = new Neuron(1, NeuronType.Input);
 		var n2 = new Neuron(2, NeuronType.Output);
 		var genome = new Genome(n1, n2, 2f);
-		var firstPart = n1.ToString();
-		var secondPart = n2.ToString();
+		var n1Hex = n1.ToString();
+		var n2Hex = n2.ToString();
 		var weightInHex = (genome.Weight * (float.MaxValue/4)).ToHex();
 		
-		var expectedHex = firstPart + secondPart + weightInHex;
+		var expectedHex = n1Hex + n2Hex + weightInHex;
 
 		//Act
 		var hex = genome.ToString();
@@ -47,11 +47,11 @@ public class GenomeEncodingTests {
 		var n1 = new Neuron(1, NeuronType.Input);
 		var n2 = new Neuron(2, NeuronType.Internal);
 		var genome = new Genome(n1, n2, 3f);
-		var firstPart = n1.ToString();
-		var secondPart = n2.ToString();
+		var n1Hex = n1.ToString();
+		var n2Hex = n2.ToString();
 		var weightInHex = (genome.Weight * (float.MaxValue/4)).ToHex();
 		
-		var expectedHex = firstPart + secondPart + weightInHex;
+		var expectedHex = n1Hex + n2Hex + weightInHex;
 
 		//Act
 		var hex = genome.ToString();
@@ -66,11 +66,11 @@ public class GenomeEncodingTests {
 		var n1 = new Neuron(50, NeuronType.Input);
 		var n2 = new Neuron(900, NeuronType.Internal);
 		var genome = new Genome(n1, n2, -300f);
-		var firstPart = "8032";
-		var secondPart = "0384";
-		var weightInHex = "C3960000";
+		var n1Hex = "3280";
+		var n2Hex = "8403";
+		var weightInHex = "000096C3";
 		
-		var expectedHex = firstPart + secondPart + weightInHex;
+		var expectedHex =  n1Hex + n2Hex + weightInHex;
 
 		//Act
 		var hex = genome.ToString();
@@ -85,11 +85,11 @@ public class GenomeEncodingTests {
 		var n1 = new Neuron(50, NeuronType.Input);
 		var n2 = new Neuron(900, NeuronType.Output);
 		var genome = new Genome(n1, n2, -300f);
-		var firstPart = "8032";
-		var secondPart = "8384";
-		var weightInHex = "C3960000";
+		var n1Hex = "3280";
+		var n2Hex = "8483";
+		var weightInHex = "000096C3";
 		
-		var expectedHex = firstPart + secondPart + weightInHex;
+		var expectedHex =  n1Hex + n2Hex + weightInHex;
 
 		//Act
 		var hex = genome.ToString();

@@ -125,10 +125,11 @@ public class NeuronTests {
 	}
 	
 	[Theory]
-	[InlineData(0x7F, NeuronType.Internal, "007F")]
-	[InlineData(0x70, NeuronType.Internal, "0070")]
-	[InlineData(0x79, NeuronType.Input, "8079")]
-	[InlineData(0x79, NeuronType.Output, "8079")]
+	[InlineData(0x7F, NeuronType.Internal, "7F00")]
+	[InlineData(0x70, NeuronType.Internal, "7000")]
+	[InlineData(0x79, NeuronType.Input, "7980")]
+	[InlineData(0x79, NeuronType.Output, "7980")]
+	[InlineData(0x79, NeuronType.Internal, "7900")]
 	public void ToString_ShouldHaveCorrectHexValue_ForValidParams(ushort id, NeuronType type, string expected) {
 		//Arrange
 		var neuron = new Neuron(id, type);
@@ -141,13 +142,12 @@ public class NeuronTests {
 	}
 	
 	[Theory]
-	[InlineData(0x7F, NeuronType.Internal, NeuronType.Input, "7F")]
-	[InlineData(0x70, NeuronType.Internal, NeuronType.Input,"70")]
-	[InlineData(0x79, NeuronType.Input, NeuronType.Input,"8079")]
-	[InlineData(0x79, NeuronType.Output, NeuronType.Output,"8079")]
+	[InlineData(0x7F, NeuronType.Internal, NeuronType.Input, "7F00")]
+	[InlineData(0x70, NeuronType.Internal, NeuronType.Input,"7000")]
+	[InlineData(0x79, NeuronType.Input, NeuronType.Input,"7980")]
+	[InlineData(0x79, NeuronType.Output, NeuronType.Output,"7980")]
 	public void FromHex_ShouldHaveCorrectNeuron_ForValidHex(ushort id, NeuronType type,NeuronType externalType ,string hex) {
 		//Arrange
-		
 
 		//Act
 		var neuron = Neuron.FromHex(hex, externalType);
@@ -155,6 +155,23 @@ public class NeuronTests {
 		//Assert
 		neuron.Id.Should().Be(id);
 		neuron.NeuronType.Should().Be(type);
+	}
+	
+	[Theory]
+	[InlineData(0x7F, NeuronType.Internal, NeuronType.Input)]
+	[InlineData(0x70, NeuronType.Internal, NeuronType.Input)]
+	[InlineData(0x79, NeuronType.Input, NeuronType.Input)]
+	[InlineData(0x79, NeuronType.Output, NeuronType.Output)]
+	public void FromHex_ShouldHaveCorrectNeuron_WhenEncodedBefore(ushort id, NeuronType type, NeuronType externalType) {
+		//Arrange
+		var original = new Neuron(id, type);
+		var hex = original.ToString();
+
+		//Act
+		var neuron = Neuron.FromHex(hex, externalType);
+
+		//Assert
+		neuron.Should().Be(original);
 	}
 	
 	

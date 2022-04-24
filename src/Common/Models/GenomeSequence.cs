@@ -1,7 +1,11 @@
+using Common.Helpers;
+
 namespace Common.Models;
 
 public record GenomeSequence {
-	public GenomeSequence(Genome[] Genomes, string? HexSequence, string LeftOverSequence) {
+	private readonly Genome[] _genomes;
+
+	public GenomeSequence(Genome[] Genomes, string? HexSequence = null, string? LeftOverSequence = null) {
 		this.Genomes = Genomes;
 		this.HexSequence = HexSequence;
 		this.LeftOverSequence = LeftOverSequence;
@@ -11,25 +15,26 @@ public record GenomeSequence {
 	// Together that are 8 bytes.
 	// The hex string is split into 8 byte chunks, which is 16 chars.
 	private const int GenomeSequenceLength = 16;
-	public Genome[] Genomes { get; init; }
+
+	public Genome[] Genomes {
+		get => _genomes;
+		init {
+			if (value.Length == 0) {
+				throw new ArgumentException("Genomes must not be empty.");
+			}
+			
+			_genomes = value;
+		}
+	}
+
 	public string? HexSequence { get; init; }
-	public string LeftOverSequence { get; init; }
+	public string? LeftOverSequence { get; init; }
 
 	public byte[] GetBytes() {
-		var bytes = new List<byte>();
-		for (int i = Genomes.Length - 1; i >= 0; i--) {
-			bytes.AddRange(Genomes[i].GetBytes());
-		}
-
-		return bytes.ToArray();
-	}
-	
-	private byte[] GetReversedBytes() {
 		return Genomes.SelectMany(x => x.GetBytes()).ToArray();
 	}
 	
-	// Use reverse since ToHexString uses the first byte as the most significant byte.
-	public override string ToString() => Convert.ToHexString(GetReversedBytes());
+	public override string ToString() =>  GetBytes().ToHex();
 
 	public static GenomeSequence FromHex(string hex) {
 		var genomes = Enumerable.Range(0, hex.Length / GenomeSequenceLength)
