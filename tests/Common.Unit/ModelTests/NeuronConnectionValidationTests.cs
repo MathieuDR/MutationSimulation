@@ -5,19 +5,19 @@ using Xunit;
 
 namespace Common.Unit.ModelTests; 
 
-public class GenomeValidationTests {
+public class NeuronConnectionValidationTests {
 
 	[Fact]
-	public void Ctor_ShouldCreateGenome_WhenGivenValidParams() {
+	public void Ctor_ShouldCreateNeuronConnection_WhenGivenValidParams() {
 		//Arrange
 		var n1 = new Neuron(1, NeuronType.Input);
 		var n2 = new Neuron(2, NeuronType.Internal);
 
 		//Act
-		var genome = new Genome(n1, n2, float.MaxValue);
+		var neuronConnection = new NeuronConnection(n1, n2, float.MaxValue);
 
 		//Assert
-		genome.Should().NotBeNull();
+		neuronConnection.Should().NotBeNull();
 	}
 
 	[Theory]
@@ -32,7 +32,7 @@ public class GenomeValidationTests {
 		var n2 = new Neuron(2, neuronType2);
 
 		//Act
-		Action act = () => new Genome(n1, n2, 1f);
+		Action act = () => new NeuronConnection(n1, n2, 1f);
 
 		//Assert
 		act.Should().Throw<ArgumentException>();
@@ -48,13 +48,13 @@ public class GenomeValidationTests {
 		//Arrange
 		var n1 = new Neuron(1, NeuronType.Input);
 		var n2 = new Neuron(2, NeuronType.Internal);
-		var genome = new Genome(n1, n2, 1f);
+		var neuronConnection = new NeuronConnection(n1, n2, 1f);
 		
 		var n3 = new Neuron(1, neuronType1);
 		var n4 = new Neuron(2, neuronType2);
 
 		//Act
-		Action act = () => genome = genome with {Source = n3, Destination = n4};
+		Action act = () => neuronConnection = neuronConnection with {Source = n3, Destination = n4};
 
 		//Assert
 		act.Should().Throw<ArgumentException>();
@@ -70,7 +70,7 @@ public class GenomeValidationTests {
 		var n2 = new Neuron(2, neuronType2);
 
 		//Act
-		Action act = () => new Genome(n1, n2, 1f);
+		Action act = () => new NeuronConnection(n1, n2, 1f);
 
 		//Assert
 		act.Should().NotThrow();
@@ -84,13 +84,13 @@ public class GenomeValidationTests {
 		//Arrange
 		var n1 = new Neuron(1, NeuronType.Input);
 		var n2 = new Neuron(2, NeuronType.Internal);
-		var genome = new Genome(n1, n2, 1f);
+		var neuronConnection = new NeuronConnection(n1, n2, 1f);
 		
 		var n3 = new Neuron(1, neuronType1);
 		var n4 = new Neuron(2, neuronType2);
 
 		//Act
-		Action act = () => genome = genome with {Source = n3, Destination = n4};
+		Action act = () => neuronConnection = neuronConnection with {Source = n3, Destination = n4};
 
 		//Assert
 		act.Should().NotThrow();
@@ -109,10 +109,10 @@ public class GenomeValidationTests {
 		var n2 = new Neuron(2, NeuronType.Internal);
 
 		//Act
-		var genome = new Genome(n1, n2, weight);
+		var neuronConnection = new NeuronConnection(n1, n2, weight);
 
 		//Assert
-		genome.Weight.Should().BeInRange(-4f, 4f);
+		neuronConnection.Weight.Should().BeInRange(-4f, 4f);
 	}
 	
 	[Theory]
@@ -126,13 +126,13 @@ public class GenomeValidationTests {
 		//Arrange
 		var n1 = new Neuron(1, NeuronType.Input);
 		var n2 = new Neuron(2, NeuronType.Internal);
-		var genome = new Genome(n1, n2, 1f);
+		var neuronConnection = new NeuronConnection(n1, n2, 1f);
 
 		//Act
-		genome = genome with { Weight = weight };
+		neuronConnection = neuronConnection with { Weight = weight };
 
 		//Assert
-		genome.Weight.Should().BeInRange(-4f, 4f);
+		neuronConnection.Weight.Should().BeInRange(-4f, 4f);
 	}
 
 	[Fact]
@@ -142,9 +142,9 @@ public class GenomeValidationTests {
 		var n2 = new Neuron(2, NeuronType.Internal);
 
 		//Act
-		var genome = new Genome(n1, n2, 0f);
+		var neuronConnection = new NeuronConnection(n1, n2, 0f);
 
 		//Assert
-		genome.Weight.Should().Be(0f);
+		neuronConnection.Weight.Should().Be(0f);
 	}
 }

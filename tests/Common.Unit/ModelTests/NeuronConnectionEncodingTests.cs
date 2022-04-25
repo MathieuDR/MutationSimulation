@@ -6,15 +6,15 @@ using Xunit;
 
 namespace Common.Unit.ModelTests; 
 
-public class GenomeEncodingTests {
+public class NeuronConnectionEncodingTests {
 	
 	[Fact]
-	public void ToString_ShouldBe16CharsLong_WhenGivenValidGenome() {
+	public void ToString_ShouldBe16CharsLong_WhenGivenValidNeuronConnection() {
 		//Arrange
-		var genome = new Genome(new Neuron(1, NeuronType.Input), new Neuron(2, NeuronType.Output), 2f);
+		var neuronConnection = new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(2, NeuronType.Output), 2f);
 
 		//Act
-		var hex = genome.ToString();
+		var hex = neuronConnection.ToString();
 		
 		//Assert
 		// Neuron is short (2bytes): 4 Char
@@ -23,49 +23,49 @@ public class GenomeEncodingTests {
 	}
 	
 	[Fact]
-	public void ToString_ShouldProvideCorrectOrderHexString_WhenGivenValidInputOutputGenome() {
+	public void ToString_ShouldProvideCorrectOrderHexString_WhenGivenValidInputOutputNeuronConnection() {
 		//Arrange
 		var n1 = new Neuron(1, NeuronType.Input);
 		var n2 = new Neuron(2, NeuronType.Output);
-		var genome = new Genome(n1, n2, 2f);
+		var neuronConnection = new NeuronConnection(n1, n2, 2f);
 		var n1Hex = n1.ToString();
 		var n2Hex = n2.ToString();
-		var weightInHex = (genome.Weight * (float.MaxValue/4)).ToHex();
+		var weightInHex = (neuronConnection.Weight * (float.MaxValue/4)).ToHex();
 		
 		var expectedHex = n1Hex + n2Hex + weightInHex;
 
 		//Act
-		var hex = genome.ToString();
+		var hex = neuronConnection.ToString();
 		
 		//Assert
 		hex.Should().Be(expectedHex);
 	}
 	
 	[Fact]
-	public void ToString_ShouldProvideCorrectOrderHexString_WhenGivenValidInputInternalGenome() {
+	public void ToString_ShouldProvideCorrectOrderHexString_WhenGivenValidInputInternalNeuronConnection() {
 		//Arrange
 		var n1 = new Neuron(1, NeuronType.Input);
 		var n2 = new Neuron(2, NeuronType.Internal);
-		var genome = new Genome(n1, n2, 3f);
+		var neuronConnection = new NeuronConnection(n1, n2, 3f);
 		var n1Hex = n1.ToString();
 		var n2Hex = n2.ToString();
-		var weightInHex = (genome.Weight * (float.MaxValue/4)).ToHex();
+		var weightInHex = (neuronConnection.Weight * (float.MaxValue/4)).ToHex();
 		
 		var expectedHex = n1Hex + n2Hex + weightInHex;
 
 		//Act
-		var hex = genome.ToString();
+		var hex = neuronConnection.ToString();
 		
 		//Assert
 		hex.Should().Be(expectedHex);
 	}
 	
 	[Fact]
-	public void ToString_ShouldProvideCorrectHexString_WhenGivenValidGenome() {
+	public void ToString_ShouldProvideCorrectHexString_WhenGivenValidNeuronConnection() {
 		//Arrange
 		var n1 = new Neuron(50, NeuronType.Input);
 		var n2 = new Neuron(900, NeuronType.Internal);
-		var genome = new Genome(n1, n2, -300f);
+		var neuronConnection = new NeuronConnection(n1, n2, -300f);
 		var n1Hex = "3280";
 		var n2Hex = "8403";
 		var weightInHex = "000096C3";
@@ -73,18 +73,18 @@ public class GenomeEncodingTests {
 		var expectedHex =  n1Hex + n2Hex + weightInHex;
 
 		//Act
-		var hex = genome.ToString();
+		var hex = neuronConnection.ToString();
 		
 		//Assert
 		hex.Should().Be(expectedHex);
 	}
 	
 	[Fact]
-	public void ToString_ShouldProvideCorrectHexString_WhenGivenValidInputOutputGenome() {
+	public void ToString_ShouldProvideCorrectHexString_WhenGivenValidInputOutputNeuronConnection() {
 		//Arrange
 		var n1 = new Neuron(50, NeuronType.Input);
 		var n2 = new Neuron(900, NeuronType.Output);
-		var genome = new Genome(n1, n2, -300f);
+		var neuronConnection = new NeuronConnection(n1, n2, -300f);
 		var n1Hex = "3280";
 		var n2Hex = "8483";
 		var weightInHex = "000096C3";
@@ -92,7 +92,7 @@ public class GenomeEncodingTests {
 		var expectedHex =  n1Hex + n2Hex + weightInHex;
 
 		//Act
-		var hex = genome.ToString();
+		var hex = neuronConnection.ToString();
 		
 		//Assert
 		hex.Should().Be(expectedHex);

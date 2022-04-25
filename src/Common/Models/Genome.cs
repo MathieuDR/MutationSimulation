@@ -1,83 +1,89 @@
 using Common.Helpers;
 
-namespace Common.Models; 
+namespace Common.Models;
 
 public record Genome {
-	private readonly Neuron _source;
-	private readonly Neuron _destination;
-	private readonly float _weight;
-	private const float Divider = float.MaxValue / 4;
-	public const int ByteSize = Neuron.ByteSize * 2 + sizeof(float); 
-	
-	public static float WeightToFloat(float weight) {
-		if(weight is < -4f or > 4f) {
-			throw new ArgumentOutOfRangeException(nameof(weight), "Weight must be in range [-4, 4]");
-		}
-		
-		return weight * Divider;
+	// NeuronConnections exist out of 2 neurons and a weight in float.
+	// Together that are 8 bytes.
+	// The hex string is split into 8 byte chunks, which is 16 chars.
+	private readonly NeuronConnection[] _neuronConnections;
+
+	public Genome(NeuronConnection[] neuronConnections, string? hexSequence = null) {
+		NeuronConnections = neuronConnections;
+		HexSequence = hexSequence;
 	}
 
-	public Genome(Neuron Source, Neuron Destination,float Weight) {
-		this.Source = Source;
-		this.Destination = Destination;
-		this.Weight = Weight;
+	public NeuronConnection[] UsedConnections { get; private set; }
+	
+	public NeuronConnection[] NeuronConnections {
+		get => _neuronConnections;
+		init {
+			if (value.Length == 0) {
+				throw new ArgumentException("NeuronConnections must not be empty.");
+			}
+			
+			_neuronConnections = value;
+			UsedConnections = GetUsedConnections();
+		}
+	}
+
+	private NeuronConnection[] GetUsedConnections() {
+		var usedConnections = new List<NeuronConnection>();
+		var unusedConnections = new List<NeuronConnection>(NeuronConnections);
+
+		PruneConnections(usedConnections, unusedConnections);
+		return usedConnections.ToArray();
+	}
+
+	private void PruneConnections(List<NeuronConnection> usedConnections, List<NeuronConnection> unusedConnections, NeuronConnection? current = default) {
+		var connections = current == default ? 
+			unusedConnections.Where(c => c.Destination.NeuronType == NeuronType.Output).ToArray() : 
+			unusedConnections.Where(c => c.Destination == current.Source).ToArray();
+
+		if (!connections.Any()) {
+			return;
+		}
+
+		usedConnections.AddRange(connections);
+		unusedConnections.RemoveAll(c => connections.Contains(c));
+		
+		if(unusedConnections.Count == 0) {
+			return;
+		}
+		
+		foreach(var connection in connections) {
+			PruneConnections(usedConnections, unusedConnections, connection);
+		}
+	}
+	
+	public IEnumerable<NeuronConnectionTree> GenerateTree(NeuronConnection currentNeuronConnection) {
+		foreach (var childGenome in NeuronConnections.Where(c => c.Source.Id == currentNeuronConnection.Destination.Id && currentNeuronConnection != c)) {
+			yield return new NeuronConnectionTree(childGenome, GenerateTree(childGenome));
+		}
+	}
+	
+	// reverse tree
+	
+
+	public string? HexSequence { get; init; }
+
+	public byte[] GetBytes() {
+		return NeuronConnections.SelectMany(x => x.GetBytes()).ToArray();
 	}
 
 	public override string ToString() => GetBytes().ToHex();
 
-	public byte[] GetBytes() {
-		return Source.GetBytes()
-			.Concat(Destination.GetBytes())
-			.Concat(BitConverter.GetBytes(Weight * Divider))
-			.ToArray();
-	}
-	
-	public static Genome FromBytes(byte[] bytes) {
-		// first 2 bytes are source neuron
-		var source = Neuron.FromBytes(bytes.Take(Neuron.ByteSize).ToArray(), NeuronType.Input);
-		
-		// next 2 bytes are destination neuron
-		var destination = Neuron.FromBytes(bytes.Skip(Neuron.ByteSize).Take(Neuron.ByteSize).ToArray(), NeuronType.Output);
-		
-		// The rest is the weight
-		var weight = BitConverter.ToSingle(bytes.Skip(Neuron.ByteSize * 2).Take(sizeof(float)).ToArray(), 0);
-		
-		return new Genome(source, destination, weight);
-	} 
-	
-	public static Genome FromHex(string hex) {
-		var bytes = Convert.FromHexString(hex);
-		return FromBytes(bytes);
-	}
+	public static Genome FromBytes(byte[] bytes) => new (GenomesFromBytes(bytes));
 
-	public Neuron Source {
-		get => _source;
-		init {
-			if(value.NeuronType == NeuronType.Output) {
-				throw new ArgumentException("Source neuron cannot be an output neuron");
-			}
-			_source = value;
-		}
-	}
+	private static NeuronConnection[] GenomesFromBytes(byte[] bytes) => bytes.Chunk(NeuronConnection.ByteSize).Select(NeuronConnection.FromBytes).ToArray();
 
-	public Neuron Destination {
-		get => _destination;
-		init {
-			if(value.NeuronType == NeuronType.Input) {
-				throw new ArgumentException("Destination neuron cannot be an input neuron");
-			}
-			_destination = value;
-		}
-	}
-	
-	public float Weight {
-		get => _weight;
-		init => _weight = value / Divider;
-	}
+	public static Genome FromHex(string hex) => new (GenomesFromBytes(Convert.FromHexString(hex)), hex);
 
-	public void Deconstruct(out Neuron Source, out Neuron Destination, out float Weight) {
-		Source = this.Source;
-		Destination = this.Destination;
-		Weight = this.Weight;
+	public void Deconstruct(out NeuronConnection[] Genomes, out string? HexSequence) {
+		Genomes = this.NeuronConnections;
+		HexSequence = this.HexSequence;
 	}
 }
+
+public record NeuronConnectionTree(NeuronConnection Item, IEnumerable<NeuronConnectionTree> Children);
+

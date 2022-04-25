@@ -3,7 +3,7 @@ using SkiaSharp;
 
 namespace Common.Models;
 
-public record Creature(GenomeSequence GenomeSequence, Position Position, int Radius, Color Color) : ICreature {
+public record Creature(Genome Genome, Position Position, int Radius, Color Color) : ICreature {
 	public int Age { get;init; } = 0;
 	public ICreature Simulate(World world) {
 		return this with {Age = Age + 1};

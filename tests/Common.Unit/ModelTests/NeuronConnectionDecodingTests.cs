@@ -9,22 +9,22 @@ using Xunit.Abstractions;
 
 namespace Common.Unit.ModelTests; 
 
-public class GenomeDecodingTests {
+public class NeuronConnectionDecodingTests {
 	[Theory]
-	[MemberData(nameof(Genomes))]
-	public void FromHex_ShouldResultInSameGenome_WhenGivenGenome(Neuron sourceNeuron, Neuron destinationNeuron, float weight) {
+	[MemberData(nameof(NeuronConnections))]
+	public void FromHex_ShouldResultInSameNeuronConnection_WhenGivenNeuronConnection(Neuron sourceNeuron, Neuron destinationNeuron, float weight) {
 		//Arrange
-		var genome = new Genome(sourceNeuron, destinationNeuron, weight);
-		var hex = genome.ToString();
+		var neuronConnection = new NeuronConnection(sourceNeuron, destinationNeuron, weight);
+		var hex = neuronConnection.ToString();
 
 		//Act
-		var result = Genome.FromHex(hex);
+		var result = NeuronConnection.FromHex(hex);
 
 		//Assert
-		result.Should().Be(genome);
+		result.Should().Be(neuronConnection);
 	}
 	
-	public static IEnumerable<object[]> Genomes =>
+	public static IEnumerable<object[]> NeuronConnections =>
 		new List<object[]>
 		{
 			new object[] { new Neuron(1, NeuronType.Input), new Neuron(21, NeuronType.Output), 1232f },
@@ -37,15 +37,15 @@ public class GenomeDecodingTests {
 	
 
 	[Fact]
-	public void FromHex_ShouldResultInGenome_WhenGivenValidHex() {
+	public void FromHex_ShouldResultInNeuronConnection_WhenGivenValidHex() {
 		//Arrange
 		var hex = "00B0124581800880";
 
 		//Act
-		var genome = Genome.FromHex(hex);
+		var neuronConnection = NeuronConnection.FromHex(hex);
 		
 		//Assert
-		genome.Should().NotBeNull();
+		neuronConnection.Should().NotBeNull();
 	}
 	
 	[Fact]
@@ -54,8 +54,8 @@ public class GenomeDecodingTests {
 		var hex = "0880158000009A44";
 
 		//Act
-		var genome = Genome.FromHex(hex);
-		var sourceNeuron = genome.Source;
+		var neuronConnection = NeuronConnection.FromHex(hex);
+		var sourceNeuron = neuronConnection.Source;
 		
 		//Assert
 		sourceNeuron.NeuronType.Should().Be(NeuronType.Input);
@@ -68,8 +68,8 @@ public class GenomeDecodingTests {
 		var hex = "1900158000009A44";
 
 		//Act
-		var genome = Genome.FromHex(hex);
-		var sourceNeuron = genome.Source;
+		var neuronConnection = NeuronConnection.FromHex(hex);
+		var sourceNeuron = neuronConnection.Source;
 		
 		//Assert
 		sourceNeuron.NeuronType.Should().Be(NeuronType.Internal);
@@ -82,8 +82,8 @@ public class GenomeDecodingTests {
 		var hex = "0880818000009A44";
 
 		//Act
-		var genome = Genome.FromHex(hex);
-		var sourceNeuron = genome.Destination;
+		var neuronConnection = NeuronConnection.FromHex(hex);
+		var sourceNeuron = neuronConnection.Destination;
 		
 		//Assert
 		sourceNeuron.NeuronType.Should().Be(NeuronType.Output);
@@ -96,8 +96,8 @@ public class GenomeDecodingTests {
 		var hex = "0880421C00009A44";
 
 		//Act
-		var genome = Genome.FromHex(hex);
-		var sourceNeuron = genome.Destination;
+		var neuronConnection = NeuronConnection.FromHex(hex);
+		var sourceNeuron = neuronConnection.Destination;
 		
 		//Assert
 		sourceNeuron.NeuronType.Should().Be(NeuronType.Internal);
@@ -110,10 +110,10 @@ public class GenomeDecodingTests {
 		var hex = "0880421CFFFF5F7F";
 
 		//Act
-		var genome = Genome.FromHex(hex);
+		var neuronConnection = NeuronConnection.FromHex(hex);
 		
 		//Assert
-		genome.Weight.Should().BeInRange(3.49f, 3.51f);
+		neuronConnection.Weight.Should().BeInRange(3.49f, 3.51f);
 	}
 	
 }
