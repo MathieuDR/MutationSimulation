@@ -7,6 +7,7 @@ public record Genome {
 	private readonly Neuron _destination;
 	private readonly float _weight;
 	private const float Divider = float.MaxValue / 4;
+	public const int ByteSize = Neuron.ByteSize * 2 + sizeof(float); 
 	
 	public static float WeightToFloat(float weight) {
 		if(weight is < -4f or > 4f) {
@@ -33,13 +34,13 @@ public record Genome {
 	
 	public static Genome FromBytes(byte[] bytes) {
 		// first 2 bytes are source neuron
-		var source = Neuron.FromBytes(bytes.Take(2).ToArray(), NeuronType.Input);
+		var source = Neuron.FromBytes(bytes.Take(Neuron.ByteSize).ToArray(), NeuronType.Input);
 		
 		// next 2 bytes are destination neuron
-		var destination = Neuron.FromBytes(bytes.Skip(2).Take(2).ToArray(), NeuronType.Output);
+		var destination = Neuron.FromBytes(bytes.Skip(Neuron.ByteSize).Take(Neuron.ByteSize).ToArray(), NeuronType.Output);
 		
 		// The rest is the weight
-		var weight = BitConverter.ToSingle(bytes.Skip(4).Take(4).ToArray(), 0);
+		var weight = BitConverter.ToSingle(bytes.Skip(Neuron.ByteSize * 2).Take(sizeof(float)).ToArray(), 0);
 		
 		return new Genome(source, destination, weight);
 	} 
@@ -47,16 +48,6 @@ public record Genome {
 	public static Genome FromHex(string hex) {
 		var bytes = Convert.FromHexString(hex);
 		return FromBytes(bytes);
-		// // first 2 bytes are source neuron
-		// var source = Neuron.FromHex(hex.Substring(0, 4), NeuronType.Input);
-		//
-		// // next 2 bytes are destination neuron
-		// var destination = Neuron.FromHex(hex.Substring(4, 4), NeuronType.Output);
-		//
-		// // the rest is the weight
-		// var weight = hex.Substring(8).ToFloat();
-		//
-		// return new Genome(source, destination, weight);
 	}
 
 	public Neuron Source {

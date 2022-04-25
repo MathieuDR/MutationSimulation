@@ -7,6 +7,7 @@ public record Neuron {
 	
 	private const int TypeMask = (1 << 7);
 	private const int IdAndMask = (byte.MaxValue - TypeMask);
+	public const int ByteSize = 2;
 	
 	public Neuron(ushort Id, NeuronType NeuronType) {
 		this.Id = Id;
@@ -32,14 +33,14 @@ public record Neuron {
 	public override string ToString() => GetBytes().ToHex();
 
 	public byte[] GetBytes() {
-		var idBytes = BitConverter.GetBytes(Id);
+		var idBytes = BitConverter.GetBytes(Id).ToList();
 		
 		// If it's an internal neuron, the leftmost bit is unset
 		if(NeuronType != NeuronType.Internal) {
 			idBytes[^1] |= TypeMask;
 		}
-		
-		return idBytes;
+
+		return idBytes.ToArray();
 	}
 
 	public static Neuron FromBytes(byte[] bytes, NeuronType externalType) {
