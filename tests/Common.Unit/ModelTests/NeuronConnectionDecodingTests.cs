@@ -15,7 +15,7 @@ public class NeuronConnectionDecodingTests {
 	public void FromHex_ShouldResultInSameNeuronConnection_WhenGivenNeuronConnection(Neuron sourceNeuron, Neuron destinationNeuron, float weight) {
 		//Arrange
 		var neuronConnection = new NeuronConnection(sourceNeuron, destinationNeuron, weight);
-		var hex = neuronConnection.ToString();
+		var hex = neuronConnection.ToHex();
 
 		//Act
 		var result = NeuronConnection.FromHex(hex);

@@ -30,7 +30,9 @@ public record Neuron {
 		NeuronType = this.NeuronType;
 	}
 
-	public override string ToString() => GetBytes().ToHex();
+	//public override string ToString() => GetBytes().ToHex();
+	
+	public string ToHex() => GetBytes().ToHex();
 
 	public byte[] GetBytes() {
 		var idBytes = BitConverter.GetBytes(Id).ToList();

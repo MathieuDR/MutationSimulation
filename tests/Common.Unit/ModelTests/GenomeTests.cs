@@ -64,53 +64,53 @@ public class GenomeTests {
 	}
 
 	[Fact]
-	public void ToString_ShouldGiveCorrectHex_WhenGivenValidSequence() {
+	public void ToHex_ShouldGiveCorrectHex_WhenGivenValidSequence() {
 		//Arrange
 		var n1 = new Neuron(50, NeuronType.Input);
 		var n2 = new Neuron(900, NeuronType.Internal);
 		var genome = new NeuronConnection(n1, n2, -300f);
 		var genome2 = new NeuronConnection(n2, n2, 100f);
 		var sequence = new Genome(new[] { genome, genome2 });
-		var genome1Hex = genome.ToString();
-		var genome2Hex = genome2.ToString();
+		var genome1Hex = genome.ToHex();
+		var genome2Hex = genome2.ToHex();
 		
 
 		//Act
-		var hex = sequence.ToString();
+		var hex = sequence.ToHex();
 
 		//Assert
 		hex.Should().Be(genome1Hex + genome2Hex);
 	}
 	
 	[Fact]
-	public void ToString_ShouldGiveCorrectHex_WhenGivenValidSequenceWithOneGenome() {
+	public void ToHex_ShouldGiveCorrectHex_WhenGivenValidSequenceWithOneGenome() {
 		//Arrange
 		var n1 = new Neuron(50, NeuronType.Input);
 		var n2 = new Neuron(900, NeuronType.Internal);
 		var genome = new NeuronConnection(n1, n2, -300f);
 		var sequence = new Genome(new[] { genome });
-		var genome1Hex = genome.ToString();
+		var genome1Hex = genome.ToHex();
 		
 
 		//Act
-		var hex = sequence.ToString();
+		var hex = sequence.ToHex();
 
 		//Assert
 		hex.Should().Be(genome1Hex);
 	}
 	
-	[Theory]
-	[MemberData(nameof(Sequences))]
-	public void FromHex_ShouldResultInSameGenome_WhenGivenGenome(Genome sequence) {
-		//Arrange
-		var hex = sequence.ToString();
-
-		//Act
-		var result = Genome.FromHex(hex);
-		
-		//Assert
-		result.Should().BeEquivalentTo(sequence, options => options.Excluding(x => x.HexSequence));
-	}
+	// [Theory]
+	// [MemberData(nameof(Sequences))]
+	// public void FromHex_ShouldResultInSameGenome_WhenGivenGenome(Genome sequence) {
+	// 	//Arrange
+	// 	var hex = sequence.ToHex();
+	//
+	// 	//Act
+	// 	var result = Genome.FromHex(hex);
+	// 	
+	// 	//Assert
+	// 	result.Should().BeEquivalentTo(sequence, options => options.Excluding(x => x.HexSequence));
+	// }
 
 	[Fact]
 	public void Ctor_ShouldPruneNeuronConnections_WhenThereAreNoValidConnections() {
@@ -131,6 +131,278 @@ public class GenomeTests {
 		//Assert
 		genome.UsedConnections.Should().HaveCount(1);
 	}
+	
+	[Fact]
+	public void LayerConnections_ShouldHaveOneLayer_WhenThereIsInternalToOutput() {
+		//Arrange
+		//Act
+		var genome = new Genome(new[] { new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Output), 2f) });
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(1);
+	}
+	
+	[Fact]
+	public void LayerConnections_ShouldHaveNoLayer_WhenThereIsNoUsedConnection() {
+		//Arrange
+		//Act
+		var genome = new Genome(new[] { new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f) });
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(0);
+	}
+	
+	[Fact]
+	public void LayerConnections_ShouldHaveTwoLayer_WhenThereIsAnInternal() {
+		//Arrange
+		//Act
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Output), 2f)
+		});
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(2);
+	}
+	
+	[Fact]
+	public void LayerConnections_ShouldHaveOneLayer_WhenThereIsSeparatePath() {
+		//Arrange
+		//Act
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Input), new Neuron(3, NeuronType.Output), 2f)
+		});
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(1);
+		genome.LayeredConnections.First().Should().HaveCount(2);		
+	}
+	
+	
+	[Fact]
+	public void LayerConnections_ShouldHaveOneLayer_WhenThereIsSeparatePathFromSameInput() {
+		//Arrange
+		//Act
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(3, NeuronType.Output), 2f)
+		});
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(1);
+		genome.LayeredConnections.First().Should().HaveCount(2);		
+	}
+	
+	[Fact]
+	public void LayerConnections_ShouldHaveThreeLayer_WhenThePathHasMultipleInternals() {
+		//Arrange
+		//Act
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Output), 2f)
+		});
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(3);
+		genome.LayeredConnections.First().Should().HaveCount(1);		
+	}
+	
+	[Fact]
+	public void LayerConnections_ShouldHaveThreeLayer_WhenThePathHasMultipleInternalsAndSeperatePath() {
+		//Arrange
+		//Act
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Output), 2f),
+		});
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(3);
+		genome.LayeredConnections.First().Should().HaveCount(2);		
+	}
+	
+	[Fact]
+	public void LayerConnections_ShouldHaveCorrectFirstLayers_WhenThePathHasFeedForwardToInternalAndOutput() {
+		//Arrange
+		//Act
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(3, NeuronType.Output), 2f),
+		});
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(2);
+		genome.LayeredConnections.First().Should().HaveCount(2);		
+	}
+	
+	[Fact]
+	public void GetUsedConnections_ShouldTrimUnusedConnection_WhenDependencyLoopOccurs() {
+		//Arrange
+		//Act
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
+		});
+
+		//Assert
+		genome.UsedConnections.Should().HaveCount(3);
+	}
+	
+	[Fact]
+	public void LayerConnections_ShouldRemoveConnection_WhenDependencyLoop() {
+		//Arrange
+		//Act
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
+		});
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(3);
+	}
+	
+	
+	[Fact]
+	public void LayerConnections_ShouldRemoveCorrectConnection_WhenComplexDependencyLoop() {
+		//Arrange
+		var connections = new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
+		};
+		
+		//Act
+		var genome = new Genome(connections);
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(3);
+		genome.LayeredConnections[0].Should().HaveCount(1);
+		genome.LayeredConnections[0][0].Should().Be(connections[0]);
+		
+		genome.LayeredConnections[1].Should().HaveCount(1);
+		genome.LayeredConnections[1][0].Should().Be(connections[1]);
+		
+		genome.LayeredConnections[2].Should().HaveCount(1);
+		genome.LayeredConnections[2][0].Should().Be(connections[2]);
+	}
+	
+	[Fact]
+	public void LayerConnections_ShouldRemoveCorrectConnection_WhenComplexDependencyLoopInDifferentOrder() {
+		//Arrange
+		var connections = new[] {
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
+		};
+		
+		//Act
+		var genome = new Genome(connections);
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(3);
+		genome.LayeredConnections[0].Should().HaveCount(1);
+		genome.LayeredConnections[0][0].Should().Be(connections[1]);
+		
+		genome.LayeredConnections[1].Should().HaveCount(1);
+		genome.LayeredConnections[1][0].Should().Be(connections[2]);
+		
+		genome.LayeredConnections[2].Should().HaveCount(1);
+		genome.LayeredConnections[2][0].Should().Be(connections[3]);
+	}
+
+	[Fact]
+	public void LayerConnections_ShouldRemoveConnectionWithLeastDependencies_WhenComplexDependencyLoop() {
+		//Arrange
+		var connections = new[] {
+			new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(1, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+		};
+
+		//Act
+		var genome = new Genome(connections);
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(5);
+		
+		genome.LayeredConnections[0].Should().HaveCount(1);
+		genome.LayeredConnections[0].Should().Contain(connections[0]);
+		
+		genome.LayeredConnections[1].Should().HaveCount(2);
+		genome.LayeredConnections[1].Should().Contain(connections[1]);
+		genome.LayeredConnections[1].Should().Contain(connections[2]);
+		
+		genome.LayeredConnections[2].Should().HaveCount(1);
+		genome.LayeredConnections[2].Should().Contain(connections[4]);
+		
+		genome.LayeredConnections[3].Should().HaveCount(1);
+		genome.LayeredConnections[3].Should().Contain(connections[5]);
+		
+		genome.LayeredConnections[4].Should().HaveCount(1);
+		genome.LayeredConnections[4].Should().Contain(connections[7]);
+		
+		genome.LayeredConnections[4].Should().HaveCount(3);
+		genome.LayeredConnections[4].Should().Contain(connections[8]);
+		genome.LayeredConnections[4].Should().Contain(connections[9]);
+		genome.LayeredConnections[4].Should().Contain(connections[10]);
+		
+	}
+
+	[Fact]
+	public void LayerConnections_ShouldKeepOutputs_WhenComplexDependencyLoop() {
+		//Arrange
+		var connections = new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(2, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
+		};
+		
+		//Act
+		var genome = new Genome(connections);
+
+		//Assert
+		genome.LayeredConnections.Should().HaveCount(4);
+
+		genome.LayeredConnections[0].Should().HaveCount(1);
+		genome.LayeredConnections[0][0].Should().Be(connections[0]);
+		
+		genome.LayeredConnections[1].Should().HaveCount(1);
+		genome.LayeredConnections[1][0].Should().Be(connections[1]);
+		
+		genome.LayeredConnections[2].Should().HaveCount(2);
+		genome.LayeredConnections[2].Should().Contain(connections[2]);
+		genome.LayeredConnections[2].Should().Contain(connections[5]);
+		
+		genome.LayeredConnections[3].Should().HaveCount(1);
+		genome.LayeredConnections[3][0].Should().Be(connections[4]);
+	}
+
 	
 	[Fact]
 	public void Ctor_ShouldHaveOneUsedConnection_WhenThereIsInputToOutput() {
@@ -168,6 +440,20 @@ public class GenomeTests {
 		//Assert
 		genome.UsedConnections.Should().HaveCount(3);
 	}
+	
+	[Fact]
+	public void Ctor_ShouldHaveThreeUsedConnection_WhenInternalsAreConnected() {
+		//Arrange
+		//Act
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(2, NeuronType.Output), 2f)
+		});
+
+		//Assert
+		genome.UsedConnections.Should().HaveCount(3);
+	}
 
 	
 	[Fact]
@@ -200,30 +486,30 @@ public class GenomeTests {
 		genome.UsedConnections.Should().HaveCount(2);
 	}
 	
-	public static Neuron[] Neurons =>
-		new Neuron[]
-		{
-			new (1, NeuronType.Input), 
-			new (1, NeuronType.Output),
-			new (1, NeuronType.Internal),
-			new (2, NeuronType.Input),
-			new (2, NeuronType.Output)
-		};
-	
-	public static NeuronConnection[] NeuronConnections =>
-		new NeuronConnection[]
-		{
-			new(Neurons[0], Neurons[2], NeuronConnection.WeightToFloat(3f)),
-			new(Neurons[2], Neurons[1], NeuronConnection.WeightToFloat(3f)),
-			new(Neurons[2], Neurons[4], NeuronConnection.WeightToFloat(-2.2f)),
-			new(Neurons[3], Neurons[2], NeuronConnection.WeightToFloat(-0.4f)),
-		};
-	
-	public static IEnumerable<object[]> Sequences =>
-		new List<object[]>
-		{
-			new object[] { new Genome(new []{NeuronConnections[0], NeuronConnections[1],NeuronConnections[2] }) },
-			new object[] { new Genome(new []{NeuronConnections[3], NeuronConnections[1],NeuronConnections[2] }) },
-			new object[] { new Genome(new []{NeuronConnections[1],NeuronConnections[2] }) },
-		};
+	// public static Neuron[] Neurons =>
+	// 	new Neuron[]
+	// 	{
+	// 		new (1, NeuronType.Input), 
+	// 		new (1, NeuronType.Output),
+	// 		new (1, NeuronType.Internal),
+	// 		new (2, NeuronType.Input),
+	// 		new (2, NeuronType.Output)
+	// 	};
+	//
+	// public static NeuronConnection[] NeuronConnections =>
+	// 	new NeuronConnection[]
+	// 	{
+	// 		new(Neurons[0], Neurons[2], NeuronConnection.WeightToFloat(3f)),
+	// 		new(Neurons[2], Neurons[1], NeuronConnection.WeightToFloat(3f)),
+	// 		new(Neurons[2], Neurons[4], NeuronConnection.WeightToFloat(-2.2f)),
+	// 		new(Neurons[3], Neurons[2], NeuronConnection.WeightToFloat(-0.4f)),
+	// 	};
+	//
+	// public static IEnumerable<object[]> Sequences =>
+	// 	new List<object[]>
+	// 	{
+	// 		new object[] { new Genome(new []{NeuronConnections[0], NeuronConnections[1],NeuronConnections[2] }) },
+	// 		new object[] { new Genome(new []{NeuronConnections[3], NeuronConnections[1],NeuronConnections[2] }) },
+	// 		new object[] { new Genome(new []{NeuronConnections[1],NeuronConnections[2] }) },
+	// 	};
 }

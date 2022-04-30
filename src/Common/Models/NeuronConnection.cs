@@ -17,13 +17,13 @@ public record NeuronConnection {
 		return weight * Divider;
 	}
 
-	public NeuronConnection(Neuron Source, Neuron Destination,float Weight) {
+	public NeuronConnection(Neuron Source, Neuron Destination, float Weight) {
 		this.Source = Source;
 		this.Destination = Destination;
 		this.Weight = Weight;
 	}
 
-	public override string ToString() => GetBytes().ToHex();
+	public string ToHex() => GetBytes().ToHex();
 
 	public byte[] GetBytes() {
 		return Source.GetBytes()

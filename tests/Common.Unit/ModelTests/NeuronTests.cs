@@ -130,12 +130,12 @@ public class NeuronTests {
 	[InlineData(0x79, NeuronType.Input, "7980")]
 	[InlineData(0x79, NeuronType.Output, "7980")]
 	[InlineData(0x79, NeuronType.Internal, "7900")]
-	public void ToString_ShouldHaveCorrectHexValue_ForValidParams(ushort id, NeuronType type, string expected) {
+	public void ToHex_ShouldHaveCorrectHexValue_ForValidParams(ushort id, NeuronType type, string expected) {
 		//Arrange
 		var neuron = new Neuron(id, type);
 
 		//Act
-		var b = neuron.ToString();
+		var b = neuron.ToHex();
 
 		//Assert
 		b.Should().Be(expected);
@@ -165,7 +165,7 @@ public class NeuronTests {
 	public void FromHex_ShouldHaveCorrectNeuron_WhenEncodedBefore(ushort id, NeuronType type, NeuronType externalType) {
 		//Arrange
 		var original = new Neuron(id, type);
-		var hex = original.ToString();
+		var hex = original.ToHex();
 
 		//Act
 		var neuron = Neuron.FromHex(hex, externalType);
