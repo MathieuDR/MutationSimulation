@@ -26,7 +26,7 @@ watch.Restart();
 var dot = brain.CreateDotFile();
 watch.Stop();
 Console.WriteLine("Drawing brain took {0}ms", watch.ElapsedMilliseconds);
-Console.WriteLine(dot);
+Console.WriteLine("Dot file: {0}", dot);
 
 // int worldWidth = 150, worldHeight = 150;
 //
