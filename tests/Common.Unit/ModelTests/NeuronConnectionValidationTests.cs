@@ -54,7 +54,7 @@ public class NeuronConnectionValidationTests {
 		var n4 = new Neuron(2, neuronType2);
 
 		//Act
-		Action act = () => neuronConnection = neuronConnection with {Source = n3, Destination = n4};
+		Action act = () => neuronConnection = neuronConnection with {Source = n3, Target = n4};
 
 		//Assert
 		act.Should().Throw<ArgumentException>();
@@ -90,7 +90,7 @@ public class NeuronConnectionValidationTests {
 		var n4 = new Neuron(2, neuronType2);
 
 		//Act
-		Action act = () => neuronConnection = neuronConnection with {Source = n3, Destination = n4};
+		Action act = () => neuronConnection = neuronConnection with {Source = n3, Target = n4};
 
 		//Assert
 		act.Should().NotThrow();

@@ -5,7 +5,6 @@ using Common.Interfaces;
 using Common.Models;
 using Common.Simulator;
 using Graphics;
-using LanguageExt;
 
 // var mark = BenchmarkRunner.Run<BenchMarker>();
 
@@ -15,7 +14,7 @@ var random = new Random(seed);
 
 int worldWidth = 150, worldHeight = 150;
 
-var blobs = IntegerRange.FromMinMax(1, 7, 1).Select(_ => new BouncingCreature(random, 4, 20, worldWidth, worldHeight) as ICreature).ToArray();
+var blobs = Enumerable.Range(1,7).Select(_ => new BouncingCreature(random, 4, 20, worldWidth, worldHeight) as ICreature).ToArray();
 
 var world = new World(worldWidth, worldHeight, blobs);
 var renderMachine = new WorldRenderMachine("output", "world", randomSeed: seed);
@@ -23,9 +22,9 @@ var renderMachine = new WorldRenderMachine("output", "world", randomSeed: seed);
 var images = new List<string>();
 watch.Start();
 for (var i = 0; i < 500; i++) {
-	var options =renderMachine.RenderWorld(world);
-	if(options.IsSome) {
-		images.Add(options.Select(x => x).First());
+	var path =renderMachine.RenderWorld(world);
+	if(!string.IsNullOrEmpty(path)) {
+		images.Add(path);
 	}
 	
 	world = SimulationMachine.Tick(world);

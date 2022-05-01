@@ -83,7 +83,7 @@ public class NeuronConnectionDecodingTests {
 
 		//Act
 		var neuronConnection = NeuronConnection.FromHex(hex);
-		var sourceNeuron = neuronConnection.Destination;
+		var sourceNeuron = neuronConnection.Target;
 		
 		//Assert
 		sourceNeuron.NeuronType.Should().Be(NeuronType.Output);
@@ -97,7 +97,7 @@ public class NeuronConnectionDecodingTests {
 
 		//Act
 		var neuronConnection = NeuronConnection.FromHex(hex);
-		var sourceNeuron = neuronConnection.Destination;
+		var sourceNeuron = neuronConnection.Target;
 		
 		//Assert
 		sourceNeuron.NeuronType.Should().Be(NeuronType.Internal);

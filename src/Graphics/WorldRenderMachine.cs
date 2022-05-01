@@ -1,7 +1,6 @@
 using Common.Interfaces;
 using Common.Models;
 using Graphics.Helpers;
-using LanguageExt;
 using SkiaSharp;
 
 namespace Graphics;
@@ -28,7 +27,7 @@ public class WorldRenderMachine {
 		_random = randomSeed.HasValue ? new Random(randomSeed.Value) : new Random();
 	}
 
-	public Option<string> RenderWorld(World world) {
+	public string RenderWorld(World world) {
 		using var surface =
 			SKSurface.Create(new SKImageInfo(world.Width * _multiplier + _borderWidth * 2, world.Height * _multiplier + _borderWidth * 2));
 		using var canvas = surface.Canvas;
@@ -54,11 +53,11 @@ public class WorldRenderMachine {
 
 	private SKColor GetRandomColor() => new((byte)_random.Next(0, 255), (byte)_random.Next(0, 255), (byte)_random.Next(0, 255));
 
-	private Option<string> SaveFrame(SKSurface surface) {
+	private string SaveFrame(SKSurface surface) {
 		var path = GetCurrentPath();
 		surface.SaveToPath(path, _format, _quality);
 		_frameCount++;
-		return new Option<string>(new[] { path });
+		return path;
 	}
 
 	private void DrawBorder(SKCanvas canvas, SKColor color, int width, int height) {
