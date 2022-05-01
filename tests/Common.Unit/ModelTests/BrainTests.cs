@@ -187,8 +187,26 @@ public class BrainTests {
 		var brain = new Brain(genome);
 
 		//Assert
-		brain.SortedConnections.Should().HaveCount(3);
+		brain.SortedConnections.Should().HaveCount(4);
 		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f));
+	}
+	
+	[Fact]
+	public void Brain_ShouldAddMemory_WhenDependencyLoopOccurs() {
+		//Arrange
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
+		});
+
+		//Act
+		var brain = new Brain(genome);
+
+		//Assert
+		brain.SortedConnections.Should().HaveCount(4);
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(3, NeuronType.Memory), new Neuron(2, NeuronType.Internal), 2f));
 	}
 
 	[Fact]
@@ -208,8 +226,9 @@ public class BrainTests {
 		var brain = new Brain(genome);
 
 		//Assert
-		brain.SortedConnections.Should().HaveCount(4);
+		brain.SortedConnections.Should().HaveCount(5);
 		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(3, NeuronType.Memory), new Neuron(4, NeuronType.Internal), 2f));
 	}
 	
 	[Fact]
@@ -229,8 +248,9 @@ public class BrainTests {
 		var brain = new Brain(genome);
 
 		//Assert
-		brain.SortedConnections.Should().HaveCount(4);
+		brain.SortedConnections.Should().HaveCount(5);
 		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(3, NeuronType.Memory), new Neuron(4, NeuronType.Internal), 2f));
 	}
 
 	[Fact]
@@ -258,15 +278,20 @@ public class BrainTests {
 		var brain = new Brain(genome);
 
 		//Assert
-		brain.SortedConnections.Should().HaveCount(9);
-		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f));
-		//brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().HaveCount(13);
+		// brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f));
 		// this makes the most sense, but currently it's not the case. 
 		// we could try and add something to see if it's still connected to an input. 
 		
-		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 1f));
 		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f));
 		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f));
+		
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(3, NeuronType.Memory), new Neuron(1, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(1, NeuronType.Memory), new Neuron(2, NeuronType.Internal), 1f));
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(4, NeuronType.Memory), new Neuron(1, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(5, NeuronType.Memory), new Neuron(3, NeuronType.Internal), 2f));
 	}
 	
 	[Fact]
@@ -293,10 +318,14 @@ public class BrainTests {
 		var brain = new Brain(genome);
 
 		//Assert
-		brain.SortedConnections.Should().HaveCount(8);
+		brain.SortedConnections.Should().HaveCount(12);
 		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f));
 		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f));
 		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f));
+		
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(3, NeuronType.Memory), new Neuron(1, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(5, NeuronType.Memory), new Neuron(3, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(4, NeuronType.Memory), new Neuron(1, NeuronType.Internal), 2f));
 	}
 
 	[Fact]
@@ -371,7 +400,7 @@ public class BrainTests {
 	}
 	
 	[Fact]
-	public void Brain_ShouldHaveThreeUsedConnection_WhenInternalIsSelfRefencing() {
+	public void Brain_ShouldHaveThreeUsedConnection_WhenInternalIsSelfReferencing() {
 		//Arrange
 		var genome = new Genome(new[] {
 			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
@@ -384,5 +413,37 @@ public class BrainTests {
 
 		//Assert
 		brain.SortedConnections.Should().HaveCount(3);
+	}
+	
+	[Fact]
+	public void Brain_ShouldAddMemory_WhenSelfReferencing() {
+		//Arrange
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Output), 2f)
+		});
+
+		//Act
+		var brain = new Brain(genome);
+
+		//Assert
+		brain.BrainGraph.Vertices.Should().Contain(new Neuron(2, NeuronType.Memory));
+	}
+	
+	[Fact]
+	public void Brain_ShouldAddMemoryToSorted_WhenSelfReferencing() {
+		//Arrange
+		var genome = new Genome(new[] {
+			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Output), 2f)
+		});
+
+		//Act
+		var brain = new Brain(genome);
+
+		//Assert
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(2, NeuronType.Memory), new Neuron(2, NeuronType.Internal), 2f));
 	}
 }

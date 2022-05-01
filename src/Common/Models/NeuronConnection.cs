@@ -64,8 +64,8 @@ public record NeuronConnection : IEdge<Neuron> {
 	public Neuron Target {
 		get => _target;
 		init {
-			if(value.NeuronType == NeuronType.Input) {
-				throw new ArgumentException("Destination neuron cannot be an input neuron");
+			if(value.NeuronType == NeuronType.Input || value.NeuronType == NeuronType.Memory) {
+				throw new ArgumentException("Destination neuron cannot be an input or memory neuron");
 			}
 			_target = value;
 		}

@@ -37,6 +37,10 @@ public static class BrainHelper {
 						args.VertexFormat.Group = "internal";
 						args.VertexFormat.FillColor = GraphvizColor.Yellow;
 						break;
+					case NeuronType.Memory:
+						args.VertexFormat.Group = "memory";
+						args.VertexFormat.FillColor = GraphvizColor.Brown;
+						break;
 					default:
 						throw new ArgumentOutOfRangeException();
 				}
@@ -49,7 +53,7 @@ public static class BrainHelper {
 				var edge = args.Edge;
 
 				var isRed = edge.Weight < 0;
-				args.EdgeFormat.Style = GraphvizEdgeStyle.Bold;
+				args.EdgeFormat.Style = edge.Source.NeuronType == NeuronType.Memory ? GraphvizEdgeStyle.Dashed : GraphvizEdgeStyle.Solid;
 				args.EdgeFormat.FontColor = isRed ? GraphvizColor.Red : GraphvizColor.Black;
 
 				args.EdgeFormat.Label = new GraphvizEdgeLabel() {

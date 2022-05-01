@@ -13,6 +13,7 @@ public record Brain {
 		this.Genome = genome;
 	}
 	public NeuronConnection[] SortedConnections { get; private set; }
+	public NeuronConnection[] MemoryConnections { get; private set; }
 	public Neuron[] SortedNeurons { get; private set; }
 	public AdjacencyGraph<Neuron,NeuronConnection> BrainGraph { get; private set; }
 	
@@ -44,36 +45,40 @@ public record Brain {
 
 	private void CreateGraph(NeuronConnection[] connections) {
 		var cons = CalculatedUsedConnections(connections).ToArray();
-		var selfReferences = cons.Where(x => x.Source == x.Target).ToArray();
-		var withoutSelfReference = cons.Where(x => x.Source != x.Target).ToArray();
+		var selfReferences = cons.Where(x => x.Source == x.Target).Select(ToMemoryConnection).ToArray();
+		var withMemory = cons.Where(x => x.Source != x.Target).Concat(selfReferences).ToArray();
 		
-		BrainGraph = withoutSelfReference.ToAdjacencyGraph<Neuron, NeuronConnection>(false);
+		BrainGraph = withMemory.ToAdjacencyGraph<Neuron, NeuronConnection>(false);
 		EnsureAcyclicGraph(cons);
 
 		// sort
 		SortedNeurons = BrainGraph.TopologicalSort().ToArray();
 		
 		// fix the connections
-		SortConnections(selfReferences);
+		SortConnections();
+	}
+	
+	private NeuronConnection ToMemoryConnection(NeuronConnection connection) {
+		return new NeuronConnection(connection.Source with { NeuronType = NeuronType.Memory }, connection.Target, NeuronConnection.WeightToFloat(connection.Weight));
 	}
 
-	private void SortConnections(NeuronConnection[] selfReferences) {
+	private void SortConnections() {
 		var sortedConnections = new List<NeuronConnection>();
 		foreach (var neuron in SortedNeurons) {
 			var outEdges = BrainGraph.OutEdges(neuron);
 			
 			// add self refences before the others
-			var selfRef = selfReferences.FirstOrDefault(x => x.Source == neuron);
-			if (selfRef is not null) {
-				sortedConnections.Add(selfRef);
-			}
+			//var selfRef = selfReferences.FirstOrDefault(x => x.Source == neuron);
+			// if (selfRef is not null) {
+			// 	sortedConnections.Add(selfRef);
+			// }
 
 			sortedConnections.AddRange(outEdges);
 		}
 
-		foreach (var selfReference in selfReferences) {
-			BrainGraph.AddEdge(selfReference);
-		}
+		// foreach (var selfReference in selfReferences) {
+		// 	BrainGraph.AddEdge(selfReference);
+		// }
 		
 		SortedConnections = sortedConnections.ToArray();
 	}
@@ -83,6 +88,8 @@ public record Brain {
 		List<BidirectionalGraph<Neuron, NeuronConnection>> components;
 		var componentsCountDict = new Dictionary<Neuron, int>();
 		var cCAlg = new StronglyConnectedComponentsAlgorithm<Neuron, NeuronConnection>(BrainGraph, componentsCountDict);
+
+		var memoryConnection = new List<NeuronConnection>();
 
 		do {
 			cCAlg.Compute();
@@ -128,27 +135,14 @@ public record Brain {
 			}
 
 			foreach (var kvp in edgeWithUsed) {
+				var memory = ToMemoryConnection(kvp.Value.connection);
 				BrainGraph.RemoveEdge(kvp.Value.connection);
+				memoryConnection.Add(memory);
+				BrainGraph.AddVerticesAndEdge(memory);
 			}
 		} while (counter++ < 10 && components.Any());
-	}
 
-	private void RemoveEdgeFromCyclic(NeuronConnection[] cons, List<BidirectionalGraph<Neuron, NeuronConnection>> components) {
-		foreach (var component in components) {
-			var weightedSort = component.Edges.OrderBy(x => x.Weight);
-			foreach (var edge in weightedSort) {
-				Debug.Assert(edge is not null);
-
-				var tempEdges = BrainGraph.Edges.Where(x => x != edge);
-				var used = CalculatedUsedConnections(tempEdges).Count();
-				if (used < cons.Length - 1) {
-					continue;
-				}
-
-				BrainGraph.RemoveEdge(edge);
-				break;
-			}
-		}
+		MemoryConnections = memoryConnection.ToArray();
 	}
 
 	public void Deconstruct(out Genome Genome) {
