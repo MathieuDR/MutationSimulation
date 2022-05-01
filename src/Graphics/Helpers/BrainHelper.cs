@@ -39,7 +39,9 @@ public static class BrainHelper {
 						break;
 					case NeuronType.Memory:
 						args.VertexFormat.Group = "memory";
-						args.VertexFormat.FillColor = GraphvizColor.Brown;
+						args.VertexFormat.FillColor = GraphvizColor.Purple;
+						args.VertexFormat.StrokeColor = GraphvizColor.White;
+						args.VertexFormat.Style = GraphvizVertexStyle.Dotted;
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();
