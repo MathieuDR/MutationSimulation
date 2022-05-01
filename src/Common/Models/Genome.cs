@@ -1,4 +1,5 @@
 using Common.Helpers;
+using LZStringCSharp;
 
 namespace Common.Models;
 
@@ -31,14 +32,14 @@ public record Genome {
 		return NeuronConnections.SelectMany(x => x.GetBytes()).ToArray();
 	}
 
-	public string ToHex() => GetBytes().ToHex();
+	public string ToHex() => LZString.CompressToBase64(GetBytes().ToHex());
 
 	public static Genome FromBytes(byte[] bytes) => new(GenomesFromBytes(bytes));
 
 	private static NeuronConnection[] GenomesFromBytes(byte[] bytes) =>
 		bytes.Chunk(NeuronConnection.ByteSize).Select(NeuronConnection.FromBytes).ToArray();
 
-	public static Genome FromHex(string hex) => new(GenomesFromBytes(Convert.FromHexString(hex)), hex);
+	public static Genome FromHex(string hex) => new(GenomesFromBytes(Convert.FromHexString(LZString.DecompressFromBase64(hex))), hex);
 
 	public void Deconstruct(out NeuronConnection[] Genomes, out string? HexSequence) {
 		Genomes = NeuronConnections;

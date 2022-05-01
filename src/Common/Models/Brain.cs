@@ -71,6 +71,10 @@ public record Brain {
 			sortedConnections.AddRange(outEdges);
 		}
 
+		foreach (var selfReference in selfReferences) {
+			BrainGraph.AddEdge(selfReference);
+		}
+		
 		SortedConnections = sortedConnections.ToArray();
 	}
 

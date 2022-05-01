@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="11.1.0" />
+      <PackageReference Include="QuikGraph.Graphviz" Version="2.3.1" />
       <PackageReference Include="SkiaSharp" Version="2.80.3" />
       <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.80.3" />
     </ItemGroup>

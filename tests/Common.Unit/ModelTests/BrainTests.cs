@@ -238,16 +238,16 @@ public class BrainTests {
 		//Arrange
 		var connections = new[] {
 			new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(1, NeuronType.Internal), 2f),
-			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 1f),
 			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
 			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
-			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 3f),
 			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
-			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 02f),
 			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
 			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), 2f),
 			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Output), 2f),
-			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Output), 213f),
 			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Output), 2f),
 			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
 		};
