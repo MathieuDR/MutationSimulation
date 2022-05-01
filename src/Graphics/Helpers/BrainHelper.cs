@@ -5,7 +5,7 @@ using QuikGraph.Graphviz.Dot;
 namespace Graphics.Helpers; 
 
 public static class BrainHelper {
-	public static string CreateDotFile(this Brain brain, string outputDir = "./output/brains", string? fileName = null) {
+	public static string CreateDotFile(this Brain brain, string outputDir = "./output/brains/", string? fileName = null) {
 		var dot = CreateDotContent(brain);
 		
 		// create output directory if it doesn't exist
@@ -13,10 +13,15 @@ public static class BrainHelper {
 			Directory.CreateDirectory(outputDir);
 		}
 		
-		var filePath = Path.Combine(outputDir, fileName ?? $"{brain.Genome.HexSequence}.dot");
-		
+		var filePath = Path.Combine(outputDir, ToValidFileName(fileName ?? $"{brain.Genome.HexSequence}.dot"));
+
 		File.WriteAllText(filePath, dot);
 		return filePath;
+	}
+
+	private static string ToValidFileName(string filename) {
+		var invalidChars = Path.GetInvalidFileNameChars();
+		return new string(filename.Select(c => invalidChars.Contains(c) ? '_' : c).ToArray());
 	}
 
 	private static string CreateDotContent(Brain brain) {

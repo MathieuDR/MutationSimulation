@@ -288,9 +288,69 @@ public class BrainTests {
 		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f));
 		brain.SortedConnections.Should().NotContain(new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f));
 		
+			}
+	
+	[Fact]
+	public void Brain_ShouldAddMemories_WhenComplexDependencyLoop() {
+		//Arrange
+		var connections = new[] {
+			new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(1, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 1f),
+			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 3f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 02f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Output), 213f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+		};
+
+		var genome = new Genome(connections);
+
+		//Act
+		var brain = new Brain(genome);
+
+		//Assert
 		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(3, NeuronType.Memory), new Neuron(1, NeuronType.Internal), 2f));
 		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(1, NeuronType.Memory), new Neuron(2, NeuronType.Internal), 1f));
 		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(4, NeuronType.Memory), new Neuron(1, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(5, NeuronType.Memory), new Neuron(3, NeuronType.Internal), 2f));
+	}
+	
+	[Fact]
+	public void Brain_ShouldAddMemories_WhenComplexDependencyLoopAndSelfReference() {
+		//Arrange
+		var connections = new[] {
+			new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(1, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 1f),
+			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 3f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 02f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Output), 213f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Output), 2f),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
+		};
+
+		var genome = new Genome(connections);
+
+		//Act
+		var brain = new Brain(genome);
+
+		//Assert
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(3, NeuronType.Memory), new Neuron(1, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(1, NeuronType.Memory), new Neuron(2, NeuronType.Internal), 1f));
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(4, NeuronType.Memory), new Neuron(1, NeuronType.Internal), 2f));
+		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(4, NeuronType.Memory), new Neuron(4, NeuronType.Internal), 2f));
 		brain.SortedConnections.Should().Contain(new NeuronConnection(new Neuron(5, NeuronType.Memory), new Neuron(3, NeuronType.Internal), 2f));
 	}
 	

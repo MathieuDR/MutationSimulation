@@ -14,7 +14,7 @@ var watch = new Stopwatch();
 var random = new Random(seed);
 
 var hex =
-	"AwRgHMqQYr0OwIKJUgJhnR0UksAZkgFYAhMaMNeFDSPYAQQBEAWeVkRYOwk8ymhx9IrfhWLVoI1GCQBhIcRrAx9cYJVrgxDVRW76EYiHJoksHfjTGB+lIcK2KVYY6I671JEA";
+	"AwRgHMqd0CySaAmGkIGYBiVLtXSFBfSeYI4PVeMq4M/W6REshlx06AVhPq4GdgvBBCEjyYnt1h4J6KTDLy+8IA==";
 var genome = Genome.FromHex(hex);
 
 watch.Start();
