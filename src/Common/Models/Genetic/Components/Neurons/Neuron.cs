@@ -1,7 +1,6 @@
 using Common.Helpers;
-using Common.Simulator;
 
-namespace Common.Models.Bio;
+namespace Common.Models.Genetic.Components.Neurons;
 
 public record Neuron : INeuron {
 	private readonly ushort _id;

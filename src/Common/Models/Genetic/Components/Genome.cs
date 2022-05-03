@@ -1,7 +1,7 @@
 using Common.Helpers;
 using LZStringCSharp;
 
-namespace Common.Models.Bio;
+namespace Common.Models.Genetic.Components;
 
 public record Genome :IBiologicalEncodable {
 	// NeuronConnections exist out of 2 neurons and a weight in float.

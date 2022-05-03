@@ -1,7 +1,8 @@
 using Common.Helpers;
+using Common.Models.Genetic.Components.Neurons;
 using QuikGraph;
 
-namespace Common.Models.Bio; 
+namespace Common.Models.Genetic.Components; 
 
 public record NeuronConnection : IEdge<INeuron>, IBiologicalEncodable {
 	private readonly INeuron _source;

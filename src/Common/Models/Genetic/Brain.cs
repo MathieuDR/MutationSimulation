@@ -1,9 +1,11 @@
+using Common.Models.Genetic.Components;
+using Common.Models.Genetic.Components.Neurons;
 using QuikGraph;
 using QuikGraph.Algorithms;
 using QuikGraph.Algorithms.ConnectedComponents;
 using QuikGraph.Algorithms.Search;
 
-namespace Common.Models.Bio;
+namespace Common.Models.Genetic;
 
 public record Brain {
 	private readonly Genome _genome;

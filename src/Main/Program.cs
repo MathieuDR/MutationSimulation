@@ -3,7 +3,9 @@
 using System.Diagnostics;
 using Common.Interfaces;
 using Common.Models;
-using Common.Models.Bio;
+using Common.Models.Genetic;
+using Common.Models.Genetic.Components;
+using Common.Models.Genetic.Components.Neurons;
 using Common.Simulator;
 using Graphics;
 using Graphics.Helpers;

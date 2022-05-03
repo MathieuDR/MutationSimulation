@@ -1,4 +1,4 @@
-namespace Common.Models.Bio;
+namespace Common.Models.Genetic.Components.Neurons;
 
 public record InputNeuron : Neuron, IInputNeuron {
 	public InputNeuron(ushort id, NeuronInput neuronInput): base(id, NeuronType.Input) {

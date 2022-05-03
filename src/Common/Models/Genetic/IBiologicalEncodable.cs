@@ -1,4 +1,4 @@
-namespace Common.Models.Bio;
+namespace Common.Models.Genetic;
 
 public interface IBiologicalEncodable {
 	public string ToHex();

@@ -1,4 +1,4 @@
-namespace Common.Models.Bio; 
+namespace Common.Models.Genetic.Components.Neurons; 
 
 public enum NeuronAction {
 	WalkForward,

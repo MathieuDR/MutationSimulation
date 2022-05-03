@@ -1,4 +1,4 @@
-namespace Common.Models.Bio;
+namespace Common.Models.Genetic.Components.Neurons;
 
 public record ActionNeuron : Neuron, IActionNeuron {
 	public ActionNeuron(ushort id, NeuronAction neuronAction): base(id, NeuronType.Action) {

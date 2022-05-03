@@ -1,5 +1,6 @@
 using Common.Models;
-using Common.Models.Bio;
+using Common.Models.Genetic;
+using Common.Models.Genetic.Components.Neurons;
 using QuikGraph.Graphviz;
 using QuikGraph.Graphviz.Dot;
 

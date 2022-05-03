@@ -1,5 +1,6 @@
 using Common.Interfaces;
-using Common.Models.Bio;
+using Common.Models.Genetic;
+using Common.Models.Genetic.Components;
 using SkiaSharp;
 
 namespace Common.Models;
