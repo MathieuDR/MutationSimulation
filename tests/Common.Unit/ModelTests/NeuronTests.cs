@@ -1,6 +1,7 @@
 using System;
 using Common.Helpers;
 using Common.Models;
+using Common.Models.Bio;
 using FluentAssertions;
 using Xunit;
 
@@ -71,7 +72,7 @@ public class NeuronTests {
 	[Fact]
 	public void ToBytes_ShouldHaveSetLeftMostBit_ForOutputNeuronType() {
 		//Arrange
-		var neuron = new Neuron(1, NeuronType.Output);
+		var neuron = new Neuron(1, NeuronType.Action);
 
 		//Act
 		var b = neuron.GetBytes()[^1];
@@ -114,7 +115,7 @@ public class NeuronTests {
 	[InlineData(32767, 32767+32768)]
 	public void ToBytes_ShouldHaveCorrectByteValue_WhenNeuronIsExternal(ushort id, ushort expected) {
 		//Arrange
-		var neuron = new Neuron(id, NeuronType.Output);
+		var neuron = new Neuron(id, NeuronType.Action);
 
 		//Act
 		var b = neuron.GetBytes();
@@ -128,7 +129,7 @@ public class NeuronTests {
 	[InlineData(0x7F, NeuronType.Internal, "7F00")]
 	[InlineData(0x70, NeuronType.Internal, "7000")]
 	[InlineData(0x79, NeuronType.Input, "7980")]
-	[InlineData(0x79, NeuronType.Output, "7980")]
+	[InlineData(0x79, NeuronType.Action, "7980")]
 	[InlineData(0x79, NeuronType.Internal, "7900")]
 	public void ToHex_ShouldHaveCorrectHexValue_ForValidParams(ushort id, NeuronType type, string expected) {
 		//Arrange
@@ -145,7 +146,7 @@ public class NeuronTests {
 	[InlineData(0x7F, NeuronType.Internal, NeuronType.Input, "7F00")]
 	[InlineData(0x70, NeuronType.Internal, NeuronType.Input,"7000")]
 	[InlineData(0x79, NeuronType.Input, NeuronType.Input,"7980")]
-	[InlineData(0x79, NeuronType.Output, NeuronType.Output,"7980")]
+	[InlineData(0x79, NeuronType.Action, NeuronType.Action,"7980")]
 	public void FromHex_ShouldHaveCorrectNeuron_ForValidHex(ushort id, NeuronType type,NeuronType externalType ,string hex) {
 		//Arrange
 
@@ -161,7 +162,7 @@ public class NeuronTests {
 	[InlineData(0x7F, NeuronType.Internal, NeuronType.Input)]
 	[InlineData(0x70, NeuronType.Internal, NeuronType.Input)]
 	[InlineData(0x79, NeuronType.Input, NeuronType.Input)]
-	[InlineData(0x79, NeuronType.Output, NeuronType.Output)]
+	[InlineData(0x79, NeuronType.Action, NeuronType.Action)]
 	public void FromHex_ShouldHaveCorrectNeuron_WhenEncodedBefore(ushort id, NeuronType type, NeuronType externalType) {
 		//Arrange
 		var original = new Neuron(id, type);

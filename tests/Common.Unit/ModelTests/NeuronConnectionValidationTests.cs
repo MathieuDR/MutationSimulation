@@ -1,5 +1,6 @@
 using System;
 using Common.Models;
+using Common.Models.Bio;
 using FluentAssertions;
 using Xunit;
 
@@ -23,9 +24,9 @@ public class NeuronConnectionValidationTests {
 	[Theory]
 	[InlineData(NeuronType.Input, NeuronType.Input)]
 	[InlineData(NeuronType.Internal, NeuronType.Input)]
-	[InlineData(NeuronType.Output, NeuronType.Input)]
-	[InlineData(NeuronType.Output, NeuronType.Output)]
-	[InlineData(NeuronType.Output, NeuronType.Internal)]
+	[InlineData(NeuronType.Action, NeuronType.Input)]
+	[InlineData(NeuronType.Action, NeuronType.Action)]
+	[InlineData(NeuronType.Action, NeuronType.Internal)]
 	public void Ctor_ShouldThrowArgumentException_WhenWrongNeuronTypesConnectToEachOther(NeuronType neuronType1, NeuronType neuronType2) {
 		//Arrange
 		var n1 = new Neuron(1, neuronType1);
@@ -41,9 +42,9 @@ public class NeuronConnectionValidationTests {
 	[Theory]
 	[InlineData(NeuronType.Input, NeuronType.Input)]
 	[InlineData(NeuronType.Internal, NeuronType.Input)]
-	[InlineData(NeuronType.Output, NeuronType.Input)]
-	[InlineData(NeuronType.Output, NeuronType.Output)]
-	[InlineData(NeuronType.Output, NeuronType.Internal)]
+	[InlineData(NeuronType.Action, NeuronType.Input)]
+	[InlineData(NeuronType.Action, NeuronType.Action)]
+	[InlineData(NeuronType.Action, NeuronType.Internal)]
 	public void WithKeyword_ShouldThrowArgumentException_WhenWrongNeuronTypesConnectToEachOther(NeuronType neuronType1, NeuronType neuronType2 ) {
 		//Arrange
 		var n1 = new Neuron(1, NeuronType.Input);
@@ -63,7 +64,7 @@ public class NeuronConnectionValidationTests {
 	[Theory]
 	[InlineData(NeuronType.Input, NeuronType.Internal)]
 	[InlineData(NeuronType.Internal, NeuronType.Internal)]
-	[InlineData(NeuronType.Internal, NeuronType.Output)]
+	[InlineData(NeuronType.Internal, NeuronType.Action)]
 	public void Ctor_ShouldNotThrowArgumentException_WhenCorrectNeuronTypesConnectToEachOther(NeuronType neuronType1, NeuronType neuronType2) {
 		//Arrange
 		var n1 = new Neuron(1, neuronType1);
@@ -79,7 +80,7 @@ public class NeuronConnectionValidationTests {
 	[Theory]
 	[InlineData(NeuronType.Input, NeuronType.Internal)]
 	[InlineData(NeuronType.Internal, NeuronType.Internal)]
-	[InlineData(NeuronType.Internal, NeuronType.Output)]
+	[InlineData(NeuronType.Internal, NeuronType.Action)]
 	public void WithKeyword_ShouldNotThrowArgumentException_WhenCorrectNeuronTypesConnectToEachOther(NeuronType neuronType1, NeuronType neuronType2 ) {
 		//Arrange
 		var n1 = new Neuron(1, NeuronType.Input);

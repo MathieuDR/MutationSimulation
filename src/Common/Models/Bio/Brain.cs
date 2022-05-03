@@ -3,7 +3,7 @@ using QuikGraph.Algorithms;
 using QuikGraph.Algorithms.ConnectedComponents;
 using QuikGraph.Algorithms.Search;
 
-namespace Common.Models;
+namespace Common.Models.Bio;
 
 public record Brain {
 	private readonly Genome _genome;
@@ -12,8 +12,8 @@ public record Brain {
 
 	public NeuronConnection[] SortedConnections { get; private set; }
 	public NeuronConnection[] MemoryConnections { get; private set; }
-	public Neuron[] SortedNeurons { get; private set; }
-	public AdjacencyGraph<Neuron, NeuronConnection> BrainGraph { get; private set; }
+	public INeuron[] SortedNeurons { get; private set; }
+	public AdjacencyGraph<INeuron, NeuronConnection> BrainGraph { get; private set; }
 
 	public Genome Genome {
 		get => _genome;
@@ -27,15 +27,15 @@ public record Brain {
 		var neuronConnections = connections as NeuronConnection[] ?? connections.ToArray();
 		
 		var reversedGraph = neuronConnections
-			.Select(x => new Edge<Neuron>(x.Target, x.Source))
-			.ToAdjacencyGraph<Neuron, Edge<Neuron>>(false);
+			.Select(x => new Edge<INeuron>(x.Target, x.Source))
+			.ToAdjacencyGraph<INeuron, Edge<INeuron>>(false);
 
 
-		var connectedVertices = new List<Neuron>();
-		var alg = new BreadthFirstSearchAlgorithm<Neuron, Edge<Neuron>>(reversedGraph);
+		var connectedVertices = new List<INeuron>();
+		var alg = new BreadthFirstSearchAlgorithm<INeuron, Edge<INeuron>>(reversedGraph);
 		alg.DiscoverVertex += vertex => connectedVertices.Add(vertex);
 
-		foreach (var vertex in reversedGraph.Vertices.Where(x => x.NeuronType == NeuronType.Output)) {
+		foreach (var vertex in reversedGraph.Vertices.Where(x => x.NeuronType == NeuronType.Action)) {
 			alg.Compute(vertex);
 		}
 
@@ -47,7 +47,7 @@ public record Brain {
 		var selfReferences = usedConnections.Where(x => x.Source == x.Target).Select(ToMemoryConnection).ToArray();
 		var withMemory = usedConnections.Where(x => x.Source != x.Target).Concat(selfReferences).ToArray();
 
-		BrainGraph = withMemory.ToAdjacencyGraph<Neuron, NeuronConnection>(false);
+		BrainGraph = withMemory.ToAdjacencyGraph<INeuron, NeuronConnection>(false);
 		EnsureAcyclicGraph();
 
 		// sort
@@ -58,7 +58,7 @@ public record Brain {
 	}
 
 	private NeuronConnection ToMemoryConnection(NeuronConnection connection) => new NeuronConnection(
-		connection.Source with { NeuronType = NeuronType.Memory }, connection.Target, NeuronConnection.WeightToFloat(connection.Weight));
+		connection.Source.ToMemoryNeuron(), connection.Target, NeuronConnection.WeightToFloat(connection.Weight));
 
 	private void SortConnections() {
 		var sortedConnections = new List<NeuronConnection>();
@@ -72,9 +72,9 @@ public record Brain {
 
 	private void EnsureAcyclicGraph() {
 		var counter = 0;
-		List<BidirectionalGraph<Neuron, NeuronConnection>> components;
-		var componentsCountDict = new Dictionary<Neuron, int>();
-		var cCAlg = new StronglyConnectedComponentsAlgorithm<Neuron, NeuronConnection>(BrainGraph, componentsCountDict);
+		List<BidirectionalGraph<INeuron, NeuronConnection>> components;
+		var componentsCountDict = new Dictionary<INeuron, int>();
+		var cCAlg = new StronglyConnectedComponentsAlgorithm<INeuron, NeuronConnection>(BrainGraph, componentsCountDict);
 
 		var memoryConnection = new List<NeuronConnection>();
 
@@ -93,7 +93,7 @@ public record Brain {
 		MemoryConnections = memoryConnection.ToArray();
 	}
 
-	private void MakeCandidatesToMemories(Dictionary<Neuron, (NeuronConnection connection, int removedConnections)> edgeWithUsed,
+	private void MakeCandidatesToMemories(Dictionary<INeuron, (NeuronConnection connection, int removedConnections)> edgeWithUsed,
 		List<NeuronConnection> memoryConnection) {
 		foreach (var kvp in edgeWithUsed) {
 			var memory = ToMemoryConnection(kvp.Value.connection);
@@ -103,12 +103,12 @@ public record Brain {
 		}
 	}
 
-	private Dictionary<Neuron, (NeuronConnection connection, int removedConnections)> FindBestMemoryCandidates(
-		StronglyConnectedComponentsAlgorithm<Neuron, NeuronConnection> cCAlg) {
+	private Dictionary<INeuron, (NeuronConnection connection, int removedConnections)> FindBestMemoryCandidates(
+		StronglyConnectedComponentsAlgorithm<INeuron, NeuronConnection> cCAlg) {
 		var neuronsToCheck = FindCyclicNeurons(cCAlg);
 
-		// var componentDone = new List<Neuron>();
-		var edgeWithUsed = new Dictionary<Neuron, (NeuronConnection connection, int removedConnections)>();
+		// var componentDone = new List<INeuron>();
+		var edgeWithUsed = new Dictionary<INeuron, (NeuronConnection connection, int removedConnections)>();
 		foreach (var kvp in neuronsToCheck) {
 			if (edgeWithUsed.Any(x => x.Key == kvp.Value && x.Value.removedConnections == 1)) {
 				continue;
@@ -125,8 +125,8 @@ public record Brain {
 		return edgeWithUsed;
 	}
 
-	private bool TryFindEdgeByStronglyConnectedComponents(StronglyConnectedComponentsAlgorithm<Neuron, NeuronConnection> cCAlg,
-		KeyValuePair<Neuron, Neuron> kvp, out NeuronConnection? outEdge) {
+	private bool TryFindEdgeByStronglyConnectedComponents(StronglyConnectedComponentsAlgorithm<INeuron, NeuronConnection> cCAlg,
+		KeyValuePair<INeuron, INeuron> kvp, out NeuronConnection? outEdge) {
 		outEdge = BrainGraph
 			.OutEdges(kvp.Key)
 			.FirstOrDefault(x => x.Target == kvp.Value || (cCAlg.Roots.ContainsKey(x.Target) && cCAlg.Roots[x.Target] == kvp.Value));
@@ -134,8 +134,8 @@ public record Brain {
 		return outEdge is null;
 	}
 
-	private static void SaveToDictionary(Dictionary<Neuron, (NeuronConnection connection, int removedConnections)> edgeWithUsed,
-		KeyValuePair<Neuron, Neuron> kvp, int removed, NeuronConnection outEdge) {
+	private static void SaveToDictionary(Dictionary<INeuron, (NeuronConnection connection, int removedConnections)> edgeWithUsed,
+		KeyValuePair<INeuron, INeuron> kvp, int removed, NeuronConnection outEdge) {
 		if (edgeWithUsed.TryGetValue(kvp.Value, out var tuple)) {
 			if (tuple.removedConnections > removed) {
 				edgeWithUsed[kvp.Value] = (outEdge, removed);
@@ -154,7 +154,7 @@ public record Brain {
 		return removed;
 	}
 
-	private static IEnumerable<KeyValuePair<Neuron, Neuron>> FindCyclicNeurons(StronglyConnectedComponentsAlgorithm<Neuron, NeuronConnection> cCAlg) {
+	private static IEnumerable<KeyValuePair<INeuron, INeuron>> FindCyclicNeurons(StronglyConnectedComponentsAlgorithm<INeuron, NeuronConnection> cCAlg) {
 		var componentGroups = cCAlg.Components
 			.GroupBy(x => x.Value).Where(x => x.Count() > 1)
 			.SelectMany(x => x);

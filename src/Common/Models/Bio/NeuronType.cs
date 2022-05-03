@@ -1,8 +1,8 @@
-namespace Common.Models;
+namespace Common.Models.Bio;
 
 public enum NeuronType {
 	Input,
-	Output,
+	Action,
 	Internal,
 	Memory
 }

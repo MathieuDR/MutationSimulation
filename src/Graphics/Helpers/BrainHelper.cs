@@ -1,4 +1,5 @@
 using Common.Models;
+using Common.Models.Bio;
 using QuikGraph.Graphviz;
 using QuikGraph.Graphviz.Dot;
 
@@ -34,7 +35,7 @@ public static class BrainHelper {
 						args.VertexFormat.Group = "input";
 						args.VertexFormat.FillColor = GraphvizColor.Green;
 						break;
-					case NeuronType.Output:
+					case NeuronType.Action:
 						args.VertexFormat.Group = "output";
 						args.VertexFormat.FillColor = GraphvizColor.Orange;
 						break;

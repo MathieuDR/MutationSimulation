@@ -3,15 +3,16 @@
 using System.Diagnostics;
 using Common.Interfaces;
 using Common.Models;
+using Common.Models.Bio;
 using Common.Simulator;
 using Graphics;
 using Graphics.Helpers;
 
 // var mark = BenchmarkRunner.Run<BenchMarker>();
 
-var seed = 8923478;
 var watch = new Stopwatch();
-var random = new Random(seed);
+RandomProvider.SetSeed(8923478);
+var random = RandomProvider.GetRandom();
 
 var connections = new[] {
 	new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
@@ -23,9 +24,9 @@ var connections = new[] {
 	new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1.92f)),
 	new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
 	new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
-	new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Output), NeuronConnection.WeightToFloat(-2.73f)),
-	new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Output), NeuronConnection.WeightToFloat(1.02f)),
-	new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Output), NeuronConnection.WeightToFloat(-1.02f)),
+	new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Action), NeuronConnection.WeightToFloat(-2.73f)),
+	new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Action), NeuronConnection.WeightToFloat(1.02f)),
+	new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Action), NeuronConnection.WeightToFloat(-1.02f)),
 	new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
 };
 

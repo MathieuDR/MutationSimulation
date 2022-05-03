@@ -1,8 +1,9 @@
 using Common.Helpers;
+using Common.Simulator;
 
-namespace Common.Models;
+namespace Common.Models.Bio;
 
-public record Neuron {
+public record Neuron : INeuron {
 	private readonly ushort _id;
 	
 	private const int TypeMask = (1 << 7);
@@ -24,14 +25,13 @@ public record Neuron {
 	}
 
 	public NeuronType NeuronType { get; init; }
-	
+	public INeuron ToMemoryNeuron() => this with { NeuronType = NeuronType.Memory };
+
 	public void Deconstruct(out ushort Id, out NeuronType NeuronType) {
 		Id = this.Id;
 		NeuronType = this.NeuronType;
 	}
 
-	//public override string ToString() => GetBytes().ToHex();
-	
 	public string ToHex() => GetBytes().ToHex();
 
 	public byte[] GetBytes() {
@@ -45,14 +45,21 @@ public record Neuron {
 		return idBytes.ToArray();
 	}
 
-	public static Neuron FromBytes(byte[] bytes, NeuronType externalType) {
+	public static INeuron FromBytes(byte[] bytes, NeuronType externalType) {
 		var type = (bytes[^1] & TypeMask) != 0 ? externalType : NeuronType.Internal;
 		bytes[^1] &= IdAndMask;
 		var id = BitConverter.ToUInt16(bytes, 0);
-		return new Neuron(id, type);
+
+		return type switch {
+			NeuronType.Input => new InputNeuron(id),
+			NeuronType.Action => new ActionNeuron(id),
+			NeuronType.Internal => new Neuron(id, NeuronType.Internal),
+			_ => throw new ArgumentOutOfRangeException()
+		};
+		
 	}
 	
-	public static Neuron FromHex(string hex, NeuronType externalType) {	
+	public static INeuron FromHex(string hex, NeuronType externalType) {	
 		var bytes = Convert.FromHexString(hex);
 		return FromBytes(bytes, externalType);
 	}

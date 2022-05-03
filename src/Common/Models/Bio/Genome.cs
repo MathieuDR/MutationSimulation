@@ -1,9 +1,9 @@
 using Common.Helpers;
 using LZStringCSharp;
 
-namespace Common.Models;
+namespace Common.Models.Bio;
 
-public record Genome {
+public record Genome :IBiologicalEncodable {
 	// NeuronConnections exist out of 2 neurons and a weight in float.
 	// Together that are 8 bytes.
 	// The hex string is split into 8 byte chunks, which is 16 chars.

@@ -1,6 +1,7 @@
 using System;
 using Common.Helpers;
 using Common.Models;
+using Common.Models.Bio;
 using FluentAssertions;
 using Xunit;
 
@@ -11,7 +12,7 @@ public class NeuronConnectionEncodingTests {
 	[Fact]
 	public void ToHex_ShouldBe16CharsLong_WhenGivenValidNeuronConnection() {
 		//Arrange
-		var neuronConnection = new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(2, NeuronType.Output), 2f);
+		var neuronConnection = new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(2, NeuronType.Action), 2f);
 
 		//Act
 		var hex = neuronConnection.ToHex();
@@ -26,7 +27,7 @@ public class NeuronConnectionEncodingTests {
 	public void ToHex_ShouldProvideCorrectOrderHexString_WhenGivenValidInputOutputNeuronConnection() {
 		//Arrange
 		var n1 = new Neuron(1, NeuronType.Input);
-		var n2 = new Neuron(2, NeuronType.Output);
+		var n2 = new Neuron(2, NeuronType.Action);
 		var neuronConnection = new NeuronConnection(n1, n2, 2f);
 		var n1Hex = n1.ToHex();
 		var n2Hex = n2.ToHex();
@@ -83,7 +84,7 @@ public class NeuronConnectionEncodingTests {
 	public void ToHex_ShouldProvideCorrectHexString_WhenGivenValidInputOutputNeuronConnection() {
 		//Arrange
 		var n1 = new Neuron(50, NeuronType.Input);
-		var n2 = new Neuron(900, NeuronType.Output);
+		var n2 = new Neuron(900, NeuronType.Action);
 		var neuronConnection = new NeuronConnection(n1, n2, -300f);
 		var n1Hex = "3280";
 		var n2Hex = "8483";
