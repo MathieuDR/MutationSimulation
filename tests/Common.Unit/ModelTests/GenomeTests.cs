@@ -73,7 +73,25 @@ public class GenomeTests {
 		//Assert
 		genome.Should().BeEquivalentTo(genome2, options => options.Excluding(x => x.HexSequence));
 	}
-	
+
+	[Fact]
+	public void CreateGenome() {
+		//Arrange
+		var connections = new[] {
+			new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Output), NeuronConnection.WeightToFloat(1f)),
+		};
+
+		var genome = new Genome(connections);
+
+		//Act
+		var hex = genome.ToHex();
+		
+	}
+
 	[Fact]
 	public void GetBytes_ShouldGiveCorrectByte_WhenGivenValidSequence() {
 		//Arrange

@@ -8,6 +8,7 @@ public record Genome {
 	// Together that are 8 bytes.
 	// The hex string is split into 8 byte chunks, which is 16 chars.
 	private readonly NeuronConnection[] _neuronConnections;
+	private readonly string? _hexSequence;
 
 	public Genome(NeuronConnection[] neuronConnections, string? hexSequence = null) {
 		NeuronConnections = neuronConnections;
@@ -25,7 +26,10 @@ public record Genome {
 		}
 	}
 
-	public string? HexSequence { get; init; }
+	public string? HexSequence {
+		get => _hexSequence ?? ToHex();
+		init => _hexSequence = value;
+	}
 
 
 	public byte[] GetBytes() {

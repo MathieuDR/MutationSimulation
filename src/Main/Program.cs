@@ -13,9 +13,23 @@ var seed = 8923478;
 var watch = new Stopwatch();
 var random = new Random(seed);
 
-var hex =
-	"AwRgHMqd0CySaAmGkIGYBiVLtXSFBfSeYI4PVeMq4M/W6REshlx06AVhPq4GdgvBBCEjyYnt1h4J6KTDLy+8IA==";
-var genome = Genome.FromHex(hex);
+var connections = new[] {
+	new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+	new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal),  NeuronConnection.WeightToFloat(-1f)),
+	new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(3, NeuronType.Internal),  NeuronConnection.WeightToFloat(1.02f)),
+	new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(3.02f)),
+	new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), NeuronConnection.WeightToFloat(-1.02f)),
+	new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), NeuronConnection.WeightToFloat(3.29f)),
+	new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1.92f)),
+	new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
+	new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
+	new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Output), NeuronConnection.WeightToFloat(-2.73f)),
+	new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Output), NeuronConnection.WeightToFloat(1.02f)),
+	new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Output), NeuronConnection.WeightToFloat(-1.02f)),
+	new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
+};
+
+var genome = new Genome(connections);
 
 watch.Start();
 var brain = new Brain(genome);
