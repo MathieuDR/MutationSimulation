@@ -4,9 +4,9 @@ using QuikGraph;
 
 namespace Common.Models.Genetic.Components; 
 
-public record NeuronConnection : IEdge<INeuron>, IBiologicalEncodable {
-	private readonly INeuron _source;
-	private readonly INeuron _target;
+public record NeuronConnection : IEdge<Neuron>, IBiologicalEncodable {
+	private readonly Neuron _source;
+	private readonly Neuron _target;
 	private readonly float _weight;
 	private const float Divider = float.MaxValue / 4;
 	public const int ByteSize = Neuron.ByteSize * 2 + sizeof(float); 
@@ -19,7 +19,7 @@ public record NeuronConnection : IEdge<INeuron>, IBiologicalEncodable {
 		return weight * Divider;
 	}
 
-	public NeuronConnection(INeuron Source, INeuron Target, float Weight) {
+	public NeuronConnection(Neuron Source, Neuron Target, float Weight) {
 		this.Source = Source;
 		this.Target = Target;
 		this.Weight = Weight;
@@ -35,10 +35,10 @@ public record NeuronConnection : IEdge<INeuron>, IBiologicalEncodable {
 	}
 	
 	public static NeuronConnection FromBytes(byte[] bytes) {
-		// first 2 bytes are source INeuron
+		// first 2 bytes are source Neuron
 		var source = Neuron.FromBytes(bytes.Take(Neuron.ByteSize).ToArray(), NeuronType.Input);
 		
-		// next 2 bytes are destination INeuron
+		// next 2 bytes are destination Neuron
 		var destination = Neuron.FromBytes(bytes.Skip(Neuron.ByteSize).Take(Neuron.ByteSize).ToArray(), NeuronType.Action);
 		
 		// The rest is the weight
@@ -52,21 +52,21 @@ public record NeuronConnection : IEdge<INeuron>, IBiologicalEncodable {
 		return FromBytes(bytes);
 	}
 
-	public INeuron Source {
+	public Neuron Source {
 		get => _source;
 		init {
 			if(value.NeuronType == NeuronType.Action) {
-				throw new ArgumentException("Source INeuron cannot be an output INeuron");
+				throw new ArgumentException("Source Neuron cannot be an output Neuron");
 			}
 			_source = value;
 		}
 	}
 
-	public INeuron Target {
+	public Neuron Target {
 		get => _target;
 		init {
 			if(value.NeuronType == NeuronType.Input || value.NeuronType == NeuronType.Memory) {
-				throw new ArgumentException("Destination INeuron cannot be an input or memory INeuron");
+				throw new ArgumentException("Destination Neuron cannot be an input or memory Neuron");
 			}
 			_target = value;
 		}
@@ -77,7 +77,7 @@ public record NeuronConnection : IEdge<INeuron>, IBiologicalEncodable {
 		init => _weight = value / Divider;
 	}
 
-	public void Deconstruct(out INeuron Source, out INeuron Target, out float Weight) {
+	public void Deconstruct(out Neuron Source, out Neuron Target, out float Weight) {
 		Source = this.Source;
 		Target = this.Target;
 		Weight = this.Weight;

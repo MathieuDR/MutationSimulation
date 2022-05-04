@@ -2,7 +2,7 @@ using Common.Helpers;
 
 namespace Common.Models.Genetic.Components.Neurons;
 
-public record Neuron : INeuron {
+public record Neuron {
 	private readonly ushort _id;
 	
 	private const int TypeMask = (1 << 7);
@@ -24,7 +24,7 @@ public record Neuron : INeuron {
 	}
 
 	public NeuronType NeuronType { get; init; }
-	public INeuron ToMemoryNeuron() => this with { NeuronType = NeuronType.Memory };
+	public Neuron ToMemoryNeuron() => this with { NeuronType = NeuronType.Memory };
 
 	public void Deconstruct(out ushort Id, out NeuronType NeuronType) {
 		Id = this.Id;
@@ -44,7 +44,7 @@ public record Neuron : INeuron {
 		return idBytes.ToArray();
 	}
 
-	public static INeuron FromBytes(byte[] bytes, NeuronType externalType) {
+	public static Neuron FromBytes(byte[] bytes, NeuronType externalType) {
 		var type = (bytes[^1] & TypeMask) != 0 ? externalType : NeuronType.Internal;
 		bytes[^1] &= IdAndMask;
 		var id = BitConverter.ToUInt16(bytes, 0);
@@ -58,20 +58,8 @@ public record Neuron : INeuron {
 		
 	}
 	
-	public static INeuron FromHex(string hex, NeuronType externalType) {	
+	public static Neuron FromHex(string hex, NeuronType externalType) {	
 		var bytes = Convert.FromHexString(hex);
 		return FromBytes(bytes, externalType);
-	}
-
-	public virtual bool Equals(INeuron? other) {
-		if (ReferenceEquals(null, other)) {
-			return false;
-		}
-
-		if (ReferenceEquals(this, other)) {
-			return true;
-		}
-
-		return _id == other.Id && NeuronType == other.NeuronType;
 	}
 }

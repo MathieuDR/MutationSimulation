@@ -1,6 +1,6 @@
 namespace Common.Models.Genetic.Components.Neurons;
 
-public record InputNeuron : Neuron, IInputNeuron {
+public record InputNeuron : Neuron{
 	public InputNeuron(ushort id, NeuronInput neuronInput): base(id, NeuronType.Input) {
 		this.NeuronInput = neuronInput;
 	}

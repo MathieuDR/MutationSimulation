@@ -1,6 +1,6 @@
 namespace Common.Models.Genetic.Components.Neurons;
 
-public record ActionNeuron : Neuron, IActionNeuron {
+public record ActionNeuron : Neuron {
 	public ActionNeuron(ushort id, NeuronAction neuronAction): base(id, NeuronType.Action) {
 		NeuronAction = neuronAction;
 	}
