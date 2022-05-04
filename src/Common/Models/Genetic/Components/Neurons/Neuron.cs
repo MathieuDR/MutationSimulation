@@ -62,4 +62,16 @@ public record Neuron : INeuron {
 		var bytes = Convert.FromHexString(hex);
 		return FromBytes(bytes, externalType);
 	}
+
+	public virtual bool Equals(INeuron? other) {
+		if (ReferenceEquals(null, other)) {
+			return false;
+		}
+
+		if (ReferenceEquals(this, other)) {
+			return true;
+		}
+
+		return _id == other.Id && NeuronType == other.NeuronType;
+	}
 }

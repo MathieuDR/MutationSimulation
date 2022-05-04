@@ -23,7 +23,7 @@ public class NeuronConnectionDecodingTests {
 		var result = NeuronConnection.FromHex(hex);
 
 		//Assert
-		result.Should().Be(neuronConnection);
+		result.Should().BeEquivalentTo(neuronConnection);
 	}
 	
 	public static IEnumerable<object[]> NeuronConnections =>

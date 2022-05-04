@@ -46,7 +46,10 @@ public record Brain {
 
 	private void CreateGraph(NeuronConnection[] connections) {
 		var usedConnections = CalculatedUsedConnections(connections).ToArray();
-		var selfReferences = usedConnections.Where(x => x.Source == x.Target).Select(ToMemoryConnection).ToArray();
+		var selfReferences = usedConnections.Where(x => x.Source == x.Target)
+			.Select(ToMemoryConnection)
+			.ToArray();
+		
 		var withMemory = usedConnections.Where(x => x.Source != x.Target).Concat(selfReferences).ToArray();
 
 		BrainGraph = withMemory.ToAdjacencyGraph<INeuron, NeuronConnection>(false);

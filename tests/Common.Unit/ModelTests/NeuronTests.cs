@@ -172,7 +172,7 @@ public class NeuronTests {
 		var neuron = Neuron.FromHex(hex, externalType);
 
 		//Assert
-		neuron.Should().Be(original);
+		neuron.Should().BeEquivalentTo(original);
 	}
 	
 	
