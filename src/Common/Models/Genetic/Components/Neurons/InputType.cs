@@ -1,6 +1,6 @@
 namespace Common.Models.Genetic.Components.Neurons;
 
-public enum NeuronInput {
+public enum InputType {
 	LookFront,
 	LookLeft,
 	LookRight,

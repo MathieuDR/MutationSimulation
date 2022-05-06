@@ -1,13 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Diagnostics;
-using Common.Interfaces;
-using Common.Models;
 using Common.Models.Genetic;
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;
 using Common.Simulator;
-using Graphics;
 using Graphics.Helpers;
 
 // var mark = BenchmarkRunner.Run<BenchMarker>();

@@ -1,4 +1,3 @@
-using Common.Interfaces;
 using Common.Models;
 using Graphics.Helpers;
 using SkiaSharp;
@@ -40,7 +39,7 @@ public class WorldRenderMachine {
 		return SaveFrame(surface);
 	}
 
-	private void DrawBlobs(SKCanvas canvas, ICreature[] worldBlobs) {
+	private void DrawBlobs(SKCanvas canvas, Creature[] worldBlobs) {
 		foreach (var creature in worldBlobs) {
 			creature.Draw(canvas, GetImagePosition, GetPixelSize);
 		}

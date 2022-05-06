@@ -1,11 +1,10 @@
 
-using Common.Interfaces;
 using SkiaSharp;
 
 namespace Common.Models; 
 
 
-public record BouncingCreature(Position Position, Velocity Velocity, int Diameter, Color Color) : ICreature {
+public record BouncingCreature(Position Position, Velocity Velocity, int Diameter, Color Color)  {
 	public BouncingCreature(Random random, int maxVelocity, int maxDiameter, int worldWidth, int worldHeight) : 
 		this( new(0, 0), new Velocity(random, maxVelocity), random.Next(5, Math.Max(6, maxDiameter)), new Color(random)) {
 		Position = new Position(random, worldWidth, worldHeight, Diameter);
@@ -13,7 +12,7 @@ public record BouncingCreature(Position Position, Velocity Velocity, int Diamete
 
 	public int Radius => Diameter / 2;
 	
-	public ICreature Simulate(World world) {
+	public BouncingCreature Simulate(World world) {
 		return CalculatePosition(this, world);
 	}
 
