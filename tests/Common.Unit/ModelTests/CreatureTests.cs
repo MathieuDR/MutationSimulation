@@ -96,6 +96,29 @@ public class CreatureTests {
 	}
 	
 	[Theory]
+	[InlineData(0, 0, 0, 20)]
+	[InlineData(20, 0, 0, 10)]
+	[InlineData(20, 20, 45, -10)]
+	[InlineData(0, 20, 90, -20)]
+	[InlineData(-20, 0, 180, 99)]
+	[InlineData(-20, -20, 225, 15)]
+	[InlineData(0, -20, 270, 22)]
+	[InlineData(20, -20, 315, 33)]
+	[InlineData(-20, 20, 135, -42)]
+	public void CalculateAngle_ShouldBeCorrect_WhenFVectorsHaveAnOffset(int x2, int y2, double expected, int offset) {
+		//Arrange
+		var creature1 = new Creature(EmptyGenome(),new Position(0 + offset, 0 + offset), 5, new Color(20, 20, 20));
+		var creature2 = new Creature(EmptyGenome(),new Position(x2 + offset, y2 + offset), 5, new Color(20, 20, 20));
+
+		//Act;
+		var result = creature1.CalculateAngleBetweenCreatures(creature2);
+		
+
+		//Assert
+		result.Should().Be(expected);
+	}
+	
+	[Theory]
 	[InlineData(0, 0, 0)]
 	[InlineData(20, 0, 180)]
 	[InlineData(20, 20, 225)]
