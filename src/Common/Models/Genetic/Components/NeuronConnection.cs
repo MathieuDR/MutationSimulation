@@ -8,21 +8,24 @@ public record NeuronConnection : IEdge<Neuron>, IBiologicalEncodable {
 	private readonly Neuron _source;
 	private readonly Neuron _target;
 	private readonly float _weight;
-	private const float Divider = float.MaxValue / 4;
-	public const int ByteSize = Neuron.ByteSize * 2 + sizeof(float); 
+	private const float WeightDivider = float.MaxValue / 4;
+	
+	public const int ByteSize = Neuron.ByteSize * 2 + sizeof(float) ; 
 	
 	public static float WeightToFloat(float weight) {
 		if(weight is < -4f or > 4f) {
 			throw new ArgumentOutOfRangeException(nameof(weight), "Weight must be in range [-4, 4]");
 		}
 		
-		return weight * Divider;
+		return weight * WeightDivider;
 	}
+	
+	
 
-	public NeuronConnection(Neuron Source, Neuron Target, float Weight) {
-		this.Source = Source;
-		this.Target = Target;
-		this.Weight = Weight;
+	public NeuronConnection(Neuron source, Neuron target, float weight) {
+		Source = source;
+		Target = target;
+		Weight = weight;
 	}
 
 	public string ToHex() => GetBytes().ToHex();
@@ -30,7 +33,7 @@ public record NeuronConnection : IEdge<Neuron>, IBiologicalEncodable {
 	public byte[] GetBytes() {
 		return Source.GetBytes()
 			.Concat(Target.GetBytes())
-			.Concat(BitConverter.GetBytes(Weight * Divider))
+			.Concat(BitConverter.GetBytes(Weight * WeightDivider))
 			.ToArray();
 	}
 	
@@ -41,8 +44,9 @@ public record NeuronConnection : IEdge<Neuron>, IBiologicalEncodable {
 		// next 2 bytes are destination Neuron
 		var destination = Neuron.FromBytes(bytes.Skip(Neuron.ByteSize).Take(Neuron.ByteSize).ToArray(), NeuronType.Action);
 		
-		// The rest is the weight
+		// The rest is the weight and bias
 		var weight = BitConverter.ToSingle(bytes.Skip(Neuron.ByteSize * 2).Take(sizeof(float)).ToArray(), 0);
+		var bias = BitConverter.ToSingle(bytes.Skip(Neuron.ByteSize * 2 + sizeof(float)).Take(sizeof(float)).ToArray(), 0);
 		
 		return new NeuronConnection(source, destination, weight);
 	} 
@@ -71,10 +75,9 @@ public record NeuronConnection : IEdge<Neuron>, IBiologicalEncodable {
 			_target = value;
 		}
 	}
-	
 	public float Weight {
 		get => _weight;
-		init => _weight = value / Divider;
+		init => _weight = value / WeightDivider;
 	}
 
 	public void Deconstruct(out Neuron Source, out Neuron Target, out float Weight) {

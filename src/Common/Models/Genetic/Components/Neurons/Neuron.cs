@@ -8,11 +8,21 @@ public record Neuron {
 	private const int TypeMask = (1 << 7);
 	private const int IdAndMask = (byte.MaxValue - TypeMask);
 	public const int ByteSize = 2;
+	private const float BiasDivider = float.MaxValue;
 	
 	public Neuron(ushort Id, NeuronType NeuronType) {
 		this.Id = Id;
 		this.NeuronType = NeuronType;
 	}
+	
+	public static float BiasToFloat(float bias) {
+		if(bias is < -1f or > 1f) {
+			throw new ArgumentOutOfRangeException(nameof(bias), "Bias must be in range [-1, 1]");
+		}
+		
+		return bias * BiasDivider;
+	}
+	
 	public ushort Id {
 		get => _id;
 		init {
@@ -25,6 +35,8 @@ public record Neuron {
 
 	public NeuronType NeuronType { get; init; }
 	public Neuron ToMemoryNeuron() => this with { NeuronType = NeuronType.Memory };
+
+	public float Bias => 0;
 
 	public void Deconstruct(out ushort Id, out NeuronType NeuronType) {
 		Id = this.Id;

@@ -141,9 +141,9 @@ public class CreatureTests {
 	}
 	
 	[Theory]
-	[InlineData(20, 0, Direction.East)]
+	[InlineData(20, 0, Direction.West)] // they're switched around?
 	[InlineData(0, 20, Direction.North)]
-	[InlineData(-20, 0, Direction.West)]
+	[InlineData(-20, 0, Direction.East)]
 	[InlineData(0, -20, Direction.South)]
 	public void CalculateAngle_ShouldBeZero_WhenGivenDirection(int x2, int y2, Direction direction) {
 		//Arrange

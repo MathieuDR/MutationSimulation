@@ -79,7 +79,6 @@ for (int i = 0; i < blobAmount; i++) {
 		color = new Color(0, 0, 255); // blue
 	}
 
-
 	blobs[i] = new Creature(genome, pos, blobRadius, color);
 }
 

@@ -12,10 +12,11 @@ public record Brain {
 
 	public Brain(Genome genome) => Genome = genome;
 
-	public NeuronConnection[] SortedConnections { get; private set; }
 	public NeuronConnection[] MemoryConnections { get; private set; }
 	public Neuron[] SortedNeurons { get; private set; }
+	public ActionNeuron[] ActionNeurons { get; private set; }
 	public AdjacencyGraph<Neuron, NeuronConnection> BrainGraph { get; private set; }
+	public Dictionary<Neuron, NeuronConnection[]> Dependencies { get; private set; } = new();
 
 	public Genome Genome {
 		get => _genome;
@@ -57,6 +58,7 @@ public record Brain {
 
 		// sort
 		SortedNeurons = BrainGraph.TopologicalSort().ToArray();
+		ActionNeurons = SortedNeurons.Where(x=> x.NeuronType == NeuronType.Action).Cast<ActionNeuron>().ToArray();
 
 		// fix the connections
 		SortConnections();
@@ -66,13 +68,15 @@ public record Brain {
 		connection.Source with { NeuronType = NeuronType.Memory}, connection.Target, NeuronConnection.WeightToFloat(connection.Weight));
 
 	private void SortConnections() {
-		var sortedConnections = new List<NeuronConnection>();
+		//var sortedConnections = new List<NeuronConnection>();
 		foreach (var neuron in SortedNeurons) {
-			var outEdges = BrainGraph.OutEdges(neuron);
-			sortedConnections.AddRange(outEdges);
+			if(neuron.NeuronType == NeuronType.Input || neuron.NeuronType == NeuronType.Memory) {
+				continue;
+			}
+			var cons = BrainGraph.Edges.Where(x => x.Target == neuron).ToArray();
+			Dependencies.Add(neuron, cons);
+			
 		}
-
-		SortedConnections = sortedConnections.ToArray();
 	}
 
 	private void EnsureAcyclicGraph() {
