@@ -24,8 +24,8 @@ public record Creature {
 	public float OscillatorFrequency => 5000f;
 	public float OscillatorPhaseOffset => 5000f;
 	public int OscillatorAgeDivider => 1000;
-	public int EyeSightStrength => Radius * 5;
-	public float Speed => (float)Radius / 2;
+	public int EyeSightStrength => Radius * 4;
+	public float Speed => (float)Radius / 4;
 
 	public Brain Brain { get; private set; }
 
@@ -68,7 +68,7 @@ public record Creature {
 				Direction = (Direction)(((int)Direction + 1) % 4);
 				break;
 			case NeuronAction.TurnRight:
-				Direction = (Direction)(((int)Direction - 1) % 4);
+				Direction = (Direction)(((int)Direction + 3) % 4);
 				break;
 			case NeuronAction.TurnAround:
 				Direction = (Direction)(((int)Direction + 2) % 4);
@@ -109,7 +109,7 @@ public record Creature {
 	}
 
 	private void FireActions(World world) {
-		SoftMaxActionValues();
+		ActivateActionValues();
 		
 		var rng = RandomProvider.GetRandom().NextSingle();
 
@@ -122,17 +122,19 @@ public record Creature {
 		}
 	}
 
-	private void SoftMaxActionValues() {
+	private void ActivateActionValues() {
 		foreach (var kvp in _actionValues) {
-			_actionValues[kvp.Key] = SoftMax(kvp.Value);
+			if (kvp.Value.Count > 1) {
+				_actionValues[kvp.Key] = SoftMax(kvp.Value);
+			} else {
+				_actionValues[kvp.Key][kvp.Value.First().Key] = ActivationFunctions.Sigmoid(kvp.Value.First().Value);
+			}
 		}
 	}
 
 	private Dictionary<NeuronAction, float> SoftMax(Dictionary<NeuronAction, float> values) {
-		// Todo check if copilot is correct
-		var max = values.Values.Max();
-		var sum = values.Values.Sum();
-		var exp = values.ToDictionary(x => x.Key, x => Math.Exp(x.Value - max));
+		var exp = values.ToDictionary(x => x.Key, x => Math.Exp(x.Value));
+		var sum = exp.Values.Sum();
 		var softmax = exp.ToDictionary(x => x.Key, x => (float)(x.Value / sum));
 		return softmax;
 	}
@@ -187,7 +189,7 @@ public record Creature {
 	private float GetSensoryInput(InputNeuron inputNeuron, World world) {
 		return inputNeuron.InputTypeType switch {
 			InputType.LookFront => Look(world, Direction),
-			InputType.LookLeft => Look(world, (Direction)((int)(Direction - 1) % 4)),
+			InputType.LookLeft => Look(world, (Direction)((int)(Direction + 3) % 4)),
 			InputType.LookRight => Look(world, (Direction)((int)(Direction + 1) % 4)),
 			InputType.LookBack => Look(world, (Direction)((int)(Direction + 2) % 4)),
 			InputType.SmellFood => 0,
@@ -225,7 +227,7 @@ public record Creature {
 
 			var angle = this.CalculateAngleBetweenCreatures(worldCreature, direction);
 
-			if (angle >= 90) {
+			if (angle >= 35) {
 				continue; // ?
 			}
 

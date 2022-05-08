@@ -19,7 +19,7 @@ public class World {
 		tick = Tick;
 	}
 	
-	public void Simulate() {
+	public void NextTick() {
 		Tick++;
 		foreach (var creature in Creatures) {
 			creature.Simulate(this);
