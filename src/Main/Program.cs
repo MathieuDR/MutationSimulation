@@ -39,10 +39,10 @@ var blobAmount = worldSize * worldSize / (blobRadius / 2);
 var blobsPerRow = worldSize / blobRadius;
 
 var middle = new Position(worldSize / 2, worldSize / 2);
-var viewingAngle = 90;
+var viewingAngle = 135;
 
 var blobs = new Creature[blobAmount+1];
-var defColor = new Color(0, 0, 0);
+var defColor = new Color(255, 255, 255);
 
 for (int i = 0; i < blobAmount; i++) {
 	var x = (blobRadius * 2) * (i % blobsPerRow) + blobRadius;
@@ -83,7 +83,7 @@ for (int i = 0; i < blobAmount; i++) {
 	blobs[i] = new Creature(genome, pos, blobRadius, color);
 }
 
-blobs[^1] = new Creature(genome, middle, blobRadius, new Color(255, 255, 255));
+blobs[^1] = new Creature(genome, middle, blobRadius, new Color(84, 65, 181));
 
 
 var world = new World(worldSize, worldSize, blobs);
