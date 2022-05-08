@@ -16,8 +16,8 @@ public enum Direction {
 }
 
 
-public record Creature(Genome Genome, Position Position, int Radius, Color Color) {
-	private readonly Genome _genome = Genome;
+public record Creature {
+	private readonly Genome _genome;
 	public int Age { get;init; } = 0;
 
 	public int EyeSightStrength => Radius * 5;
@@ -25,6 +25,12 @@ public record Creature(Genome Genome, Position Position, int Radius, Color Color
 	public Brain Brain { get; private set; }
 	
 	private Dictionary<Neuron, float> _neuronValues = new Dictionary<Neuron, float>();
+	public Creature(Genome Genome, Position Position, int Radius, Color Color) {
+		this.Position = Position;
+		this.Radius = Radius;
+		this.Color = Color;
+		this.Genome = Genome;
+	}
 
 	public Direction Direction { get; init; } = RandomProvider.GetRandom().NextEnum<Direction>();
 
@@ -35,6 +41,10 @@ public record Creature(Genome Genome, Position Position, int Radius, Color Color
 			Brain = new Brain(_genome);
 		}
 	}
+
+	public Position Position { get; init; }
+	public int Radius { get; init; }
+	public Color Color { get; init; }
 
 	public Creature Simulate(World world) {
 		
@@ -132,5 +142,12 @@ public record Creature(Genome Genome, Position Position, int Radius, Color Color
 		var pixelPosition = calculatePixelPosition(Position);
 
 		canvas.DrawCircle(pixelPosition.X, pixelPosition.Y , pixelSize(Radius) , fillPaint);
+	}
+
+	public void Deconstruct(out Genome Genome, out Position Position, out int Radius, out Color Color) {
+		Genome = this.Genome;
+		Position = this.Position;
+		Radius = this.Radius;
+		Color = this.Color;
 	}
 }

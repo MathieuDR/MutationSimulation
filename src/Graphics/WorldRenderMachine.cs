@@ -1,4 +1,5 @@
 using Common.Models;
+using Common.Simulator;
 using Graphics.Helpers;
 using SkiaSharp;
 
@@ -15,7 +16,7 @@ public class WorldRenderMachine {
 	private ulong _frameCount;
 
 	public WorldRenderMachine(string path, string filename, int borderWidth = 5, SKEncodedImageFormat format = SKEncodedImageFormat.Png,
-		int quality = 100, int? randomSeed = null, int multiplier = 1) {
+		int quality = 100, int multiplier = 1) {
 		_borderWidth = borderWidth;
 		_format = format;
 		_quality = quality;
@@ -23,7 +24,7 @@ public class WorldRenderMachine {
 		_fileName = filename;
 		_multiplier = multiplier;
 
-		_random = randomSeed.HasValue ? new Random(randomSeed.Value) : new Random();
+		_random = RandomProvider.GetRandom();
 	}
 
 	public string RenderWorld(World world) {
