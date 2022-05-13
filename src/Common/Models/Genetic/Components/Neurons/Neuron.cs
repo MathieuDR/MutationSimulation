@@ -9,7 +9,8 @@ public record Neuron {
 	private const int IdAndMask = (byte.MaxValue - TypeMask);
 	public const int ByteSize = 2;
 	private const float BiasDivider = float.MaxValue;
-	
+	public const int MaxId = (ushort.MaxValue/2);
+
 	public Neuron(ushort Id, NeuronType NeuronType) {
 		this.Id = Id;
 		this.NeuronType = NeuronType;
@@ -26,8 +27,8 @@ public record Neuron {
 	public ushort Id {
 		get => _id;
 		init {
-			if(value == 0 || value > (ushort.MaxValue/2)) 
-				throw new ArgumentOutOfRangeException(nameof(Id), $"Id must be between 0 and {(ushort.MaxValue/2)+1}");
+			if(value == 0 || value > MaxId) 
+				throw new ArgumentOutOfRangeException(nameof(Id), $"Id must be between 1 and {MaxId}");
 			
 			_id = value;
 		}

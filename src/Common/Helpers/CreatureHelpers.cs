@@ -43,4 +43,6 @@ public static class CreatureHelpers {
 		
 		return moveFrom - moveAmount;
 	}
+
+	
 }
