@@ -7,7 +7,7 @@ namespace Graphics;
 
 public class WorldRenderMachine {
 	private readonly int _multiplier;
-	private readonly int _borderWidth;
+	private readonly int _wallWidth;
 	private readonly string _fileName;
 	private readonly string _filePath;
 	private readonly SKEncodedImageFormat _format;
@@ -15,9 +15,9 @@ public class WorldRenderMachine {
 	private readonly Random _random;
 	private ulong _frameCount;
 
-	public WorldRenderMachine(string path, string filename, int borderWidth = 5, SKEncodedImageFormat format = SKEncodedImageFormat.Png,
+	public WorldRenderMachine(string path, string filename, int wallWidth = 4, SKEncodedImageFormat format = SKEncodedImageFormat.Png,
 		int quality = 100, int multiplier = 1) {
-		_borderWidth = borderWidth;
+		_wallWidth = wallWidth;
 		_format = format;
 		_quality = quality;
 		_filePath = path;
@@ -29,13 +29,13 @@ public class WorldRenderMachine {
 
 	public string RenderWorld(World world) {
 		using var surface =
-			SKSurface.Create(new SKImageInfo(world.Width * _multiplier + _borderWidth * 2, world.Height * _multiplier + _borderWidth * 2));
+			SKSurface.Create(new SKImageInfo(world.Width * _multiplier , world.Height * _multiplier ));
 		using var canvas = surface.Canvas;
 
 		canvas.Clear(SKColors.White);
 
 		DrawBlobs(canvas, world.Creatures);
-		DrawBorder(canvas, SKColors.DarkRed, world.Width, world.Height);
+		DrawWalls(canvas, SKColors.DarkRed, world.Walls);
 
 		return SaveFrame(surface);
 	}
@@ -48,8 +48,8 @@ public class WorldRenderMachine {
 	
 	private int GetPixelSize(int size) => size * _multiplier;
 
-	private (int X, int Y) GetImagePosition(Position position) =>
-		(position.PixelX * _multiplier + _borderWidth, position.PixelY * _multiplier + _borderWidth);
+	private (int X, int Y) GetImagePosition(Vector vector) =>
+		(vector.PixelX * _multiplier , vector.PixelY * _multiplier );
 
 	private SKColor GetRandomColor() => new((byte)_random.Next(0, 255), (byte)_random.Next(0, 255), (byte)_random.Next(0, 255));
 
@@ -60,17 +60,20 @@ public class WorldRenderMachine {
 		return path;
 	}
 
-	private void DrawBorder(SKCanvas canvas, SKColor color, int width, int height) {
+	private void DrawWalls(SKCanvas canvas, SKColor color, Line[] walls) {
 		var borderPaint = new SKPaint {
 			Style = SKPaintStyle.Stroke,
-			StrokeWidth = _borderWidth,
+			StrokeWidth = _wallWidth,
 			Color = color
 		};
+		
+		var halfWidth = _wallWidth / 2;
 
 		// Draw the world.
-		var halvedBorder = _borderWidth / 2;
-		canvas.DrawRect(new SKRect(halvedBorder, halvedBorder, width * _multiplier + halvedBorder + _borderWidth, height * _multiplier + halvedBorder + _borderWidth),
-			borderPaint);
+		foreach (var wall in walls) {
+			canvas.DrawLine((float)wall.StartPoint.X, (float)wall.StartPoint.Y , (float)wall.EndPoint.X, (float)wall.EndPoint.Y,
+				borderPaint);
+		}
 	}
 
 

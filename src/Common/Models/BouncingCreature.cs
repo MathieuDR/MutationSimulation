@@ -4,10 +4,10 @@ using SkiaSharp;
 namespace Common.Models; 
 
 
-public record BouncingCreature(Position Position, Velocity Velocity, int Diameter, Color Color)  {
+public record BouncingCreature(Vector Vector, Velocity Velocity, int Diameter, Color Color)  {
 	public BouncingCreature(Random random, int maxVelocity, int maxDiameter, int worldWidth, int worldHeight) : 
 		this( new(0, 0), new Velocity(random, maxVelocity), random.Next(5, Math.Max(6, maxDiameter)), new Color(random)) {
-		Position = new Position(random, worldWidth, worldHeight, Diameter);
+		Vector = new Vector(random, worldWidth, worldHeight, Diameter);
 	}
 
 	public int Radius => Diameter / 2;
@@ -16,20 +16,20 @@ public record BouncingCreature(Position Position, Velocity Velocity, int Diamete
 		return CalculatePosition(this, world);
 	}
 
-	public void Draw(SKCanvas canvas, Func<Position, (int X, int Y)> calculatePixelPosition, Func<int, int> pixelSize) {
+	public void Draw(SKCanvas canvas, Func<Vector, (int X, int Y)> calculatePixelPosition, Func<int, int> pixelSize) {
 		var fillPaint = new SKPaint {
 			Style = SKPaintStyle.Fill,
 			Color = new SKColor(Color.R, Color.G, Color.B)
 		};
 		
-		var pixelPosition = calculatePixelPosition(Position);
+		var pixelPosition = calculatePixelPosition(Vector);
 
 		canvas.DrawCircle(pixelPosition.X, pixelPosition.Y , pixelSize(Radius) , fillPaint);
 	}
 	
 	private static BouncingCreature CalculatePosition(BouncingCreature bouncingCreature, World world) {
 		bouncingCreature = CalculateVelocity(bouncingCreature, world);
-		bouncingCreature = bouncingCreature with { Position = CalculatePositionFromVelocity(bouncingCreature.Position, bouncingCreature.Velocity) };
+		bouncingCreature = bouncingCreature with { Vector = CalculatePositionFromVelocity(bouncingCreature.Vector, bouncingCreature.Velocity) };
 
 		return bouncingCreature;
 	}
@@ -43,11 +43,11 @@ public record BouncingCreature(Position Position, Velocity Velocity, int Diamete
 
 	private static BouncingCreature CalculateVelocityFromWallCollisions(BouncingCreature bouncingCreature, World world) {
 		// if we hit a wall, invert the velocity
-		if (bouncingCreature.Position.X - bouncingCreature.Radius <= 0 || bouncingCreature.Position.X + bouncingCreature.Radius >= world.Width) {
+		if (bouncingCreature.Vector.X - bouncingCreature.Radius <= 0 || bouncingCreature.Vector.X + bouncingCreature.Radius >= world.Width) {
 			bouncingCreature = bouncingCreature with { Velocity = bouncingCreature.Velocity with {X =  -bouncingCreature.Velocity.X } };
 		}
 		
-		if (bouncingCreature.Position.Y - bouncingCreature.Radius<= 0 || bouncingCreature.Position.Y + bouncingCreature.Radius>= world.Height) {
+		if (bouncingCreature.Vector.Y - bouncingCreature.Radius<= 0 || bouncingCreature.Vector.Y + bouncingCreature.Radius>= world.Height) {
 			bouncingCreature = bouncingCreature with { Velocity = bouncingCreature.Velocity with {Y =  -bouncingCreature.Velocity.Y } };
 		}
 
@@ -87,12 +87,12 @@ public record BouncingCreature(Position Position, Velocity Velocity, int Diamete
 		return d1*dMult;
 	}
 	
-	private static Position CalculatePositionFromVelocity(Position position, Velocity velocity) {
-		return position with { X = position.X + (int)Math.Round(velocity.X, 0), Y = position.Y + (int)Math.Round(velocity.Y, 0) };
+	private static Vector CalculatePositionFromVelocity(Vector vector, Velocity velocity) {
+		return vector with { X = vector.X + (int)Math.Round(velocity.X, 0), Y = vector.Y + (int)Math.Round(velocity.Y, 0) };
 	}
 	
 	private static double CalculateDistance(BouncingCreature bouncingCreature, BouncingCreature otherBouncingCreature) {
-		return Math.Sqrt(Math.Pow(bouncingCreature.Position.X - otherBouncingCreature.Position.X, 2) + Math.Pow(bouncingCreature.Position.Y - otherBouncingCreature.Position.Y, 2));
+		return Math.Sqrt(Math.Pow(bouncingCreature.Vector.X - otherBouncingCreature.Vector.X, 2) + Math.Pow(bouncingCreature.Vector.Y - otherBouncingCreature.Vector.Y, 2));
 	}
 }
 

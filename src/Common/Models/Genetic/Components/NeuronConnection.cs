@@ -46,7 +46,6 @@ public record NeuronConnection : IEdge<Neuron>, IBiologicalEncodable {
 		
 		// The rest is the weight and bias
 		var weight = BitConverter.ToSingle(bytes.Skip(Neuron.ByteSize * 2).Take(sizeof(float)).ToArray(), 0);
-		var bias = BitConverter.ToSingle(bytes.Skip(Neuron.ByteSize * 2 + sizeof(float)).Take(sizeof(float)).ToArray(), 0);
 		
 		return new NeuronConnection(source, destination, weight);
 	} 

@@ -21,18 +21,6 @@ public class NeuronTests {
 	}
 	
 	[Fact]
-	public void Constructor_ShouldThrowsError_WhenIdIs0() {
-		//Arrange;
-		//Act
-		Action act = () => {
-			_ = new Neuron(0, NeuronType.Input);
-		};
-		
-		//Assert
-		act.Should().Throw<ArgumentOutOfRangeException>();
-	}
-	
-	[Fact]
 	public void ConstructorWith_ShouldThrowsError_WhenIdIsOver32768() {
 		//Arrange;
 		var neuron = new Neuron(5, NeuronType.Internal);
@@ -145,8 +133,8 @@ public class NeuronTests {
 	[Theory]
 	[InlineData(0x7F, NeuronType.Internal, NeuronType.Input, "7F00")]
 	[InlineData(0x70, NeuronType.Internal, NeuronType.Input,"7000")]
-	[InlineData(0x79, NeuronType.Input, NeuronType.Input,"7980")]
-	[InlineData(0x79, NeuronType.Action, NeuronType.Action,"7980")]
+	[InlineData(0x9, NeuronType.Input, NeuronType.Input,"7980")]
+	[InlineData(0x1, NeuronType.Action, NeuronType.Action,"7980")]
 	public void FromHex_ShouldHaveCorrectNeuron_ForValidHex(ushort id, NeuronType type,NeuronType externalType ,string hex) {
 		//Arrange
 
@@ -161,8 +149,8 @@ public class NeuronTests {
 	[Theory]
 	[InlineData(0x7F, NeuronType.Internal, NeuronType.Input)]
 	[InlineData(0x70, NeuronType.Internal, NeuronType.Input)]
-	[InlineData(0x79, NeuronType.Input, NeuronType.Input)]
-	[InlineData(0x79, NeuronType.Action, NeuronType.Action)]
+	[InlineData(1, NeuronType.Input, NeuronType.Input)]
+	[InlineData(9, NeuronType.Action, NeuronType.Action)]
 	public void FromHex_ShouldHaveCorrectNeuron_WhenEncodedBefore(ushort id, NeuronType type, NeuronType externalType) {
 		//Arrange
 		var original = new Neuron(id, type);

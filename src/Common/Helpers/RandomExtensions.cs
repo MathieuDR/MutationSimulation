@@ -11,20 +11,45 @@ public static class RandomExtensions {
 	private const int MaxId = 15;
 	private const int MaxConnections = 50;
 	private const int MinConnections = 10;
-	public static Creature[] GetRandomCreatures(this Random random, int count, int worldX, int worldY) {
+	public static Creature[] GetRandomCreatures(this Random random, int count, int worldX, int worldY, Line[] walls) {
 		var creatures = new Creature[count];
 		var genomes = random.GetRandomGenomes(count);
 
+		var pos = new List<(Vector point, int radius)>();
+
 		for (var i = 0; i < count; i++) {
-			var randPos = random.GetRandomPosition(worldX, worldY);
-			creatures[i] = new Creature(genomes[i], randPos, random.Next(MinRadius, MaxRadius), new Color(random));
+			var radius = random.Next(MinRadius, MaxRadius);
+			var randPos = random.GetValidPosition(radius, worldX, worldY, pos.ToArray(), walls);
+			creatures[i] = new Creature(genomes[i], randPos, radius, new Color(random));
+			pos.Add((randPos, creatures[i].Radius));
 		}
 
 		return creatures;
 	}
+
+	private static Vector GetValidPosition(this Random random, int radius, int maxX, int maxY, (Vector point, int radius)[] blobs, Line[] walls) {
+		Vector? proposed = null;
+		var valid = true;
+		do {
+			proposed = random.GetRandomPosition(maxX, maxY);
+			valid = !walls.Any(wall => wall.DistanceToLine(proposed.Value) <= radius + 2);
+
+			if (!valid || !blobs.Any()) {
+				continue;
+			}
+
+			var minDist = blobs.Min(blob => Math.Max(0, blob.point.CalculateDistanceBetweenPositions(proposed.Value) - blob.radius));
+			valid = minDist > radius;
+			if (!valid) {
+				proposed = random.GetRandomPosition(maxX, maxY);
+			}
+		} while (!valid);
+
+		return proposed.Value;
+	}
 	
-	private static Position GetRandomPosition(this Random random, int x, int y) {
-		return new Position(random.Next(x+1), random.Next(y+1));
+	private static Vector GetRandomPosition(this Random random, int x, int y) {
+		return new Vector(random.Next(x+1), random.Next(y+1));
 	}
 
 	public static Genome[] GetRandomGenomes(this Random random, int count) {

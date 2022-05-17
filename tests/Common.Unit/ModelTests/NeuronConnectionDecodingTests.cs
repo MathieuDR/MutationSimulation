@@ -29,11 +29,11 @@ public class NeuronConnectionDecodingTests {
 	public static IEnumerable<object[]> NeuronConnections =>
 		new List<object[]>
 		{
-			new object[] { new Neuron(1, NeuronType.Input), new Neuron(21, NeuronType.Action), 1232f },
-			new object[] { new Neuron(1000, NeuronType.Input), new Neuron(12, NeuronType.Action), 882f },
-			new object[] { new Neuron(214, NeuronType.Input), new Neuron(992, NeuronType.Action), -293.51f },
+			new object[] { new Neuron(1, NeuronType.Input), new Neuron(1, NeuronType.Action), 1232f },
+			new object[] { new Neuron(5, NeuronType.Input), new Neuron(3, NeuronType.Action), 882f },
+			new object[] { new Neuron(3, NeuronType.Input), new Neuron(4, NeuronType.Action), -293.51f },
 			new object[] { new Neuron(112, NeuronType.Internal), new Neuron(223, NeuronType.Internal), 0.5f },
-			new object[] { new Neuron(13, NeuronType.Internal), new Neuron(93, NeuronType.Action), 0.5f },
+			new object[] { new Neuron(13, NeuronType.Internal), new Neuron(2, NeuronType.Action), 0.5f },
 			new object[] { new Neuron(8, NeuronType.Input), new Neuron(2123, NeuronType.Internal), 0.5f },
 		};
 	
@@ -89,7 +89,7 @@ public class NeuronConnectionDecodingTests {
 		
 		//Assert
 		sourceNeuron.NeuronType.Should().Be(NeuronType.Action);
-		sourceNeuron.Id.Should().Be(129);
+		sourceNeuron.Id.Should().Be(9);
 	}
 	
 	[Fact]

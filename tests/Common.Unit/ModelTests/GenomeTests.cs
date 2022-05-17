@@ -16,7 +16,7 @@ public class GenomeTests {
 		//Arrange
 		//Act
 		var sequence = new Genome(new[] {
-			new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(2, NeuronType.Action), 2f)
+			new NeuronConnection(new InputNeuron(1), new Neuron(2, NeuronType.Action), 2f)
 		});
 
 		//Assert
@@ -37,7 +37,7 @@ public class GenomeTests {
 	public void WithKeyword_ShouldThrowArgumentException_WhenNeuronConnectionAreEmpty() {
 		//Arrange
 		var sequence = new Genome(new[] {
-			new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(2, NeuronType.Action), 2f)
+			new NeuronConnection(new InputNeuron(1), new Neuron(2, NeuronType.Action), 2f)
 		});
 		
 		//Act
@@ -51,7 +51,7 @@ public class GenomeTests {
 	public void FromHex_ShouldReturnSameGenome_WhenProvided() {
 		//Arrange
 		var connections = new[] {
-			new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new InputNeuron(1), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
 			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal),  NeuronConnection.WeightToFloat(-1f)),
 			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(3, NeuronType.Internal),  NeuronConnection.WeightToFloat(1.02f)),
 			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(3.02f)),
@@ -60,7 +60,7 @@ public class GenomeTests {
 			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1.92f)),
 			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
 			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
-			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Action), NeuronConnection.WeightToFloat(-2.73f)),
+			new NeuronConnection(new Neuron(5, NeuronType.Internal), new ActionNeuron(1), NeuronConnection.WeightToFloat(-2.73f)),
 			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Action), NeuronConnection.WeightToFloat(1.02f)),
 			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Action), NeuronConnection.WeightToFloat(-1.02f)),
 			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
@@ -80,11 +80,11 @@ public class GenomeTests {
 	public void CreateGenome() {
 		//Arrange
 		var connections = new[] {
-			new NeuronConnection(new Neuron(1, NeuronType.Input), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new InputNeuron(1), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
 			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
 			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
 			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
-			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Action), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new ActionNeuron(1), NeuronConnection.WeightToFloat(1f)),
 		};
 
 		var genome = new Genome(connections);

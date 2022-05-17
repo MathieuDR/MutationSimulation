@@ -23,7 +23,7 @@ public class BrainTests {
 	// [Fact]
 	// public void Brain_ShouldHaveOneUsedConnection_WhenThereIsInternalToOutput() {
 	// 	//Arrange
-	// 	var genome = new Genome(new[] { new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Action), 2f) });
+	// 	var genome = new Genome(new[] { new NeuronConnection(new Neuron(2, NeuronType.Internal), new ActionNeuron(2), 2f) });
 	// 	
 	// 	//Act
 	// 	var brain = new Brain(genome);
@@ -48,8 +48,8 @@ public class BrainTests {
 	// public void Brain_ShouldHaveSortedConnections_WhenThereIsAnInternal() {
 	// 	//Arrange
 	// 	var genome = new Genome(new[] {
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Action), 2f)
+	// 		new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
+	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new ActionNeuron(2), 2f)
 	// 	});
 	// 	
 	// 	//Act
@@ -57,16 +57,16 @@ public class BrainTests {
 	//
 	// 	//Assert
 	// 	brain.SortedConnections.Should().HaveCount(2);
-	// 	brain.SortedConnections[0].Should().BeEquivalentTo(new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f));
-	// 	brain.SortedConnections[1].Should().BeEquivalentTo(new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Action), 2f));
+	// 	brain.SortedConnections[0].Should().BeEquivalentTo(new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f));
+	// 	brain.SortedConnections[1].Should().BeEquivalentTo(new NeuronConnection(new Neuron(2, NeuronType.Internal), new ActionNeuron(2), 2f));
 	// }
 	
 	[Fact]
 	public void Brain_ShouldHave4SortedNeurons_WhenThereAre2SeparatePaths() {
 		//Arrange
 		var genome = new Genome(new[] {
-			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Action), 2f),
-			new NeuronConnection(new Neuron(3, NeuronType.Input), new Neuron(3, NeuronType.Action), 2f)
+			new NeuronConnection(new InputNeuron(2), new ActionNeuron(2), 2f),
+			new NeuronConnection(new InputNeuron(3), new ActionNeuron(3), 2f)
 		});
 		
 		//Act
@@ -80,8 +80,8 @@ public class BrainTests {
 	// public void Brain_ShouldHave2SortedPaths_WhenThereAre2SeparatePaths() {
 	// 	//Arrange
 	// 	var genome = new Genome(new[] {
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Action), 2f),
-	// 		new NeuronConnection(new Neuron(3, NeuronType.Input), new Neuron(3, NeuronType.Action), 2f)
+	// 		new NeuronConnection(new InputNeuron(2), new ActionNeuron(2), 2f),
+	// 		new NeuronConnection(new InputNeuron(3), new ActionNeuron(3), 2f)
 	// 	});
 	// 	
 	// 	//Act
@@ -95,8 +95,8 @@ public class BrainTests {
 	// public void Brain_ShouldHave2SortedPaths_WhenThereIsSplittingPath() {
 	// 	//Arrange
 	// 	var genome = new Genome(new[] {
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Action), 2f),
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(3, NeuronType.Action), 2f)
+	// 		new NeuronConnection(new InputNeuron(2), new ActionNeuron(2), 2f),
+	// 		new NeuronConnection(new InputNeuron(2), new ActionNeuron(3), 2f)
 	// 	});
 	// 	
 	// 	//Act
@@ -110,8 +110,8 @@ public class BrainTests {
 	public void Brain_ShouldHave3Neurons_WhenThereIsSplittingPath() {
 		//Arrange
 		var genome = new Genome(new[] {
-			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Action), 2f),
-			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(3, NeuronType.Action), 2f)
+			new NeuronConnection(new InputNeuron(2), new ActionNeuron(2), 2f),
+			new NeuronConnection(new InputNeuron(2), new ActionNeuron(3), 2f)
 		});
 		
 		//Act
@@ -125,7 +125,7 @@ public class BrainTests {
 	// public void Brain_ShouldSortConnections_WhenReceivingTree() {
 	// 	//Arrange
 	// 	var genome = new Genome(new[] {
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+	// 		new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Action), 2f)
 	// 	});
@@ -145,7 +145,7 @@ public class BrainTests {
 	// 	//Arrange
 	// 	var genome = new Genome(new[] {
 	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Action), 2f),
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+	// 		new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
 	// 	});
 	// 	
@@ -164,9 +164,9 @@ public class BrainTests {
 	// public void Brain_ShouldNotPrune_WhenWeHaveInputTwoNeurons() {
 	// 	//Arrange
 	// 	var genome = new Genome(new[] {
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Action), 2f),
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(3, NeuronType.Action), 2f),
+	// 		new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
+	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new ActionNeuron(3), 2f),
+	// 		new NeuronConnection(new InputNeuron(2), new ActionNeuron(3), 2f),
 	// 	});
 	// 	
 	// 	//Act
@@ -180,9 +180,9 @@ public class BrainTests {
 	// public void Brain_ShouldPrune_WhenDependencyLoopOccurs() {
 	// 	//Arrange
 	// 	var genome = new Genome(new[] {
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+	// 		new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
-	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Action), 2f),
+	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new ActionNeuron(3), 2f),
 	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
 	// 	});
 	//
@@ -198,9 +198,9 @@ public class BrainTests {
 	// public void Brain_ShouldAddMemory_WhenDependencyLoopOccurs() {
 	// 	//Arrange
 	// 	var genome = new Genome(new[] {
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+	// 		new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
-	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Action), 2f),
+	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new ActionNeuron(3), 2f),
 	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
 	// 	});
 	//
@@ -216,9 +216,9 @@ public class BrainTests {
 	// public void Brain_ShouldRemoveCorrectConnection_WhenComplexDependencyLoop() {
 	// 	//Arrange
 	// 	var connections = new[] {
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+	// 		new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
-	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Action), 2f),
+	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new ActionNeuron(3), 2f),
 	// 		new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
 	// 	};
@@ -240,9 +240,9 @@ public class BrainTests {
 	// 	var connections = new[] {
 	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+	// 		new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
-	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Action), 2f),
+	// 		new NeuronConnection(new Neuron(3, NeuronType.Internal), new ActionNeuron(3), 2f),
 	// 	};
 	// 	
 	// 	var genome = new Genome(connections);
@@ -270,8 +270,8 @@ public class BrainTests {
 	// 		new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Action), 2f),
-	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Action), 213f),
-	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Action), 2f),
+	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new ActionNeuron(2), 213f),
+	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new ActionNeuron(3), 2f),
 	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
 	// 	};
 	//
@@ -307,8 +307,8 @@ public class BrainTests {
 	// 		new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Action), 2f),
-	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Action), 213f),
-	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Action), 2f),
+	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new ActionNeuron(2), 213f),
+	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new ActionNeuron(3), 2f),
 	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
 	// 	};
 	//
@@ -339,8 +339,8 @@ public class BrainTests {
 	// 		new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Action), 2f),
-	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Action), 213f),
-	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Action), 2f),
+	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new ActionNeuron(2), 213f),
+	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new ActionNeuron(3), 2f),
 	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
 	// 	};
 	//
@@ -370,8 +370,8 @@ public class BrainTests {
 	// 		new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(1, NeuronType.Action), 2f),
-	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Action), 2f),
-	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Action), 2f),
+	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new ActionNeuron(2), 2f),
+	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new ActionNeuron(3), 2f),
 	// 		new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
 	// 	};
 	//
@@ -395,11 +395,11 @@ public class BrainTests {
 	public void Brain_ShouldKeepOutputs_WhenPruning() {
 		//Arrange
 		var connections = new[] {
-			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
 			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
-			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Action), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new ActionNeuron(3), 2f),
 			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
-			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(2, NeuronType.Action), 2f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new ActionNeuron(2), 2f),
 			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
 		};
 		
@@ -417,11 +417,11 @@ public class BrainTests {
 	public void Brain_ShouldKeepInputs_WhenPruning() {
 		//Arrange
 		var connections = new[] {
-			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
 			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), 2f),
-			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(3, NeuronType.Action), 2f),
+			new NeuronConnection(new Neuron(3, NeuronType.Internal), new ActionNeuron(3), 2f),
 			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
-			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(2, NeuronType.Action), 2f),
+			new NeuronConnection(new Neuron(4, NeuronType.Internal), new ActionNeuron(2), 2f),
 			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), 2f),
 		};
 		
@@ -438,7 +438,7 @@ public class BrainTests {
 	// [Fact]
 	// public void Brain_ShouldHaveOneUsedConnection_WhenThereIsInputToOutput() {
 	// 	//Arrange
-	// 	var genome = new Genome(new[] { new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Action), 2f) });
+	// 	var genome = new Genome(new[] { new NeuronConnection(new InputNeuron(2), new ActionNeuron(2), 2f) });
 	//
 	// 	//Act
 	// 	var brain = new Brain(genome);
@@ -451,8 +451,8 @@ public class BrainTests {
 	// public void Brain_ShouldHaveTwoUsedConnection_WhenThereAreTwoConnections() {
 	// 	//Arrange
 	// 	var genome = new Genome(new[] {
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Action), 2f)
+	// 		new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
+	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new ActionNeuron(2), 2f)
 	// 	});
 	//
 	// 	//Act
@@ -466,9 +466,9 @@ public class BrainTests {
 	// public void Brain_ShouldHaveThreeUsedConnection_WhenInternalIsSelfReferencing() {
 	// 	//Arrange
 	// 	var genome = new Genome(new[] {
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+	// 		new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Action), 2f)
+	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new ActionNeuron(2), 2f)
 	// 	});
 	//
 	// 	//Act
@@ -482,9 +482,9 @@ public class BrainTests {
 	public void Brain_ShouldAddMemory_WhenSelfReferencing() {
 		//Arrange
 		var genome = new Genome(new[] {
-			new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+			new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
 			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
-			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Action), 2f)
+			new NeuronConnection(new Neuron(2, NeuronType.Internal), new ActionNeuron(2), 2f)
 		});
 
 		//Act
@@ -498,9 +498,9 @@ public class BrainTests {
 	// public void Brain_ShouldAddMemoryToSorted_WhenSelfReferencing() {
 	// 	//Arrange
 	// 	var genome = new Genome(new[] {
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Input), new Neuron(2, NeuronType.Internal), 2f),
+	// 		new NeuronConnection(new InputNeuron(2), new Neuron(2, NeuronType.Internal), 2f),
 	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Internal), 2f),
-	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(2, NeuronType.Action), 2f)
+	// 		new NeuronConnection(new Neuron(2, NeuronType.Internal), new ActionNeuron(2), 2f)
 	// 	});
 	//
 	// 	//Act

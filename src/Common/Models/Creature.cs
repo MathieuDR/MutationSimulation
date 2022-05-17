@@ -13,8 +13,8 @@ public record Creature {
 	private readonly Dictionary<ActionCategory, Dictionary<ActionType, float>> _actionValues;
 	private readonly Dictionary<Neuron, float> _neuronValues = new();
 
-	public Creature(Genome genome, Position position, int radius, Color color) {
-		Position = position;
+	public Creature(Genome genome, Vector vector, int radius, Color color) {
+		Vector = vector;
 		Radius = radius;
 		Color = color;
 		Genome = genome;
@@ -47,7 +47,7 @@ public record Creature {
 		}
 	}
 
-	public Position Position { get; private set; }
+	public Vector Vector { get; private set; }
 	public int Radius { get; init; }
 	public Color Color { get; init; }
 
@@ -106,7 +106,7 @@ public record Creature {
 			yMovement *= -1;
 		}
 		
-		Position = Position with { X = Position.X + xMovement, Y = Position.Y + yMovement };
+		Vector = Vector with { X = Vector.X + xMovement, Y = Vector.Y + yMovement };
 	}
 
 	private void FireActions(World world) {
@@ -215,7 +215,11 @@ public record Creature {
 
 
 	private float Look(World world, Direction direction) {
-		float bestValue = 1;
+		// 1 = nothing infront
+		float closestObj = 1;
+		
+		var closestWallInDirection = world.GetClosestWallInDirection(Vector, direction);
+		
 
 		// check which is in the fov of the creature
 		
@@ -238,26 +242,26 @@ public record Creature {
 			}
 
 			var strength = 1 - (float)(distance / EyeSightStrength);
-			bestValue = Math.Min(strength, bestValue);
+			closestObj = Math.Min(strength, closestObj);
 		}
 
-		return bestValue;
+		return closestObj;
 	}
 
-	public void Draw(SKCanvas canvas, Func<Position, (int X, int Y)> calculatePixelPosition, Func<int, int> pixelSize) {
+	public void Draw(SKCanvas canvas, Func<Vector, (int X, int Y)> calculatePixelPosition, Func<int, int> pixelSize) {
 		var fillPaint = new SKPaint {
 			Style = SKPaintStyle.Fill,
 			Color = new SKColor(Color.R, Color.G, Color.B)
 		};
 
-		var pixelPosition = calculatePixelPosition(Position);
+		var pixelPosition = calculatePixelPosition(Vector);
 
 		canvas.DrawCircle(pixelPosition.X, pixelPosition.Y, pixelSize(Radius), fillPaint);
 	}
 
-	public void Deconstruct(out Genome genome, out Position position, out int radius, out Color color) {
+	public void Deconstruct(out Genome genome, out Vector vector, out int radius, out Color color) {
 		genome = Genome;
-		position = Position;
+		vector = Vector;
 		radius = Radius;
 		color = Color;
 	}
