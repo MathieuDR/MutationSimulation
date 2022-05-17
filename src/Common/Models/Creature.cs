@@ -10,7 +10,7 @@ namespace Common.Models;
 
 public record Creature {
 	private readonly Genome _genome;
-	private readonly Dictionary<ActionCategory, Dictionary<NeuronAction, float>> _actionValues;
+	private readonly Dictionary<ActionCategory, Dictionary<ActionType, float>> _actionValues;
 	private readonly Dictionary<Neuron, float> _neuronValues = new();
 
 	public Creature(Genome genome, Position position, int radius, Color color) {
@@ -40,9 +40,9 @@ public record Creature {
 			Brain = new Brain(_genome);
 
 			_actionValues = Brain.ActionNeurons
-				.GroupBy(x => x.NeuronAction.GetActionCategory())
+				.GroupBy(x => x.ActionType.GetActionCategory())
 				.ToDictionary(x => x.Key,
-					x => x.ToDictionary(y => y.NeuronAction, y => 0f));
+					x => x.ToDictionary(y => y.ActionType, y => 0f));
 		}
 	}
 
@@ -56,33 +56,33 @@ public record Creature {
 		FireActions(world);
 	}
 
-	private void Act(World world, NeuronAction action) {
-		switch (action) {
-			case NeuronAction.WalkForward:
+	private void Act(World world, ActionType actionType) {
+		switch (actionType) {
+			case ActionType.WalkForward:
 				Walk();
 				break;
-			case NeuronAction.WalkBackward:
+			case ActionType.WalkBackward:
 				Walk(false);
 				break;
-			case NeuronAction.TurnLeft:
+			case ActionType.TurnLeft:
 				Direction = (Direction)(((int)Direction + 1) % 4);
 				break;
-			case NeuronAction.TurnRight:
+			case ActionType.TurnRight:
 				Direction = (Direction)(((int)Direction + 3) % 4);
 				break;
-			case NeuronAction.TurnAround:
+			case ActionType.TurnAround:
 				Direction = (Direction)(((int)Direction + 2) % 4);
 				break;
-			case NeuronAction.Eat:
-			case NeuronAction.Sleep:
-			case NeuronAction.EmitPheromone:
-			case NeuronAction.SetOscillator:
-			case NeuronAction.SetPheromoneStrength:
-			case NeuronAction.SetPheromoneDecay:
-			case NeuronAction.SetSpeed:
+			case ActionType.Eat:
+			case ActionType.Sleep:
+			case ActionType.EmitPheromone:
+			case ActionType.SetOscillator:
+			case ActionType.SetPheromoneStrength:
+			case ActionType.SetPheromoneDecay:
+			case ActionType.SetSpeed:
 				break;
 			default:
-				throw new ArgumentOutOfRangeException(nameof(action), action, null);
+				throw new ArgumentOutOfRangeException(nameof(actionType), actionType, null);
 		}
 	}
 
@@ -132,7 +132,7 @@ public record Creature {
 		}
 	}
 
-	private Dictionary<NeuronAction, float> SoftMax(Dictionary<NeuronAction, float> values) {
+	private Dictionary<ActionType, float> SoftMax(Dictionary<ActionType, float> values) {
 		var exp = values.ToDictionary(x => x.Key, x => Math.Exp(x.Value));
 		var sum = exp.Values.Sum();
 		var softmax = exp.ToDictionary(x => x.Key, x => (float)(x.Value / sum));
@@ -153,8 +153,8 @@ public record Creature {
 			if (neuron.NeuronType == NeuronType.Action) {
 				// fill in in _actionValues
 				var actionNeuron = (ActionNeuron)neuron;
-				var cat = actionNeuron.NeuronAction.GetActionCategory();
-				_actionValues[cat][actionNeuron.NeuronAction] = value;
+				var cat = actionNeuron.ActionType.GetActionCategory();
+				_actionValues[cat][actionNeuron.ActionType] = value;
 			}
 		}
 	}
@@ -162,6 +162,10 @@ public record Creature {
 	public float CalculateNeuronValueFromDependencies(Neuron neuron) {
 		if (neuron.NeuronType == NeuronType.Input) {
 			throw new InvalidOperationException("Cannot calculate value of input neuron");
+		}
+
+		if (neuron.NeuronType == NeuronType.Memory) {
+			return GetNeuronValue(neuron);
 		}
 
 		var input = neuron.Bias;
@@ -187,7 +191,7 @@ public record Creature {
 	}
 
 	private float GetSensoryInput(InputNeuron inputNeuron, World world) {
-		return inputNeuron.InputTypeType switch {
+		return inputNeuron.InputType switch {
 			InputType.LookFront => Look(world, Direction),
 			InputType.LookLeft => Look(world, (Direction)((int)(Direction + 3) % 4)),
 			InputType.LookRight => Look(world, (Direction)((int)(Direction + 1) % 4)),

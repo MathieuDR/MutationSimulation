@@ -1,19 +1,20 @@
 namespace Common.Models.Genetic.Components.Neurons;
 
 public record ActionNeuron : Neuron {
-	public ActionNeuron(ushort id, NeuronAction neuronAction): base(id, NeuronType.Action) {
-		NeuronAction = neuronAction;
+	protected static int NeuronActionsAmount = Enum.GetValues<ActionType>().Length;
+	public ActionNeuron(ushort id, ActionType actionType): base(id, NeuronType.Action) {
+		ActionType = actionType;
 	}
 	
-	public ActionNeuron(ushort id): base(id, NeuronType.Action) {
-		var action = id % (Enum.GetValues<NeuronAction>().Length - 1);
-		NeuronAction = (NeuronAction)action;
+	public ActionNeuron(ushort id): base((ushort)(id % NeuronActionsAmount), NeuronType.Action) {
+		var action = Id; 
+		ActionType = (ActionType)action;
 	}
 	
-	public NeuronAction NeuronAction { get; init; }
+	public ActionType ActionType { get; init; }
 	
-	public void Deconstruct(out ushort Id, out NeuronType NeuronType, out NeuronAction NeuronAction) {
+	public void Deconstruct(out ushort Id, out NeuronType NeuronType, out ActionType actionType) {
 		base.Deconstruct(out Id, out NeuronType);
-		NeuronAction = this.NeuronAction;
+		actionType = this.ActionType;
 	}
 }

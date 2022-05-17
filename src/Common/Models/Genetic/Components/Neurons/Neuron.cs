@@ -27,8 +27,8 @@ public record Neuron {
 	public ushort Id {
 		get => _id;
 		init {
-			if(value == 0 || value > MaxId) 
-				throw new ArgumentOutOfRangeException(nameof(Id), $"Id must be between 1 and {MaxId}");
+			if(value > MaxId) 
+				throw new ArgumentOutOfRangeException(nameof(Id), $"Id must be higher than {MaxId}");
 			
 			_id = value;
 		}

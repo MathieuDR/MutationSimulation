@@ -1,6 +1,6 @@
 namespace Common.Models.Genetic.Components.Neurons; 
 
-public enum NeuronAction {
+public enum ActionType {
 	WalkForward,
 	WalkBackward,
 	TurnLeft,

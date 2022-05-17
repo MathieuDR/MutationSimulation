@@ -73,9 +73,8 @@ public record Brain {
 			if(neuron.NeuronType == NeuronType.Input || neuron.NeuronType == NeuronType.Memory) {
 				continue;
 			}
-			var cons = BrainGraph.Edges.Where(x => x.Target == neuron).ToArray();
+			var cons = BrainGraph.Edges.Where(x => x.Target == neuron || (x.Target.Id == neuron.Id && x.Target.NeuronType == NeuronType.Memory)).ToArray();
 			Dependencies.Add(neuron, cons);
-			
 		}
 	}
 
