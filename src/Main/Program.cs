@@ -12,7 +12,11 @@ RandomProvider.SetSeed(781239324);
 var random = RandomProvider.GetRandom();
 
 int worldSize = 500;
+watch.Start();
 var blobs = random.GetRandomCreatures(50, worldSize, worldSize);
+watch.Stop();
+Console.WriteLine("Created {0} creatures in {1}ms", blobs.Length, watch.ElapsedMilliseconds);
+
 
 
 var world = new World(worldSize, worldSize, blobs);
@@ -23,7 +27,7 @@ foreach (var blob in blobs) {
 }
 
 var images = new List<string>();
-watch.Start();
+watch.Restart();
 var rounds = 500;
 
 for (var i = 0; i < rounds; i++) {

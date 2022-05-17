@@ -34,8 +34,8 @@ public static class RandomExtensions {
 			var connectionCount = random.Next(MinConnections, MaxConnections);
 			var connections = new NeuronConnection?[connectionCount];
 			for (int c = 0; c < connectionCount; c++) {
-				var n1 = random.NextNeuron(NeuronType.Input);
-				var n2 = random.NextNeuron(NeuronType.Action);
+				var n1 = random.NextValidNeuron(NeuronType.Input);
+				var n2 = random.NextValidNeuron(NeuronType.Action);
 				
 				if(connections.Any(x => x is not null && x.Source == n1 && x.Target == n2)) {
 					// redo
@@ -71,6 +71,20 @@ public static class RandomExtensions {
 		// // choose -149 instead of -126 to also generate subnormal floats (*)
 		// double exponent = Math.Pow(2.0, random.Next(-126, 128));
 		// return (float)(mantissa * exponent);
+	}
+
+	public static Neuron NextValidNeuron(this Random random, NeuronType nonInternalType) {
+		int i = 0;
+		Neuron n = random.NextNeuron(nonInternalType);
+		while (!n.IsEnabledNeuron()) {
+			n = random.NextNeuron(nonInternalType);
+			i++;
+			if (i > 100) {
+				throw new Exception("Could not create valid neuron");
+			}
+		}
+
+		return n;
 	}
 
 	public static Neuron NextNeuron(this Random random, NeuronType nonInternalType) {

@@ -1,3 +1,4 @@
+using Common.Helpers;
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;
 using QuikGraph;
@@ -36,9 +37,13 @@ public record Brain {
 
 		var connectedVertices = new List<Neuron>();
 		var alg = new BreadthFirstSearchAlgorithm<Neuron, Edge<Neuron>>(reversedGraph);
-		alg.DiscoverVertex += vertex => connectedVertices.Add(vertex);
+		alg.DiscoverVertex += vertex => {
+			if (vertex.IsEnabledNeuron()) {
+				connectedVertices.Add(vertex);
+			}
+		};
 
-		foreach (var vertex in reversedGraph.Vertices.Where(x => x.NeuronType == NeuronType.Action)) {
+		foreach (var vertex in reversedGraph.Vertices.Where(x => x.NeuronType == NeuronType.Action && x.IsEnabledNeuron())) {
 			alg.Compute(vertex);
 		}
 
@@ -57,7 +62,7 @@ public record Brain {
 		EnsureAcyclicGraph();
 
 		// sort
-		SortedNeurons = BrainGraph.TopologicalSort().ToArray();
+		SortedNeurons = BrainGraph.TopologicalSort().Where(x=>x.IsEnabledNeuron()).ToArray();
 		ActionNeurons = SortedNeurons.Where(x=> x.NeuronType == NeuronType.Action).Cast<ActionNeuron>().ToArray();
 
 		// fix the connections
