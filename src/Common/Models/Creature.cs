@@ -25,6 +25,7 @@ public record Creature {
 	public float OscillatorPhaseOffset => 5000f;
 	public int OscillatorAgeDivider => 1000;
 	public int EyeSightStrength => Radius * 4;
+	public int ViewingAngle => 40;
 	public float Speed => (float)Radius / 4;
 
 	public Brain Brain { get; private set; }
@@ -217,6 +218,7 @@ public record Creature {
 		float bestValue = 1;
 
 		// check which is in the fov of the creature
+		
 		foreach (var worldCreature in world.Creatures) {
 			if (this == worldCreature) {
 				continue;
@@ -231,7 +233,7 @@ public record Creature {
 
 			var angle = this.CalculateAngleBetweenCreatures(worldCreature, direction);
 
-			if (angle >= 35) {
+			if (angle >= ViewingAngle) {
 				continue; // ?
 			}
 
