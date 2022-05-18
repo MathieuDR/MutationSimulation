@@ -25,7 +25,7 @@ public static class RandomExtensions {
 				creatures[i] = new Creature(genomes[i], randPos, radius, new Color(random));
 				pos.Add((randPos, creatures[i]!.Radius));
 			} catch (OverflowException e) {
-				Console.WriteLine(e.Message);
+				//Console.WriteLine(e.Message);
 			}
 		}
 
@@ -39,18 +39,18 @@ public static class RandomExtensions {
 		do {
 			proposed = random.GetRandomPosition(maxX, maxY);
 			counter++;
-			if(counter > 200) {
+			if(counter > 100) {
 				throw new OverflowException("Could not find a valid position");
 			}
 			
-			valid = !walls.Any(wall => wall.Distance(proposed.Value) <= radius + 1);
+			valid = !walls.Any(wall => wall.Distance(proposed.Value) <= radius + 2);
 
 			if (!valid || !blobs.Any()) {
 				continue;
 			}
 
 			var minDist = blobs.Min(blob => Math.Max(0, blob.point.CalculateDistanceBetweenPositions(proposed.Value) - blob.radius));
-			valid = minDist > radius;
+			valid = minDist > radius + 1;
 			if (!valid) {
 				proposed = random.GetRandomPosition(maxX, maxY);
 			}

@@ -23,13 +23,13 @@ worldWalls.Add(new Line(new Vector(worldSize/2, worldSize/4 * 3), new Vector(wor
 var walls = worldWalls.ToArray();
 
 var watch = new Stopwatch();
-var seed = "thieu";
+var seed = "quickmaffs";
 RandomProvider.SetSeed(seed.GetHashCode());
 var random = RandomProvider.GetRandom();
 
 
 watch.Start();
-var blobs = random.GetRandomCreatures(1000, worldSize, worldSize, walls);
+var blobs = random.GetRandomCreatures(100, worldSize, worldSize, walls);
 watch.Stop();
 Console.WriteLine("Created {0} creatures in {1}ms", blobs.Length, watch.ElapsedMilliseconds);
 
