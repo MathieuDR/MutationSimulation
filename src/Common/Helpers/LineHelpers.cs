@@ -3,8 +3,7 @@ using Common.Models;
 namespace Common.Helpers; 
 
 public static class LineHelpers {
-	public static Vector? GetIntersectionWithinLines(this Line l1, Line l2, double? tolerance = null) {
-		var toleranceValue = tolerance ?? 0.001d;
+	public static Vector? GetIntersectionWithinLines(this Line l1, Line l2) {
 		var intersectionOfEquations = l1.GetIntersection(l2);
 		
 		// check if intersection is within the lines
@@ -13,26 +12,25 @@ public static class LineHelpers {
 		}
 
 		var intersection = intersectionOfEquations.Value;
-		if (l1.IsPointOnLine(intersection) && l2.IsPointOnLine(intersection)) {
+		if (l1.IsPointOnEquation(intersection) && l2.IsPointOnEquation(intersection)) {
 			return intersection;
 		}
 
 		return null;
 	}
 	
-	public static Vector? GetIntersection(this Line l1, Line l2, double? tolerance = null) {
-		var toleranceValue = tolerance ?? 0.001d;
+	public static Vector? GetIntersection(this Line l1, Line l2, double tolerance = 0.001d) {
 		var eq1 = l1.ToEquation();
 		var eq2 = l2.ToEquation();
 		
 		var delta = eq1.A * eq2.B - eq2.A * eq1.B;
-		if(Math.Abs(delta) < toleranceValue) {
+		if(Math.Abs(delta) < tolerance) {
 			return null;
 		}
 		
 		
 		// check if overlap
-		if(l1.Overlaps(l2, toleranceValue)) {
+		if(l1.Overlaps(l2, tolerance)) {
 			throw new Exception("Lines overlap, intersection not possible");
 		}
 		
@@ -42,17 +40,47 @@ public static class LineHelpers {
 		return new Vector(x, y);
 	}
 
-	public static double DistanceToLine(this Line line, Vector point) {
+	public static double DistanceToEquation(this Line line, Vector point) {
 		var eq = line.ToEquation();
 		var distance = Math.Abs(eq.A * point.X + eq.B * point.Y + eq.C) / Math.Sqrt(Math.Pow(eq.A, 2) + Math.Pow(eq.B, 2));
 		return distance;
+	}
+
+	// https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+	public static double Distance(this Line line, Vector point, double tolerance = 0.001d) {
+		var l2 = Dist2(line.StartPoint, line.EndPoint);
+		if(l2 < tolerance) {
+			return Dist2(point, line.StartPoint);;
+		}
 		
+		var t = ((point.X - line.StartPoint.X) * (line.EndPoint.X - line.StartPoint.X) + 
+		         (point.Y - line.StartPoint.Y) * (line.EndPoint.Y - line.StartPoint.Y)) / l2;
+		
+		t = Math.Max(0, Math.Min(1, t));
+		
+		var closestPoint = new Vector(line.StartPoint.X + t * (line.EndPoint.X - line.StartPoint.X),
+		                              line.StartPoint.Y + t * (line.EndPoint.Y - line.StartPoint.Y));
+		
+		return Math.Sqrt(Dist2(point, closestPoint));
+	}
+
+	private static double Dist2(Vector a, Vector b) {
+		return Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2);
 	}
 	
-	public static bool IsPointOnLine(this Line line, Vector point, double? tolerance = null) {
-		var toleranceValue = tolerance ?? 0.001d;
+	public static bool IsPointOnEquation(this Line line, Vector point, double tolerance = 0.001d) {
 		var eq = line.ToEquation();
-		return Math.Abs((eq.A * point.X) + (eq.B * point.Y) + eq.C) < toleranceValue;
+		return Math.Abs((eq.A * point.X) + (eq.B * point.Y) + eq.C) < tolerance;
+	}
+	
+	public static bool IsPointOnLine(this Line line, Vector point, double tolerance = 0.001d) {
+		var onEq = line.IsPointOnEquation(point, tolerance);
+		if(!onEq) {
+			return false;
+		}
+		
+		var distance = line.Distance(point);
+		return distance < tolerance;
 	}
 
 	private static bool Overlaps(this Line l1, Line l2, double tolerance) {
@@ -72,9 +100,9 @@ public static class LineHelpers {
 	}
 
 	private static (double A, double B, double C) ToEquation(this Line l) {
-		var a = l.EndPoint.Y - l.StartPoint.Y;
-		var b = l.StartPoint.X - l.EndPoint.X;
-		var c = a * l.StartPoint.X + b * l.StartPoint.Y;
+		var a = l.StartPoint.Y - l.EndPoint.Y;
+		var b = l.EndPoint.X - l.StartPoint.X;
+		var c = l.StartPoint.X * l.EndPoint.Y - l.EndPoint.X * l.StartPoint.Y;
 		return (a, b, c);
 	}
 	

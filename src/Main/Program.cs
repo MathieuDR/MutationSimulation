@@ -16,15 +16,20 @@ worldWalls.Add(new Line(new Vector(worldSize - wallOffset, 0), new Vector(worldS
 worldWalls.Add(new Line(new Vector(0, worldSize - wallOffset), new Vector(worldSize, worldSize - wallOffset)));
 worldWalls.Add(new Line(new Vector(worldSize/4, worldSize/2), new Vector(worldSize/ 4 * 3, worldSize/2)));
 worldWalls.Add(new Line(new Vector(worldSize/2, worldSize/4), new Vector(worldSize/2, worldSize/ 4 * 3)));
+worldWalls.Add(new Line(new Vector(worldSize/4, worldSize/2), new Vector(worldSize/2, worldSize/ 4 * 3)));
+worldWalls.Add(new Line(new Vector(worldSize/2, worldSize/4), new Vector(worldSize/4 * 3, worldSize/ 2)));
+worldWalls.Add(new Line(new Vector(worldSize/2, worldSize/4), new Vector(worldSize/4 , worldSize/ 2)));
+worldWalls.Add(new Line(new Vector(worldSize/2, worldSize/4 * 3), new Vector(worldSize/4 * 3 , worldSize/2)));
 var walls = worldWalls.ToArray();
 
 var watch = new Stopwatch();
-RandomProvider.SetSeed(78123924);
+var seed = "thieu";
+RandomProvider.SetSeed(seed.GetHashCode());
 var random = RandomProvider.GetRandom();
 
 
 watch.Start();
-var blobs = random.GetRandomCreatures(50, worldSize, worldSize, walls);
+var blobs = random.GetRandomCreatures(1000, worldSize, worldSize, walls);
 watch.Stop();
 Console.WriteLine("Created {0} creatures in {1}ms", blobs.Length, watch.ElapsedMilliseconds);
 

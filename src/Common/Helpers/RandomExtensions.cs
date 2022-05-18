@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Common.Models;
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;
@@ -12,27 +13,37 @@ public static class RandomExtensions {
 	private const int MaxConnections = 50;
 	private const int MinConnections = 10;
 	public static Creature[] GetRandomCreatures(this Random random, int count, int worldX, int worldY, Line[] walls) {
-		var creatures = new Creature[count];
+		var creatures = new Creature?[count];
 		var genomes = random.GetRandomGenomes(count);
 
 		var pos = new List<(Vector point, int radius)>();
 
 		for (var i = 0; i < count; i++) {
-			var radius = random.Next(MinRadius, MaxRadius);
-			var randPos = random.GetValidPosition(radius, worldX, worldY, pos.ToArray(), walls);
-			creatures[i] = new Creature(genomes[i], randPos, radius, new Color(random));
-			pos.Add((randPos, creatures[i].Radius));
+			try {
+				var radius = random.Next(MinRadius, MaxRadius);
+				var randPos = random.GetValidPosition(radius, worldX, worldY, pos.ToArray(), walls);
+				creatures[i] = new Creature(genomes[i], randPos, radius, new Color(random));
+				pos.Add((randPos, creatures[i]!.Radius));
+			} catch (OverflowException e) {
+				Console.WriteLine(e.Message);
+			}
 		}
 
-		return creatures;
+		return creatures.Where(x=> x is not null).Cast<Creature>().ToArray();
 	}
 
 	private static Vector GetValidPosition(this Random random, int radius, int maxX, int maxY, (Vector point, int radius)[] blobs, Line[] walls) {
 		Vector? proposed = null;
 		var valid = true;
+		var counter = 0;
 		do {
 			proposed = random.GetRandomPosition(maxX, maxY);
-			valid = !walls.Any(wall => wall.DistanceToLine(proposed.Value) <= radius + 2);
+			counter++;
+			if(counter > 200) {
+				throw new OverflowException("Could not find a valid position");
+			}
+			
+			valid = !walls.Any(wall => wall.Distance(proposed.Value) <= radius + 1);
 
 			if (!valid || !blobs.Any()) {
 				continue;
