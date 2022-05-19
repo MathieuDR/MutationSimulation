@@ -14,5 +14,12 @@ public enum InputType {
 	PheromoneDecay,
 	IsEmittingPheromone,
 	Age,
-	Speed
+	Speed,
+	Collisions,
+	StartX,
+	StartY,
+	CurrentX,
+	CurrentY,
+	DistanceFromStart,
+	Collided
 }

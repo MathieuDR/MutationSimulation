@@ -29,7 +29,7 @@ public class WorldRenderMachine {
 
 	public string RenderWorld(World world) {
 		using var surface =
-			SKSurface.Create(new SKImageInfo(world.Width * _multiplier , world.Height * _multiplier ));
+			SKSurface.Create(new SKImageInfo(World.Width * _multiplier , World.Height * _multiplier ));
 		using var canvas = surface.Canvas;
 
 		canvas.Clear(SKColors.White);
@@ -40,9 +40,12 @@ public class WorldRenderMachine {
 		return SaveFrame(surface);
 	}
 
+	private readonly ulong[] _ids = new ulong[]{};
+
 	private void DrawBlobs(SKCanvas canvas, Creature[] worldBlobs) {
 		foreach (var creature in worldBlobs) {
-			creature.Draw(canvas, GetImagePosition, GetPixelSize);
+			if(!_ids.Any() || _ids.Contains(creature.Id)) 
+				creature.Draw(canvas, GetImagePosition, GetPixelSize);
 		}
 	}
 	

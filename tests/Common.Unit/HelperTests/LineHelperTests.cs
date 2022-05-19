@@ -36,7 +36,7 @@ public class LineHelperTests {
 		var result = line.IsPointOnLine(point);
 
 		//Assert
-		result.Should().BeFalse();
+		result.Should().BeFalse(info);
 	}
 
 	[Fact]
@@ -93,5 +93,57 @@ public class LineHelperTests {
 
 		//Assert
 		result.Should().BeApproximately(expected, 0.001, info);
+	}
+
+	[Fact]
+	public void GetIntersectionWithinLines_ShouldReturnNull_WhenNoIntersection() {
+		//Arrange
+		var l1 = new Line(new Vector(10, 10), new Vector(20, 20));
+		var l2 = new Line(new Vector(0, 9), new Vector(9, 0));
+		
+		//Act
+		var result = l1.GetIntersectionWithinLines(l2);
+
+		//Assert
+		result.Should().BeNull();
+	}
+	
+	[Fact]
+	public void GetIntersectionWithinLines_ShouldReturnNull_WhenParalell() {
+		//Arrange
+		var l1 = new Line(new Vector(10, 10), new Vector(20, 20));
+		var l2 = new Line(new Vector(12, 12), new Vector(22, 22));
+		
+		//Act
+		var result = l1.GetIntersectionWithinLines(l2);
+
+		//Assert
+		result.Should().BeNull();
+	}
+	
+	[Fact]
+	public void GetIntersectionWithinLines_ShouldReturnPoint_WhenCrossing() {
+		//Arrange
+		var l1 = new Line(new Vector(10, 10), new Vector(20, 10));
+		var l2 = new Line(new Vector(15, 0), new Vector(15, 20));
+		
+		//Act
+		var result = l1.GetIntersectionWithinLines(l2);
+
+		//Assert
+		result.Should().Be(new Vector(15, 10));
+	}
+	
+	[Fact]
+	public void GetIntersectionWithinLines_ShouldReturnPoint_WhenCrossingAndInNegative() {
+		//Arrange
+		var l1 = new Line(new Vector(-10, -10), new Vector(-20, -10));
+		var l2 = new Line(new Vector(-15, 0), new Vector(-15, -20));
+		
+		//Act
+		var result = l1.GetIntersectionWithinLines(l2);
+
+		//Assert
+		result.Should().Be(new Vector(-15, -10));
 	}
 }

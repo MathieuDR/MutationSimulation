@@ -12,7 +12,7 @@ public static class LineHelpers {
 		}
 
 		var intersection = intersectionOfEquations.Value;
-		if (l1.IsPointOnEquation(intersection) && l2.IsPointOnEquation(intersection)) {
+		if (l1.IsPointOnLine(intersection) && l2.IsPointOnLine(intersection)) {
 			return intersection;
 		}
 
@@ -34,8 +34,8 @@ public static class LineHelpers {
 			throw new Exception("Lines overlap, intersection not possible");
 		}
 
-		var x = (eq2.B * eq1.C - eq1.B * eq2.C) / delta;
-		var y = (eq1.A * eq2.C - eq2.A * eq1.C) / delta;
+		var x = (eq1.B * eq2.C - eq2.B * eq1.C) / delta;
+		var y = (eq2.A * eq1.C - eq1.A * eq2.C) / delta;
 
 		return new Vector(x, y);
 	}

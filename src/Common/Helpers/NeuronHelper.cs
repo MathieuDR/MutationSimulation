@@ -11,7 +11,14 @@ public static class NeuronHelper {
 			InputType.LookFront,
 			InputType.LookLeft,
 			InputType.LookRight,
-			InputType.Speed
+			InputType.Speed,
+			InputType.Collisions,
+			InputType.DistanceFromStart,
+			InputType.StartX,
+			InputType.StartY,
+			InputType.CurrentX,
+			InputType.CurrentY,
+			InputType.Collided
 		};
 	}
 	

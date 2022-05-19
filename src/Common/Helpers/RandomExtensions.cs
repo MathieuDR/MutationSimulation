@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Common.Models;
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;
@@ -9,7 +8,7 @@ public static class RandomExtensions {
 	private const int MinRadius = 5;
 	private const int MaxRadius = 10;
 	private const double InternalConnChance = 0.25;
-	private const int MaxId = 15;
+	private const int MaxId = 25;
 	private const int MaxConnections = 50;
 	private const int MinConnections = 10;
 	public static Creature[] GetRandomCreatures(this Random random, int count, int worldX, int worldY, Line[] walls) {
@@ -21,7 +20,7 @@ public static class RandomExtensions {
 		for (var i = 0; i < count; i++) {
 			try {
 				var radius = random.Next(MinRadius, MaxRadius);
-				var randPos = random.GetValidPosition(radius, worldX, worldY, pos.ToArray(), walls);
+				var randPos = random.GetValidPosition(radius, worldX, worldY, pos, walls);
 				creatures[i] = new Creature(genomes[i], randPos, radius, new Color(random));
 				pos.Add((randPos, creatures[i]!.Radius));
 			} catch (OverflowException e) {
@@ -32,7 +31,7 @@ public static class RandomExtensions {
 		return creatures.Where(x=> x is not null).Cast<Creature>().ToArray();
 	}
 
-	private static Vector GetValidPosition(this Random random, int radius, int maxX, int maxY, (Vector point, int radius)[] blobs, Line[] walls) {
+	private static Vector GetValidPosition(this Random random, int radius, int maxX, int maxY, List<(Vector point, int radius)> blobs, Line[] walls) {
 		Vector? proposed = null;
 		var valid = true;
 		var counter = 0;
@@ -79,15 +78,15 @@ public static class RandomExtensions {
 					continue;
 				}
 
-				if(c < connectionCount - 1) {
-					if(random.NextDouble() < InternalConnChance) {
-						var n3 = random.NextNeuron(NeuronType.Internal);
-						connections[c] = new NeuronConnection(n1, n3, random.NextFloat());
-						connections[c+1] = new NeuronConnection(n3, n2, random.NextFloat());
-						c++;
-						continue;
-					}
-				}
+				// if(c < connectionCount - 1) {
+				// 	if(random.NextDouble() < InternalConnChance) {
+				// 		var n3 = random.NextNeuron(NeuronType.Internal);
+				// 		connections[c] = new NeuronConnection(n1, n3, random.NextFloat());
+				// 		connections[c+1] = new NeuronConnection(n3, n2, random.NextFloat());
+				// 		c++;
+				// 		continue;
+				// 	}
+				// }
 				
 				connections[c] = new NeuronConnection(n1, n2, random.NextFloat());
 			}
@@ -125,7 +124,7 @@ public static class RandomExtensions {
 
 	public static Neuron NextNeuron(this Random random, NeuronType nonInternalType) {
 		var type = random.NextDouble() > 0.5 ? NeuronType.Internal : nonInternalType;
-		var id = (ushort)random.Next(1, MaxId);
+		var id = (ushort)random.Next(0, MaxId);
 
 		return type switch {
 			NeuronType.Input => new InputNeuron(id),

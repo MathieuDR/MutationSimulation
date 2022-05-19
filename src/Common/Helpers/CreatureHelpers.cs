@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Common.Models;
+using Common.Models.Enums;
 
 namespace Common.Helpers;
 

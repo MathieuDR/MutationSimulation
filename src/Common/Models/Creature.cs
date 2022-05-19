@@ -1,4 +1,5 @@
 using Common.Helpers;
+using Common.Models.Enums;
 using Common.Models.Genetic;
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;
@@ -9,26 +10,39 @@ using SkiaSharp;
 namespace Common.Models;
 
 public record Creature {
-	private readonly Genome _genome;
 	private readonly Dictionary<ActionCategory, Dictionary<ActionType, float>> _actionValues;
+	private readonly Genome _genome;
 	private readonly Dictionary<Neuron, float> _neuronValues = new();
+
+
+	private Dictionary<Creature, double> _creatureDistances;
 
 	public Creature(Genome genome, Vector position, int radius, Color color) {
 		Position = position;
 		Radius = radius;
 		Color = color;
 		Genome = genome;
+		StartPosition = position;
 	}
+
+	public ulong Id { get; init; } = (ulong)RandomProvider.GetRandom().NextInt64(long.MinValue, long.MaxValue);
 
 	public int Age { get; private set; }
 	public float OscillatorFrequency => 5000f;
 	public float OscillatorPhaseOffset => 5000f;
 	public int OscillatorAgeDivider => 1000;
-	public int EyeSightStrength => Radius * 4;
+	public int EyeSightStrength => Radius * 4 + (int)Speed;
 	public int ViewingAngle => 40;
-	public float Speed => (float)Radius / 4;
+	public float Speed => Math.Max((float)Radius / 4, 3);
+	
+	public Vector StartPosition { get; init; }
+
+	public int Collisions { get; private set; } = 0;
+	public bool Collided { get; private set; } = false;
+	public List<Vector> UniquePositions = new();
 
 	public Brain Brain { get; private set; }
+	public double Distance { get; private set; } = 0;
 
 	private Func<float, float> InternalActivationFunction { get; } = ActivationFunctions.Relu;
 
@@ -51,7 +65,12 @@ public record Creature {
 	public int Radius { get; init; }
 	public Color Color { get; init; }
 
+	private void PrepareNextTick() {
+		_creatureDistances = new Dictionary<Creature, double>();
+	}
+
 	public void Simulate(World world) {
+		PrepareNextTick();
 		Age++;
 		FeedForward(world);
 		FireActions(world);
@@ -60,10 +79,10 @@ public record Creature {
 	private void Act(World world, ActionType actionType) {
 		switch (actionType) {
 			case ActionType.WalkForward:
-				Walk();
+				Walk(world);
 				break;
 			case ActionType.WalkBackward:
-				Walk(false);
+				Walk(world, false);
 				break;
 			case ActionType.TurnLeft:
 				Direction = (Direction)(((int)Direction + 1) % 4);
@@ -87,9 +106,9 @@ public record Creature {
 		}
 	}
 
-	private void Walk(bool forward = true) {
+	private void Walk(World world, bool forward = true) {
 		var xMovement = Direction switch {
-			Direction.East => - Speed,
+			Direction.East => -Speed,
 			Direction.West => Speed,
 			_ => 0
 		};
@@ -105,13 +124,58 @@ public record Creature {
 			xMovement *= -1;
 			yMovement *= -1;
 		}
-		
-		Position = Position with { X = Position.X + xMovement, Y = Position.Y + yMovement };
+
+		var proposedPosition = Position with { X = Position.X + xMovement, Y = Position.Y + yMovement };
+		var movementLine = new Line(this.Position, proposedPosition);
+
+		var creaturesToCheck = _creatureDistances.Any() ? 
+			_creatureDistances.Where(x => x.Value >= Speed * 2).Select(x=>x.Key).ToArray() : 
+			world.Creatures;
+
+		foreach (var creature in creaturesToCheck) {
+			if (this == creature) {
+				continue;
+			}
+			
+			var dist = Math.Max(0, movementLine.Distance(creature.Position) - creature.Radius - Radius);
+			if (dist <= 0.5d) {
+				Collisions++;
+				Collided = true;
+				// TODO calculate last position before collision
+				
+				return;
+			}
+		}
+
+		foreach (var wall in world.Walls) {
+			var intersect = wall.GetIntersectionWithinLines(movementLine);
+			if (intersect is not null) {
+				Collisions++;
+				Collided = true;
+				// TODO calculate last position before collision
+				return;
+			}
+
+			var endDist = Math.Max(wall.Distance(proposedPosition) - Radius, 0);
+			if (endDist <= 0.5d) {
+				Collisions++;
+				Collided = true;
+				// TODO calculate last position before collision
+				return;
+			}
+		}
+
+		Collided = false;
+		Position = proposedPosition;
+		Distance += Speed;
+		if (!UniquePositions.Contains(Position)) {
+			UniquePositions.Add(Position);
+		}
 	}
 
 	private void FireActions(World world) {
 		ActivateActionValues();
-		
+
 		var rng = RandomProvider.GetRandom().NextSingle();
 
 		foreach (var actionCategory in _actionValues.Keys) {
@@ -207,6 +271,13 @@ public record Creature {
 			InputType.IsEmittingPheromone => 0,
 			InputType.Age => Age,
 			InputType.Speed => 1,
+			InputType.Collisions => Collisions,
+			InputType.DistanceFromStart => ActivationFunctions.Sigmoid((float)StartPosition.CalculateDistanceBetweenPositions(Position)),
+			InputType.StartX => (float)StartPosition.X / World.Width,
+			InputType.StartY => (float)StartPosition.Y / World.Height,
+			InputType.CurrentX => (float)Position.X / World.Width,
+			InputType.CurrentY => (float)Position.Y / World.Height,
+			InputType.Collided => Collided ? 1f : 0f,
 			_ => 0
 		};
 	}
@@ -217,18 +288,18 @@ public record Creature {
 	private float Look(World world, Direction direction) {
 		// 1 = nothing infront
 		float closestObj = 1;
-		
+
 		var closestWallInDirection = world.GetClosestWallInDirection(Position, direction);
-		
+
 
 		// check which is in the fov of the creature
-		
+
 		foreach (var worldCreature in world.Creatures) {
 			if (this == worldCreature) {
 				continue;
 			}
 
-			var distance = this.CalculateDistanceBetweenCreatures(worldCreature);
+			var distance = GetDistanceToCreature(worldCreature);
 
 			if (distance > EyeSightStrength) {
 				// we cannot see
@@ -246,6 +317,15 @@ public record Creature {
 		}
 
 		return closestObj;
+	}
+
+	private double GetDistanceToCreature(Creature creature) {
+		if (!_creatureDistances.TryGetValue(creature, out var value)) {
+			value = this.CalculateDistanceBetweenCreatures(creature);
+			//_creatureDistances.Add(creature, value);
+		}
+
+		return value;
 	}
 
 	public void Draw(SKCanvas canvas, Func<Vector, (int X, int Y)> calculatePixelPosition, Func<int, int> pixelSize) {
