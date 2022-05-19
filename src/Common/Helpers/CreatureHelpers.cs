@@ -5,7 +5,7 @@ namespace Common.Helpers;
 
 public static class CreatureHelpers {
 	public static double CalculateDistanceBetweenCreatures(this Creature creature1, Creature creature2) {
-		var result = creature1.Vector.CalculateDistanceBetweenPositions(creature2.Vector);
+		var result = creature1.Position.CalculateDistanceBetweenPositions(creature2.Position);
 
 		result -= creature1.Radius;
 		result -= creature2.Radius;
@@ -16,19 +16,19 @@ public static class CreatureHelpers {
 
 	public static double CalculateAngleBetweenCreatures(this Creature creature1, Creature creature2) {
 		var closestPoint = creature1.GetClosestPointWithinRadius(creature2);
-		return closestPoint.CalculateAngleBetweenPositions(creature2.Vector);
+		return closestPoint.CalculateAngleBetweenPositions(creature2.Position);
 	}
 	
 	public static double CalculateAngleBetweenCreatures(this Creature creature1, Creature creature2, Direction direction) {
 		var closestPoint = creature1.GetClosestPointWithinRadius(creature2);
-		return closestPoint.CalculateAngleBetweenPositions(creature2.Vector, direction);
+		return closestPoint.CalculateAngleBetweenPositions(creature2.Position, direction);
 	}
 
 	private static Vector GetClosestPointWithinRadius(this Creature moveTo, Creature moveFrom) {
 		var moveAmount = moveFrom.Radius;
 
-		var x = MoveTo(moveTo.Vector.X, moveFrom.Vector.X, moveAmount);
-		var y = MoveTo(moveTo.Vector.Y, moveFrom.Vector.Y, moveAmount);
+		var x = MoveTo(moveTo.Position.X, moveFrom.Position.X, moveAmount);
+		var y = MoveTo(moveTo.Position.Y, moveFrom.Position.Y, moveAmount);
 		
 		return new Vector(x, y);
 	}

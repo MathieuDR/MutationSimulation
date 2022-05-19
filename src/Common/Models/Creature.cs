@@ -13,8 +13,8 @@ public record Creature {
 	private readonly Dictionary<ActionCategory, Dictionary<ActionType, float>> _actionValues;
 	private readonly Dictionary<Neuron, float> _neuronValues = new();
 
-	public Creature(Genome genome, Vector vector, int radius, Color color) {
-		Vector = vector;
+	public Creature(Genome genome, Vector position, int radius, Color color) {
+		Position = position;
 		Radius = radius;
 		Color = color;
 		Genome = genome;
@@ -47,7 +47,7 @@ public record Creature {
 		}
 	}
 
-	public Vector Vector { get; private set; }
+	public Vector Position { get; private set; }
 	public int Radius { get; init; }
 	public Color Color { get; init; }
 
@@ -106,7 +106,7 @@ public record Creature {
 			yMovement *= -1;
 		}
 		
-		Vector = Vector with { X = Vector.X + xMovement, Y = Vector.Y + yMovement };
+		Position = Position with { X = Position.X + xMovement, Y = Position.Y + yMovement };
 	}
 
 	private void FireActions(World world) {
@@ -218,7 +218,7 @@ public record Creature {
 		// 1 = nothing infront
 		float closestObj = 1;
 		
-		var closestWallInDirection = world.GetClosestWallInDirection(Vector, direction);
+		var closestWallInDirection = world.GetClosestWallInDirection(Position, direction);
 		
 
 		// check which is in the fov of the creature
@@ -254,14 +254,14 @@ public record Creature {
 			Color = new SKColor(Color.R, Color.G, Color.B)
 		};
 
-		var pixelPosition = calculatePixelPosition(Vector);
+		var pixelPosition = calculatePixelPosition(Position);
 
 		canvas.DrawCircle(pixelPosition.X, pixelPosition.Y, pixelSize(Radius), fillPaint);
 	}
 
 	public void Deconstruct(out Genome genome, out Vector vector, out int radius, out Color color) {
 		genome = Genome;
-		vector = Vector;
+		vector = Position;
 		radius = Radius;
 		color = Color;
 	}

@@ -23,8 +23,7 @@ worldWalls.Add(new Line(new Vector(worldSize/2, worldSize/4 * 3), new Vector(wor
 var walls = worldWalls.ToArray();
 
 var watch = new Stopwatch();
-var seed = "quickmaffs";
-RandomProvider.SetSeed(seed.GetHashCode());
+RandomProvider.SetSeed("shooki");
 var random = RandomProvider.GetRandom();
 
 
@@ -33,6 +32,19 @@ var blobs = random.GetRandomCreatures(100, worldSize, worldSize, walls);
 watch.Stop();
 Console.WriteLine("Created {0} creatures in {1}ms", blobs.Length, watch.ElapsedMilliseconds);
 
+// foreach (var wall in walls) {
+// 	foreach (var creature in blobs) {
+// 		var dist = wall.Distance(creature.Position) - creature.Radius;
+// 		if (dist <= 25) {
+// 			var closestPoint = wall.ClosestPoint(creature.Position);
+// 			worldWalls.Add(new Line(creature.Position, closestPoint));
+// 		}
+// 	}
+// }
+//
+//
+//
+// walls = worldWalls.ToArray();
 
 
 var world = new World(worldSize, worldSize, blobs, walls);

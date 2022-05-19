@@ -1,4 +1,6 @@
 using System.Runtime.Versioning;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Common.Simulator; 
 
@@ -12,5 +14,12 @@ public class RandomProvider {
 	
 	public static void SetSeed(int seed) {
 		_seed = seed;
+		Console.WriteLine("Seed: {0}", _seed);
+	}
+
+	public static void SetSeed(string seed) {
+		using var algo = SHA1.Create();
+		_seed= BitConverter.ToInt32(algo.ComputeHash(Encoding.UTF8.GetBytes(seed)));
+		Console.WriteLine("Seed: {0}", _seed);
 	}
 }
