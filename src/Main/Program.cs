@@ -5,8 +5,6 @@ using Common.Simulator;
 using Graphics;
 using Graphics.Helpers;
 
-// var mark = BenchmarkRunner.Run<BenchMarker>();
-
 int worldSize = 500;
 var worldWalls = new List<Line>();
 const int wallOffset = 2;
@@ -31,21 +29,6 @@ watch.Start();
 var blobs = random.GetRandomCreatures(100, worldSize, worldSize, walls);
 watch.Stop();
 Console.WriteLine("Created {0} creatures in {1}ms", blobs.Length, watch.ElapsedMilliseconds);
-
-// foreach (var wall in walls) {
-// 	foreach (var creature in blobs) {
-// 		var dist = wall.Distance(creature.Position) - creature.Radius;
-// 		if (dist <= 25) {
-// 			var closestPoint = wall.ClosestPoint(creature.Position);
-// 			worldWalls.Add(new Line(creature.Position, closestPoint));
-// 		}
-// 	}
-// }
-//
-//
-//
-// walls = worldWalls.ToArray();
-
 
 var world = new World(worldSize, worldSize, blobs, walls);
 var renderMachine = new WorldRenderMachine("output", "world");
