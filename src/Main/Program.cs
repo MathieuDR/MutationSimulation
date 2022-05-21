@@ -1,16 +1,38 @@
-﻿using System.Diagnostics;
-using CommandLine;
-using Common.Helpers;
-using Common.Models;
-using Common.Simulator;
-using Graphics;
-using Graphics.Helpers;
+﻿using CommandLine;
 using Main.Models;
+using Main.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Json;
 
-CommandLine.Parser.Default.ParseArguments<Options>(args)
-	.WithParsed((opt) => {
-		Console.WriteLine("Got options");
-	});
+CreateLogger();
+
+try {
+	Parser.Default.ParseArguments<Options>(args)
+		.WithParsed(opt => { CreateHostBuilder(opt).Build().Run(); });
+} catch (Exception e) {
+	Log.Logger.Fatal(e, "Fatal exception");
+}
+
+static IHostBuilder CreateHostBuilder(Options options) {
+	return Host
+		.CreateDefaultBuilder()
+		.ConfigureServices((hostContext, services) => {
+			services.AddHostedService<SimulationHost>();
+		})
+		.UseSerilog();
+}
+
+static void CreateLogger() {
+	Log.Logger = new LoggerConfiguration()
+		.Enrich.FromLogContext()
+		.MinimumLevel.Debug()
+		.WriteTo.File(new JsonFormatter(), "logs/output.log", rollingInterval: RollingInterval.Day)
+		.WriteTo.Console(LogEventLevel.Information)
+		.CreateLogger();
+}
 
 // var worldSize = 500;
 // var worldWalls = new List<Line>();
