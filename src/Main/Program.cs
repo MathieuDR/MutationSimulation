@@ -1,6 +1,8 @@
 ﻿using CommandLine;
+using Common.Models.Options;
 using Main.Models;
 using Main.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -10,19 +12,54 @@ using Serilog.Formatting.Json;
 CreateLogger();
 
 try {
-	Parser.Default.ParseArguments<Options>(args)
-		.WithParsed(opt => { CreateHostBuilder(opt).Build().Run(); });
+	Parser.Default.ParseArguments<CmdArgs>(args)
+		.WithParsed(opt => { CreateHostBuilder(opt, args).Build().Run(); });
 } catch (Exception e) {
 	Log.Logger.Fatal(e, "Fatal exception");
 }
 
-static IHostBuilder CreateHostBuilder(Options options) {
+static IHostBuilder CreateHostBuilder(CmdArgs options, string[] args) {
 	return Host
-		.CreateDefaultBuilder()
+		.CreateDefaultBuilder(args)
+		.ConfigureAppConfiguration(builder => { BuildConfiguration(builder, options); })
 		.ConfigureServices((hostContext, services) => {
+			var customOptions = hostContext.Configuration.GetSection("Mutation");
+			
+			services
+				.AddOptions<BrainOptions>()
+				.Bind(customOptions.GetSection(BrainOptions.SectionName))
+				.Validate(options =>  {
+					var isValid = options.Validate(out var results);
+				
+					if (!isValid) {
+						Log.Error("Following errors occured: {@errors}", results);
+					}
+
+					return isValid;
+				});
+
+			// services
+			// 	.Configure<BrainOptions>(customOptions.GetSection(BrainOptions.SectionName));
+			//
+			services.AddOptions<CreatureOptions>().Bind(customOptions.GetSection(CreatureOptions.SectionName)).Validate(ValidateOptions);
+			services.AddOptions<RandomOptions>().Bind(customOptions.GetSection(RandomOptions.SectionName)).Validate(ValidateOptions);
+			services.AddOptions<RenderOptions>().Bind(customOptions.GetSection(RenderOptions.SectionName)).Validate(ValidateOptions);
+			services.AddOptions<SimulatorOptions>().Bind(customOptions.GetSection(SimulatorOptions.SectionName)).Validate(ValidateOptions);
+			services.AddOptions<WorldOptions>().Bind(customOptions.GetSection(WorldOptions.SectionName)).Validate(ValidateOptions);
+			
 			services.AddHostedService<SimulationHost>();
 		})
 		.UseSerilog();
+}
+
+static bool ValidateOptions(ConfigurationOptions options) {
+	var isValid = options.Validate(out var results);
+				
+	if (!isValid) {
+		Log.Error("Configuration errors: {@errors}", results);
+	}
+
+	return isValid;
 }
 
 static void CreateLogger() {
@@ -32,6 +69,13 @@ static void CreateLogger() {
 		.WriteTo.File(new JsonFormatter(), "logs/output.log", rollingInterval: RollingInterval.Day)
 		.WriteTo.Console(LogEventLevel.Information)
 		.CreateLogger();
+}
+
+static void BuildConfiguration(IConfigurationBuilder builder, CmdArgs args) {
+	var env = args.Environment ?? Environment.GetEnvironmentVariable("SIM-ENVIRONMENT");
+	builder.Sources.Clear();
+	builder.AddJsonFile("appsettings.json", false, true);
+	builder.AddJsonFile($"appsettings.{env.ToLowerInvariant()}.json", true, true);
 }
 
 // var worldSize = 500;
