@@ -1,6 +1,6 @@
 using Common.Factories;
 using Common.Models.Options;
-using Common.Simulator;
+using Common.Services;
 using Graphics.Helpers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,6 +10,7 @@ namespace Main.Services;
 
 public class SimulationHost : IHostedService {
 	private readonly IHostApplicationLifetime _applicationLifetime;
+	private readonly IRandomProvider _randomProvider;
 	private readonly IServiceProvider _serviceProvider;
 	private readonly IOptionsMonitor<BrainOptions> _brainMonitor;
 	private readonly IOptionsMonitor<CreatureOptions> _creatureMonitor;
@@ -20,6 +21,7 @@ public class SimulationHost : IHostedService {
 	private readonly ILogger<SimulationHost> _logger;
 
 	public SimulationHost(ILogger<SimulationHost> logger, IHostApplicationLifetime applicationLifetime,
+		IRandomProvider randomProvider,
 		IServiceProvider serviceProvider, IOptionsMonitor<BrainOptions> brainMonitor, 
 		IOptionsMonitor<CreatureOptions> creatureMonitor, 
 		IOptionsMonitor<RandomOptions> randomMonitor, IOptionsMonitor<RenderOptions> renderMonitor, 
@@ -27,6 +29,7 @@ public class SimulationHost : IHostedService {
 		) {
 		_logger = logger;
 		_applicationLifetime = applicationLifetime;
+		_randomProvider = randomProvider;
 		_serviceProvider = serviceProvider;
 		_brainMonitor = brainMonitor;
 		_creatureMonitor = creatureMonitor;
@@ -39,7 +42,7 @@ public class SimulationHost : IHostedService {
 	public Task StartAsync(CancellationToken cancellationToken) {
 		_logger.LogInformation("Starting the host");
 		if (_randomMonitor.CurrentValue.UseSeed) {
-			RandomProvider.SetSeed(_randomMonitor.CurrentValue.Seed);
+			_randomProvider.SetSeed(_randomMonitor.CurrentValue.Seed);
 		}
 		
 		//LoopModus(cancellationToken);

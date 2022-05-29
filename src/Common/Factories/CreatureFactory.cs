@@ -2,7 +2,7 @@ using Common.Helpers;
 using Common.Models;
 using Common.Models.Genetic.Components;
 using Common.Models.Options;
-using Common.Simulator;
+using Common.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -14,7 +14,7 @@ internal static class CreatureFactory {
 		var simulatorOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<SimulatorOptions>>().Value;
 		var worldOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<WorldOptions>>().Value;
 		var validatePosition = simulatorOptions.ValidateStartPositions;
-		var random = RandomProvider.GetRandom();
+		var random = serviceProvider.GetRequiredService<IRandomProvider>().GetRandom();
 		var wallArray = walls?.ToArray() ?? Array.Empty<Line>();
 		
 		var genomes = GenomeFactory.CreateGenomes(serviceProvider, count);
@@ -28,15 +28,15 @@ internal static class CreatureFactory {
 			var position = validatePosition
 				? random.GetValidPosition(radius, worldOptions.Width, worldOptions.Height, currentPositions, wallArray)
 				: random.GetRandomPosition(worldOptions.Width, worldOptions.Height);
-			var color = GenerateColorFromGenome(genome);
+			var color = GenerateColorFromGenome(genome, random);
 			
 			
-			yield return new Creature(genome, position, radius, color);
+			yield return new Creature(genome, position, radius, color, random);
 		}
 	}
 
-	private static Color GenerateColorFromGenome(Genome genome) {
+	private static Color GenerateColorFromGenome(Genome genome, Random random) {
 		// Todo!
-		return new Color(RandomProvider.GetRandom());
+		return new Color(random);
 	}
 }

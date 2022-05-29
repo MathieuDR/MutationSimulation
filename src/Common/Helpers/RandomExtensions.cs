@@ -21,7 +21,7 @@ public static class RandomExtensions {
 			try {
 				var radius = random.Next(MinRadius, MaxRadius);
 				var randPos = random.GetValidPosition(radius, worldX, worldY, pos, walls);
-				creatures[i] = new Creature(genomes[i], randPos, radius, new Color(random));
+				creatures[i] = new Creature(genomes[i], randPos, radius, new Color(random), random);
 				pos.Add((randPos, creatures[i]!.Radius));
 			} catch (OverflowException e) {
 				//Console.WriteLine(e.Message);

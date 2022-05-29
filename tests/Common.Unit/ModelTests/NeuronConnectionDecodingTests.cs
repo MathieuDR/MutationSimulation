@@ -1,13 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
-using Common.Helpers;
-using Common.Models;
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;
 using FluentAssertions;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Common.Unit.ModelTests; 
 

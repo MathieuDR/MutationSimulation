@@ -1,4 +1,3 @@
-using Common.Models;
 using Common.Models.Genetic;
 using Common.Models.Genetic.Components.Neurons;
 using MathieuDR.Common.Extensions;

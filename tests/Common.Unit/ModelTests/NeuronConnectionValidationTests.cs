@@ -1,5 +1,4 @@
 using System;
-using Common.Models;
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;
 using FluentAssertions;

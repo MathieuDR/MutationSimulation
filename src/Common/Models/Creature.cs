@@ -3,8 +3,6 @@ using Common.Models.Enums;
 using Common.Models.Genetic;
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;
-using Common.Services;
-using Common.Simulator;
 using MathieuDR.Common.Extensions;
 using SkiaSharp;
 
@@ -19,8 +17,10 @@ public record Creature {
 
 	private Dictionary<Creature, double> _creatureDistances;
 
-	public Creature(Genome genome, Vector position, int radius, Color color,IRandomProvider random) {
-		_random = random.GetRandom();
+	public Creature(Genome genome, Vector position, int radius, Color color, Random random) {
+		_random = random;
+		Id = (ulong)_random.NextInt64(long.MinValue, long.MaxValue);
+		Direction = _random.NextEnum<Direction>();
 		Position = position;
 		Radius = radius;
 		Color = color;
@@ -28,7 +28,7 @@ public record Creature {
 		StartPosition = position;
 	}
 
-	public ulong Id { get; init; } = (ulong)RandomProvider.GetRandom().NextInt64(long.MinValue, long.MaxValue);
+	public ulong Id { get; }
 
 	public int Age { get; private set; }
 	public float OscillatorFrequency => 5000f;
@@ -49,7 +49,7 @@ public record Creature {
 
 	private Func<float, float> InternalActivationFunction { get; } = ActivationFunctions.Relu;
 
-	public Direction Direction { get; private set; } = RandomProvider.GetRandom().NextEnum<Direction>();
+	public Direction Direction { get; private set; }
 
 	public Genome Genome {
 		get => _genome;
@@ -179,7 +179,7 @@ public record Creature {
 	private void FireActions(World world) {
 		ActivateActionValues();
 
-		var rng = RandomProvider.GetRandom().NextSingle();
+		var rng = _random.NextSingle();
 
 		foreach (var actionCategory in _actionValues.Keys) {
 			var max = _actionValues[actionCategory].Aggregate((l, r) => l.Value > r.Value ? l : r);

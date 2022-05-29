@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Common.Models;
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;
 using FluentAssertions;

@@ -1,4 +1,3 @@
-using System;
 using Common.Helpers;
 using FluentAssertions;
 using Xunit;

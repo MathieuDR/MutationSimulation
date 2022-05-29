@@ -1,5 +1,4 @@
 using Common.Models;
-using Common.Simulator;
 using Graphics.Helpers;
 using SkiaSharp;
 
@@ -12,7 +11,6 @@ public class WorldRenderMachine {
 	private readonly string _filePath;
 	private readonly SKEncodedImageFormat _format;
 	private readonly int _quality;
-	private readonly Random _random;
 	private ulong _frameCount;
 
 	public WorldRenderMachine(string path, string filename, int wallWidth = 4, SKEncodedImageFormat format = SKEncodedImageFormat.Png,
@@ -23,8 +21,6 @@ public class WorldRenderMachine {
 		_filePath = path;
 		_fileName = filename;
 		_multiplier = multiplier;
-
-		_random = RandomProvider.GetRandom();
 	}
 
 	public string RenderWorld(World world) {
@@ -53,8 +49,6 @@ public class WorldRenderMachine {
 
 	private (int X, int Y) GetImagePosition(Vector vector) =>
 		(vector.PixelX * _multiplier , vector.PixelY * _multiplier );
-
-	private SKColor GetRandomColor() => new((byte)_random.Next(0, 255), (byte)_random.Next(0, 255), (byte)_random.Next(0, 255));
 
 	private string SaveFrame(SKSurface surface) {
 		var path = GetCurrentPath();

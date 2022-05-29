@@ -1,7 +1,7 @@
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;
 using Common.Models.Options;
-using Common.Simulator;
+using Common.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -10,7 +10,7 @@ namespace Common.Factories;
 internal static class GenomeFactory {
 	public static IEnumerable<Genome> CreateGenomes(IServiceProvider serviceProvider, int count) {
 		var brainOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<BrainOptions>>().Value;
-		var random = RandomProvider.GetRandom();
+		var random = serviceProvider.GetRequiredService<IRandomProvider>().GetRandom();
 
 		for (var i = 0; i < count; i++) {
 			var neuronsAmount = brainOptions.MinStartNeurons.HasValue

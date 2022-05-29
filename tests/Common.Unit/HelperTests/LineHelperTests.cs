@@ -1,4 +1,3 @@
-using System;
 using Common.Helpers;
 using Common.Models;
 using FluentAssertions;

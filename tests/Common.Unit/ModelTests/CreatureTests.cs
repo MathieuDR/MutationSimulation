@@ -16,12 +16,17 @@ public class CreatureTests {
 			new NeuronConnection(new InputNeuron(1), new ActionNeuron(2), 3f)
 		});
 	}
+
+	private Random _rand;
+	public CreatureTests() {
+		_rand = new Random(1234);
+	}
 	
 	[Fact]
 	public void CalculateDistance_ShouldReturnDistance_WhenAreNextToEachotherHorizontal() {
 		//Arrange
-		var creature1 = new Creature(EmptyGenome(),new Vector(20, 20), 5, new Color(20, 20, 20));
-		var creature2 = new Creature(EmptyGenome(),new Vector(40, 20), 5, new Color(20, 20, 20));
+		var creature1 = new Creature(EmptyGenome(),new Vector(20, 20), 5, new Color(20, 20, 20), _rand);
+		var creature2 = new Creature(EmptyGenome(),new Vector(40, 20), 5, new Color(20, 20, 20), _rand);
 
 		//Act;
 		var result = creature1.CalculateDistanceBetweenCreatures(creature2);
@@ -34,8 +39,8 @@ public class CreatureTests {
 	[Fact]
 	public void CalculateDistance_ShouldReturnDistance_WhenAreNextToEachotherVertical() {
 		//Arrange
-		var creature1 = new Creature(EmptyGenome(),new Vector(20, 20), 5, new Color(20, 20, 20));
-		var creature2 = new Creature(EmptyGenome(),new Vector(20, 40), 5, new Color(20, 20, 20));
+		var creature1 = new Creature(EmptyGenome(),new Vector(20, 20), 5, new Color(20, 20, 20), _rand);
+		var creature2 = new Creature(EmptyGenome(),new Vector(20, 40), 5, new Color(20, 20, 20), _rand);
 
 		//Act;
 		var result = creature1.CalculateDistanceBetweenCreatures(creature2);
@@ -48,8 +53,8 @@ public class CreatureTests {
 	[Fact]
 	public void CalculateDistance_ShouldReturnDistance_WhenDiagonal() {
 		//Arrange
-		var creature1 = new Creature(EmptyGenome(),new Vector(20, 20), 5, new Color(20, 20, 20));
-		var creature2 = new Creature(EmptyGenome(),new Vector(40, 40), 5, new Color(20, 20, 20));
+		var creature1 = new Creature(EmptyGenome(),new Vector(20, 20), 5, new Color(20, 20, 20), _rand);
+		var creature2 = new Creature(EmptyGenome(),new Vector(40, 40), 5, new Color(20, 20, 20), _rand);
 
 		//Act;
 		var result = creature1.CalculateDistanceBetweenCreatures(creature2);
@@ -62,8 +67,8 @@ public class CreatureTests {
 	[Fact]
 	public void CalculateDistance_ShouldReturn0Distance_WhenTheyAreTouching() {
 		//Arrange
-		var creature1 = new Creature(EmptyGenome(),new Vector(20, 20), 5, new Color(20, 20, 20));
-		var creature2 = new Creature(EmptyGenome(),new Vector(20, 28), 5, new Color(20, 20, 20));
+		var creature1 = new Creature(EmptyGenome(),new Vector(20, 20), 5, new Color(20, 20, 20), _rand);
+		var creature2 = new Creature(EmptyGenome(),new Vector(20, 28), 5, new Color(20, 20, 20), _rand);
 
 		//Act;
 		var result = creature1.CalculateDistanceBetweenCreatures(creature2);
@@ -85,8 +90,8 @@ public class CreatureTests {
 	[InlineData(-20, 20, 135)]
 	public void CalculateAngle_ShouldBeCorrect_WhenFirstVectorIsZeroZero(int x2, int y2, double expected) {
 		//Arrange
-		var creature1 = new Creature(EmptyGenome(),new Vector(0, 0), 5, new Color(20, 20, 20));
-		var creature2 = new Creature(EmptyGenome(),new Vector(x2, y2), 5, new Color(20, 20, 20));
+		var creature1 = new Creature(EmptyGenome(),new Vector(0, 0), 5, new Color(20, 20, 20), _rand);
+		var creature2 = new Creature(EmptyGenome(),new Vector(x2, y2), 5, new Color(20, 20, 20), _rand);
 
 		//Act;
 		var result = creature1.CalculateAngleBetweenCreatures(creature2);
@@ -108,8 +113,8 @@ public class CreatureTests {
 	[InlineData(-20, 20, 135, -42)]
 	public void CalculateAngle_ShouldBeCorrect_WhenFVectorsHaveAnOffset(int x2, int y2, double expected, int offset) {
 		//Arrange
-		var creature1 = new Creature(EmptyGenome(),new Vector(0 + offset, 0 + offset), 5, new Color(20, 20, 20));
-		var creature2 = new Creature(EmptyGenome(),new Vector(x2 + offset, y2 + offset), 5, new Color(20, 20, 20));
+		var creature1 = new Creature(EmptyGenome(),new Vector(0 + offset, 0 + offset), 5, new Color(20, 20, 20), _rand);
+		var creature2 = new Creature(EmptyGenome(),new Vector(x2 + offset, y2 + offset), 5, new Color(20, 20, 20), _rand);
 
 		//Act;
 		var result = creature1.CalculateAngleBetweenCreatures(creature2);
@@ -131,8 +136,8 @@ public class CreatureTests {
 	[InlineData(-20, 20, 315)]
 	public void CalculateAngle_ShouldBeCorrect_WhenSecondVectorIsZeroZero(int x1, int y1, double expected) {
 		//Arrange
-		var creature1 = new Creature(EmptyGenome(),new Vector(x1, y1), 5, new Color(20, 20, 20));
-		var creature2 = new Creature(EmptyGenome(),new Vector(0, 0), 5, new Color(20, 20, 20));
+		var creature1 = new Creature(EmptyGenome(),new Vector(x1, y1), 5, new Color(20, 20, 20), _rand);
+		var creature2 = new Creature(EmptyGenome(),new Vector(0, 0), 5, new Color(20, 20, 20), _rand);
 
 		//Act;
 		var result = creature1.CalculateAngleBetweenCreatures(creature2);
@@ -148,8 +153,8 @@ public class CreatureTests {
 	[InlineData(0, -20, Direction.South)]
 	public void CalculateAngle_ShouldBeZero_WhenGivenDirection(int x2, int y2, Direction direction) {
 		//Arrange
-		var creature1 = new Creature(EmptyGenome(),new Vector(0, 0), 5, new Color(20, 20, 20));
-		var creature2 = new Creature(EmptyGenome(),new Vector(x2, y2), 5, new Color(20, 20, 20));
+		var creature1 = new Creature(EmptyGenome(),new Vector(0, 0), 5, new Color(20, 20, 20), _rand);
+		var creature2 = new Creature(EmptyGenome(),new Vector(x2, y2), 5, new Color(20, 20, 20), _rand);
 
 		//Act;
 		var result = creature1.CalculateAngleBetweenCreatures(creature2, direction);
