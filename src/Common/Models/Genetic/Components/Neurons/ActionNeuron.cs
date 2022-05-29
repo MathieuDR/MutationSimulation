@@ -1,14 +1,14 @@
 namespace Common.Models.Genetic.Components.Neurons;
 
 public record ActionNeuron : Neuron {
-	protected static int NeuronActionsAmount = Enum.GetValues<ActionType>().Length;
-	public ActionNeuron(ushort id, ActionType actionType): base(id, NeuronType.Action) {
-		ActionType = actionType;
-	}
-	
-	public ActionNeuron(ushort id): base((ushort)(id % NeuronActionsAmount), NeuronType.Action) {
-		var action = Id; 
-		ActionType = (ActionType)action;
+	public static readonly int NeuronActionsAmount = Enum.GetValues<ActionType>().Length;
+
+	 public ActionNeuron(ushort id): base(id, NeuronType.Action) {
+		if (id >= NeuronActionsAmount) {
+			throw new ArgumentException("Id must be in range of action types", nameof(id));
+		}
+		
+		ActionType = (ActionType)Id;
 	}
 	
 	public ActionType ActionType { get; init; }

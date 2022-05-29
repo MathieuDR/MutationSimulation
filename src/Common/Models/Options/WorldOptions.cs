@@ -16,6 +16,9 @@ public record WorldOptions : ConfigurationOptions {
 		CreaturesAmount = creaturesAmount;
 	}
 
+	public int Width => WorldWidth ?? WorldSize ?? 250;
+	public int Height => WorldWidth ?? WorldSize ?? 250;
+
 	public int? WorldWidth { get; init; }
 	public int? WorldHeight { get; init; }
 	public int? WorldSize { get; init; } = 250;

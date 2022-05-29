@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using Common.Models.Options;
+using Common.Services;
 using Main.Models;
 using Main.Services;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +14,9 @@ CreateLogger();
 
 try {
 	Parser.Default.ParseArguments<CmdArgs>(args)
-		.WithParsed(opt => { CreateHostBuilder(opt, args).Build().Run(); });
+		.WithParsed(opt => {
+			CreateHostBuilder(opt, args).Build().Run();
+		});
 } catch (Exception e) {
 	Log.Logger.Fatal(e, "Fatal exception");
 }
@@ -46,7 +49,9 @@ static IHostBuilder CreateHostBuilder(CmdArgs options, string[] args) {
 			services.AddOptions<RenderOptions>().Bind(customOptions.GetSection(RenderOptions.SectionName)).Validate(ValidateOptions);
 			services.AddOptions<SimulatorOptions>().Bind(customOptions.GetSection(SimulatorOptions.SectionName)).Validate(ValidateOptions);
 			services.AddOptions<WorldOptions>().Bind(customOptions.GetSection(WorldOptions.SectionName)).Validate(ValidateOptions);
-			
+
+
+			services.AddSingleton<IRandomProvider, RandomProvider>();
 			services.AddHostedService<SimulationHost>();
 		})
 		.UseSerilog();

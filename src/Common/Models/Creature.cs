@@ -3,6 +3,7 @@ using Common.Models.Enums;
 using Common.Models.Genetic;
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;
+using Common.Services;
 using Common.Simulator;
 using MathieuDR.Common.Extensions;
 using SkiaSharp;
@@ -10,6 +11,7 @@ using SkiaSharp;
 namespace Common.Models;
 
 public record Creature {
+	private readonly Random _random;
 	private readonly Dictionary<ActionCategory, Dictionary<ActionType, float>> _actionValues;
 	private readonly Genome _genome;
 	private readonly Dictionary<Neuron, float> _neuronValues = new();
@@ -17,7 +19,8 @@ public record Creature {
 
 	private Dictionary<Creature, double> _creatureDistances;
 
-	public Creature(Genome genome, Vector position, int radius, Color color) {
+	public Creature(Genome genome, Vector position, int radius, Color color,IRandomProvider random) {
+		_random = random.GetRandom();
 		Position = position;
 		Radius = radius;
 		Color = color;

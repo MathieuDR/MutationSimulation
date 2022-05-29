@@ -1,14 +1,14 @@
 namespace Common.Models.Genetic.Components.Neurons;
 
 public record InputNeuron : Neuron{
-	protected static int NeuronInputAmount = Enum.GetValues<InputType>().Length;
-	public InputNeuron(ushort id, InputType inputType): base(id, NeuronType.Input) {
-		this.InputType = inputType;
-	}
-	
-	public InputNeuron(ushort id): base((ushort)(id % NeuronInputAmount), NeuronType.Input) {
-		var action = Id;
-		InputType = (InputType)action;
+	public static readonly int NeuronInputAmount = Enum.GetValues<InputType>().Length;
+
+	public InputNeuron(ushort id): base(id, NeuronType.Input) {
+		if (id >= NeuronInputAmount) {
+			throw new ArgumentException("Id must be in range of input types", nameof(id));
+		}
+		
+		InputType = (InputType)Id;
 	}
 	
 	public InputType InputType { get; init; }

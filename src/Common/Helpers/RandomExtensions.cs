@@ -31,7 +31,7 @@ public static class RandomExtensions {
 		return creatures.Where(x=> x is not null).Cast<Creature>().ToArray();
 	}
 
-	private static Vector GetValidPosition(this Random random, int radius, int maxX, int maxY, List<(Vector point, int radius)> blobs, Line[] walls) {
+	public static Vector GetValidPosition(this Random random, int radius, int maxX, int maxY, List<(Vector point, int radius)> blobs, Line[] walls) {
 		Vector? proposed = null;
 		var valid = true;
 		var counter = 0;
@@ -58,7 +58,7 @@ public static class RandomExtensions {
 		return proposed.Value;
 	}
 	
-	private static Vector GetRandomPosition(this Random random, int x, int y) {
+	public static Vector GetRandomPosition(this Random random, int x, int y) {
 		return new Vector(random.Next(x+1), random.Next(y+1));
 	}
 
@@ -108,7 +108,7 @@ public static class RandomExtensions {
 		// return (float)(mantissa * exponent);
 	}
 
-	public static Neuron NextValidNeuron(this Random random, NeuronType nonInternalType) {
+	public static Neuron NextValidNeuron(this Random random, NeuronType nonInternalType, double neuronRate = 0.5d, int maxId = 25) {
 		int i = 0;
 		Neuron n = random.NextNeuron(nonInternalType);
 		while (!n.IsEnabledNeuron()) {
@@ -122,9 +122,9 @@ public static class RandomExtensions {
 		return n;
 	}
 
-	public static Neuron NextNeuron(this Random random, NeuronType nonInternalType) {
-		var type = random.NextDouble() > 0.5 ? NeuronType.Internal : nonInternalType;
-		var id = (ushort)random.Next(0, MaxId);
+	public static Neuron NextNeuron(this Random random, NeuronType nonInternalType, double neuronRate = 0.5d, int maxId = 25) {
+		var type = random.NextDouble() > neuronRate ? NeuronType.Internal : nonInternalType;
+		var id = (ushort)random.Next(0, maxId);
 
 		return type switch {
 			NeuronType.Input => new InputNeuron(id),
