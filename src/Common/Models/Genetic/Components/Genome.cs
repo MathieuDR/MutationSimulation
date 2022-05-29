@@ -7,7 +7,6 @@ public record Genome :IBiologicalEncodable {
 	// NeuronConnections exist out of 2 neurons and a weight in float.
 	// Together that are 8 bytes.
 	// The hex string is split into 8 byte chunks, which is 16 chars.
-	private readonly NeuronConnection[] _neuronConnections;
 	private readonly string? _hexSequence;
 
 	public Genome(NeuronConnection[] neuronConnections, string? hexSequence = null) {
@@ -15,16 +14,7 @@ public record Genome :IBiologicalEncodable {
 		HexSequence = hexSequence;
 	}
 
-	public NeuronConnection[] NeuronConnections {
-		get => _neuronConnections;
-		init {
-			if (value.Length == 0) {
-				throw new ArgumentException("NeuronConnections must not be empty.");
-			}
-
-			_neuronConnections = value;
-		}
-	}
+	public NeuronConnection[] NeuronConnections { get; init; }
 
 	public string? HexSequence {
 		get => _hexSequence ?? ToHex();

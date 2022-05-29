@@ -28,15 +28,15 @@ public record BrainOptions : ConfigurationOptions {
 	public double InternalRate { get; init; } = 0.33d;
 	
 	[Range(0, 1)]
-	public double InputRate { get; init; } = 0.5d;
+	public double InputRate { get; init; } = 0.33d;
 
 	[Range(1, 100)]
 	public int MaxOutgoingConnectionsPerNeuron { get; init; } = 50;
 	
 	[Range(1, 100)]
 	public int StartingConnectionsPerNeuron { get; init; } = 10;
-	[Range(1, 100)]
-	public int? MinStartingConnectionsPerNeuron { get; init; } = 1;
+	[Range(0, 100)]
+	public int? MinStartingConnectionsPerNeuron { get; init; } = null;
 
 	public InputType[] EnabledInputNeurons { get; init; } = new[] {
 		InputType.Age,

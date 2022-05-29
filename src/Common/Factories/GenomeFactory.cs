@@ -3,6 +3,7 @@ using Common.Models.Genetic.Components.Neurons;
 using Common.Models.Options;
 using Common.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Common.Factories;
@@ -12,22 +13,49 @@ internal static class GenomeFactory {
 		var brainOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<BrainOptions>>().Value;
 		var random = serviceProvider.GetRequiredService<IRandomProvider>().GetRandom();
 
+		// var logger = serviceProvider.GetRequiredService<ILogger<Genome>>();
+
+		// var count2 = 0;
+		// var internals = 0;
+		// var actions = 0;
+		// var inputs = 0;
+		
 		for (var i = 0; i < count; i++) {
 			var neuronsAmount = brainOptions.MinStartNeurons.HasValue
 				? random.Next(brainOptions.MinStartNeurons.Value, brainOptions.StartNeurons + 1)
 				: brainOptions.StartNeurons;
 
-			var neurons = CreateNeurons(neuronsAmount, brainOptions, random);
+			var neurons = CreateNeurons(neuronsAmount, brainOptions, random).ToArray();
+			
+			//
+			// count2 += neurons.Count();
+			// internals += neurons.Count(x => x.NeuronType == NeuronType.Internal);
+			// actions+= neurons.Count(x => x.NeuronType == NeuronType.Action);
+			// inputs+= neurons.Count(x => x.NeuronType == NeuronType.Input);
+			//
+			
 			var connections = CreateConnections(neurons, brainOptions, random);
+
+
+			// if (i + 1 >= count) {
+			// 	logger.LogInformation("from factory");
+			// 	logger.LogInformation("{neurons} total neurons", count2);
+			// 	logger.LogInformation("{neurons} input neurons ({perc}%)", inputs, ((double)inputs/count2));
+			// 	logger.LogInformation("{neurons} action neurons ({perc}%)", actions, ((double)actions/count2));
+			// 	logger.LogInformation("{neurons} internal neurons ({perc}%)", internals, ((double)internals/count2));
+			// }
 
 			yield return new Genome(connections.ToArray());
 		}
+		
+		
+		yield break;
 	}
 
 
 	private static IEnumerable<NeuronConnection> CreateConnections(IEnumerable<Neuron> neurons, BrainOptions options, Random random) {
 		var connections = new List<NeuronConnection>();
-		var neuronArray = neurons as Neuron[] ?? neurons.ToArray();
+		var neuronArray = neurons.ToArray();
 		//var withoutActions = neuronArray.Where(x => x.NeuronType != NeuronType.Action);
 		var withoutInputs = neuronArray.Where(x => x.NeuronType != NeuronType.Input).ToArray();
 		
@@ -35,24 +63,23 @@ internal static class GenomeFactory {
 			if(neuron.NeuronType == NeuronType.Action)
 				continue;
 			
-			// does this make a deepcopy. Test this!
 			var toChooseFrom = withoutInputs.ToList();
 
 			var connectionsAmount = options.MinStartingConnectionsPerNeuron.HasValue
-				? random.Next(options.MinStartingConnectionsPerNeuron.Value, options.StartingConnectionsPerNeuron)
+				? random.Next(options.MinStartingConnectionsPerNeuron.Value, options.StartingConnectionsPerNeuron + 1)
 				: options.StartingConnectionsPerNeuron;
 
 			connectionsAmount = Math.Min(toChooseFrom.Count, connectionsAmount);
 			
 			var conns = 0;
-			do {
+			while (conns++ < connectionsAmount) {
 				var n2 = random.NextFromList(toChooseFrom);
 				toChooseFrom.Remove(n2);
 
 				var weight = random.NextWeight();
 				connections.Add(new NeuronConnection(neuron, n2, weight));
-				conns++;
-			} while (conns < connectionsAmount);
+				//conns++;
+			} 
 		}
 
 		return connections;
@@ -81,10 +108,12 @@ internal static class GenomeFactory {
 
 		for (var i = 0; i < count; i++) {
 			var id = (ushort) random.Next(0, options.MaxNeurons);
-			var isInternal = random.NextDouble() < options.InternalRate;
+			var randNum = random.NextDouble();
+			var isInternal = randNum < options.InternalRate;
 
 			if (isInternal) {
 				yield return new Neuron(id, NeuronType.Internal);
+				continue;
 			}
 			
 			yield return GetNeuron(options, random, id);
@@ -92,7 +121,8 @@ internal static class GenomeFactory {
 	}
 
 	private static Neuron GetNeuron(BrainOptions options, Random r, ushort id) {
-		var nonInternalType = r.NextDouble() < options.InputRate ? NeuronType.Input : NeuronType.Action;
+		var randNum = r.NextDouble();
+		var nonInternalType = randNum < options.InputRate ? NeuronType.Input : NeuronType.Action;
 		var mod = nonInternalType switch {
 			NeuronType.Input => InputNeuron.NeuronInputAmount,
 			NeuronType.Action => ActionNeuron.NeuronActionsAmount,

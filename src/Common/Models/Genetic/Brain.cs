@@ -35,6 +35,8 @@ public record Brain {
 			.ToAdjacencyGraph<Neuron, Edge<Neuron>>(false);
 
 
+		//var connectedVertices = reversedGraph.Vertices.ToArray();
+
 		var connectedVertices = new List<Neuron>();
 		var alg = new BreadthFirstSearchAlgorithm<Neuron, Edge<Neuron>>(reversedGraph);
 		alg.DiscoverVertex += vertex => {
@@ -42,7 +44,7 @@ public record Brain {
 				connectedVertices.Add(vertex);
 			}
 		};
-
+		
 		foreach (var vertex in reversedGraph.Vertices.Where(x => x.NeuronType == NeuronType.Action && x.IsEnabledNeuron())) {
 			alg.Compute(vertex);
 		}
