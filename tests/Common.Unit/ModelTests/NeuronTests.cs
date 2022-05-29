@@ -131,8 +131,8 @@ public class NeuronTests {
 	[Theory]
 	[InlineData(0x7F, NeuronType.Internal, NeuronType.Input, "7F00")]
 	[InlineData(0x70, NeuronType.Internal, NeuronType.Input,"7000")]
-	[InlineData(0x9, NeuronType.Input, NeuronType.Input,"7980")]
-	[InlineData(0x1, NeuronType.Action, NeuronType.Action,"7980")]
+	[InlineData(4, NeuronType.Input, NeuronType.Input,"0480")]
+	[InlineData(10, NeuronType.Action, NeuronType.Action,"0A80")]
 	public void FromHex_ShouldHaveCorrectNeuron_ForValidHex(ushort id, NeuronType type,NeuronType externalType ,string hex) {
 		//Arrange
 

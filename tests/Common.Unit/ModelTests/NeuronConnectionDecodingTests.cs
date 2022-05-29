@@ -36,7 +36,7 @@ public class NeuronConnectionDecodingTests {
 	[Fact]
 	public void FromHex_ShouldResultInNeuronConnection_WhenGivenValidHex() {
 		//Arrange
-		var hex = "00B0124581800880";
+		var hex = "19000980FFFF3F7F";
 
 		//Act
 		var neuronConnection = NeuronConnection.FromHex(hex);
@@ -48,7 +48,7 @@ public class NeuronConnectionDecodingTests {
 	[Fact]
 	public void FromHex_ShouldResultInCorrectInputNeuron_WhenGivenValidHex() {
 		//Arrange
-		var hex = "0880158000009A44";
+		var hex = "08800580FFFF3F7F";
 
 		//Act
 		var neuronConnection = NeuronConnection.FromHex(hex);
@@ -62,7 +62,7 @@ public class NeuronConnectionDecodingTests {
 	[Fact]
 	public void FromHex_ShouldResultInCorrectSourceInternalNeuron_WhenGivenValidHex() {
 		//Arrange
-		var hex = "1900158000009A44";
+		var hex = "19000580FFFF3F7F";
 
 		//Act
 		var neuronConnection = NeuronConnection.FromHex(hex);
@@ -76,15 +76,15 @@ public class NeuronConnectionDecodingTests {
 	[Fact]
 	public void FromHex_ShouldResultInCorrectOutputNeuron_WhenGivenValidHex() {
 		//Arrange
-		var hex = "0880818000009A44";
+		var hex = "19000980FFFF3F7F";
 
 		//Act
 		var neuronConnection = NeuronConnection.FromHex(hex);
-		var sourceNeuron = neuronConnection.Target;
+		var resultNeuron = neuronConnection.Target;
 		
 		//Assert
-		sourceNeuron.NeuronType.Should().Be(NeuronType.Action);
-		sourceNeuron.Id.Should().Be(9);
+		resultNeuron.NeuronType.Should().Be(NeuronType.Action);
+		resultNeuron.Id.Should().Be(9);
 	}
 	
 	[Fact]
