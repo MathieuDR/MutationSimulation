@@ -4,39 +4,53 @@ using Common.Models.Genetic.Components;
 using Common.Models.Options;
 using Common.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Common.Factories;
 
-internal static class CreatureFactory {
-	public static IEnumerable<Creature> CreateCreatures(IServiceProvider serviceProvider, int count, IEnumerable<Line>? walls = null) {
-		var creatureOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<CreatureOptions>>().Value;
-		var simulatorOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<SimulatorOptions>>().Value;
-		var worldOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<WorldOptions>>().Value;
-		var validatePosition = simulatorOptions.ValidateStartPositions;
-		var random = serviceProvider.GetRequiredService<IRandomProvider>().GetRandom();
-		var wallArray = walls?.ToArray() ?? Array.Empty<Line>();
-		
-		var genomes = GenomeFactory.CreateGenomes(serviceProvider, count);
+public class CreatureFactory {
+	private readonly ILogger<CreatureFactory> _logger;
+	private readonly GenomeFactory _genomeFactory;
+	private readonly Random _random;
+	private readonly WorldOptions _worldOptions;
+	private readonly SimulatorOptions _simulatorOptions;
+	private readonly CreatureOptions _creatureOptions;
+
+	public CreatureFactory(ILogger<CreatureFactory> logger, IRandomProvider randomProvider, IOptionsSnapshot<WorldOptions> worldOptions, IOptionsSnapshot<SimulatorOptions> simulatorOptions, IOptionsSnapshot<CreatureOptions> creatureOptions, GenomeFactory genomeFactory) {
+		_logger = logger;
+		_genomeFactory = genomeFactory;
+		_random = randomProvider.GetRandom();
+		_worldOptions = worldOptions.Value;
+		_simulatorOptions = simulatorOptions.Value;
+		_creatureOptions = creatureOptions.Value;
+	}
+
+	public IEnumerable<Creature> Create(int count, Line[] walls) {
+		var genomes = _genomeFactory.Create(count);
 		var currentPositions = new List<(Vector position, int radius)>();
 		using var genomeEnumerator = genomes.GetEnumerator();
-		
+
 		for (int i = 0; i < count; i++) {
 			genomeEnumerator.MoveNext();
 			var genome = genomeEnumerator.Current;
-			var radius = random.Next(creatureOptions.MinRadius, creatureOptions.MaxRadius);
-			var position = validatePosition
-				? random.GetValidPosition(radius, worldOptions.Width, worldOptions.Height, currentPositions, wallArray)
-				: random.GetRandomPosition(worldOptions.Width, worldOptions.Height);
-			var color = GenerateColorFromGenome(genome, random);
+			var radius = _random.Next(_creatureOptions.MinRadius, _creatureOptions.MaxRadius);
+			var position = _simulatorOptions.ValidateStartPositions
+				? _random.GetValidPosition(radius, _worldOptions.Width, _worldOptions.Height, currentPositions, walls)
+				: _random.GetRandomPosition(_worldOptions.Width, _worldOptions.Height);
+
+			currentPositions.Add((position, radius));
+			var color = GenerateColorFromGenome(genome);
 			
 			
-			yield return new Creature(genome, position, radius, color, random);
+			yield return new Creature(genome, position, radius, color, _random);
 		}
 	}
 
-	private static Color GenerateColorFromGenome(Genome genome, Random random) {
-		// Todo!
-		return new Color(random);
+	private Color GenerateColorFromGenome(Genome genome) {
+		return new Color(_random);
 	}
+	
+	
+
 }

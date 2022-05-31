@@ -15,7 +15,7 @@ public record Creature {
 	private readonly Dictionary<Neuron, float> _neuronValues = new();
 
 
-	private Dictionary<Creature, double> _creatureDistances;
+	private Dictionary<Creature, double> _creatureDistances = new();
 
 	public Creature(Genome genome, Vector position, int radius, Color color, Random random) {
 		_random = random;
@@ -36,7 +36,7 @@ public record Creature {
 	public int OscillatorAgeDivider => 1000;
 	public int EyeSightStrength => Radius * 4 + (int)Speed;
 	public int ViewingAngle => 40;
-	public float Speed => Math.Max((float)Radius / 4, 3);
+	public float Speed => Math.Max((float)Radius / 4, 3) / 20;
 	
 	public Vector StartPosition { get; init; }
 
@@ -69,7 +69,7 @@ public record Creature {
 	public Color Color { get; init; }
 
 	private void PrepareNextTick() {
-		_creatureDistances = new Dictionary<Creature, double>();
+		_creatureDistances.Clear();
 	}
 
 	public void Simulate(World world) {
@@ -195,7 +195,8 @@ public record Creature {
 			if (kvp.Value.Count > 1) {
 				_actionValues[kvp.Key] = SoftMax(kvp.Value);
 			} else {
-				_actionValues[kvp.Key][kvp.Value.First().Key] = ActivationFunctions.Sigmoid(kvp.Value.First().Value);
+				var kvp2 = kvp.Value.First();
+				_actionValues[kvp.Key][kvp2.Key] = ActivationFunctions.Sigmoid(kvp2.Value);
 			}
 		}
 	}

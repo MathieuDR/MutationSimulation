@@ -1,4 +1,4 @@
-namespace Graphics.Helpers; 
+namespace Common.Helpers; 
 
 public static class FileHelper {
 	public static void EnsurePath(string filePath) {

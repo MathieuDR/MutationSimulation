@@ -2,7 +2,9 @@ using Common.Factories;
 using Common.Models.Genetic.Components.Neurons;
 using Common.Models.Options;
 using Common.Services;
+using Graphics;
 using Graphics.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -15,14 +17,12 @@ public class SimulationHost : IHostedService {
 	private readonly IOptionsMonitor<CreatureOptions> _creatureMonitor;
 	private readonly ILogger<SimulationHost> _logger;
 	private readonly IOptionsMonitor<RandomOptions> _randomMonitor;
-	private readonly IRandomProvider _randomProvider;
 	private readonly IOptionsMonitor<RenderOptions> _renderMonitor;
 	private readonly IServiceProvider _serviceProvider;
 	private readonly IOptionsMonitor<SimulatorOptions> _simulatorMonitor;
 	private readonly IOptionsMonitor<WorldOptions> _worldMonitor;
 
 	public SimulationHost(ILogger<SimulationHost> logger, IHostApplicationLifetime applicationLifetime,
-		IRandomProvider randomProvider,
 		IServiceProvider serviceProvider, IOptionsMonitor<BrainOptions> brainMonitor,
 		IOptionsMonitor<CreatureOptions> creatureMonitor,
 		IOptionsMonitor<RandomOptions> randomMonitor, IOptionsMonitor<RenderOptions> renderMonitor,
@@ -30,7 +30,6 @@ public class SimulationHost : IHostedService {
 	) {
 		_logger = logger;
 		_applicationLifetime = applicationLifetime;
-		_randomProvider = randomProvider;
 		_serviceProvider = serviceProvider;
 		_brainMonitor = brainMonitor;
 		_creatureMonitor = creatureMonitor;
@@ -42,36 +41,118 @@ public class SimulationHost : IHostedService {
 
 	public Task StartAsync(CancellationToken cancellationToken) {
 		_logger.LogInformation("Starting the host");
-		if (_randomMonitor.CurrentValue.UseSeed) {
-			_randomProvider.SetSeed(_randomMonitor.CurrentValue.Seed);
-		}
+		// if (_randomMonitor.CurrentValue.UseSeed) {
+		// 	_randomProvider.SetSeed(_randomMonitor.CurrentValue.Seed);
+		// }
 
 		//LoopModus(cancellationToken);
-		var world = WorldFactory.CreateWorld(_serviceProvider);
-		foreach (var creature in world.Creatures) {
-			creature.Brain.CreateDotFile(fileName: $"{creature.Id}.dot");
+		Task.Run(() => {
+			try {
+				return StartSimulation(cancellationToken);
+			} catch (Exception e) {
+				_logger.LogError(e, "Error in sim");
+				return Task.FromException(e);
+			}
+		}, cancellationToken);
+		return Task.CompletedTask;
+	}
+
+	public async Task StartSimulation(CancellationToken cancellationToken) {
+
+		var scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
+		
+		var maxGenerations = 11;
+		var gifTasks = new List<Task>();
+		var render = 0;
+		for (var gen = 0; gen < maxGenerations; gen++) {
+			// await using var asyncScope = scopeFactory.CreateAsyncScope();
+			//
+			
+			try {
+				using var scope = scopeFactory.CreateScope();
+				InitializeScope(scope, gen);
+				await SolveGeneration(scope);
+
+			} catch (Exception e) {
+				_logger.LogError(e, "Error in sim");
+			}
+		
+
+
+
+			// _logger.LogInformation("Starting gen {gen}", gen);
+			// var world = WorldFactory.CreateWorld(_serviceProvider);
+			// var simOpts = _simulatorMonitor.CurrentValue;
+			// var renderOpts = _renderMonitor.CurrentValue;
+			//
+			// var basePath = Path.Combine("output", gen.ToString());
+			// var brainPath = Path.Combine(basePath, "brains");
+			// var framePath = Path.Combine(basePath, "frames");
+			// var gifPath = Path.Combine(basePath, "run.gif");
+			//
+			// var renderMod = renderOpts.RenderMod ?? 1;
+			// var rendering = gen % renderMod == 0;
+			//
+			// _logger.LogInformation("We {verb} rendering", rendering ? "are":"are not");
+			//
+			// foreach (var creature in world.Creatures) {
+			// 	creature.Brain.CreateDotFile(brainPath, $"{creature.Id}.dot");
+			// }
+			//
+			// var renderMachine = rendering ? new WorldRenderMachine(framePath, "w"): null;
+			// var frames = new List<string>();
+			//
+			// for (var step = 0; step < simOpts.Steps; step++) {
+			// 	world.NextTick();
+			// 	if (rendering && step % renderOpts.TicksPerFrame == 0) {
+			// 		frames.Add(renderMachine!.RenderWorld(world));
+			// 	}
+			// }
+			//
+			// var gifMod = renderOpts.GifRenderMod ?? 1;
+			// var gifVerb = "are not";
+			// if (rendering && render % gifMod == 0) {
+			// 	var t = Task.Run(()=> CreateGif(frames.ToArray(), gifPath, default));
+			// 	gifTasks.Add(t);
+			// 	gifVerb = "are";
+			// }
+			//
+			// _logger.LogInformation("We {verb} creating a gif", gifVerb);
 		}
 
-		var neurons = world.Creatures.SelectMany(x => x.Brain.SortedNeurons.Where(x=> x.NeuronType != NeuronType.Memory)).ToArray();
 
-		var count = neurons.Count();
-		var internals = neurons.Count(x => x.NeuronType == NeuronType.Internal);
-		var action = neurons.Count(x => x.NeuronType == NeuronType.Action);
-		var input = neurons.Count(x => x.NeuronType == NeuronType.Input);
-
-		var shookies = world.Creatures.Count(x => !x.Brain.SortedNeurons.Any());
-		
-		_logger.LogInformation("{neurons} total neurons", count);
-		_logger.LogInformation("{neurons} input neurons ({perc}%)", input, ((double)input/count));
-		_logger.LogInformation("{neurons} action neurons ({perc}%)", action, ((double)action/count));
-		_logger.LogInformation("{neurons} internal neurons ({perc}%)", internals, ((double)internals/count));
-		_logger.LogInformation("{nobrainers} shookies ({perc}%)", shookies, ((double)shookies/world.Creatures.Count()));
-		// _logger.LogInformation("{neurons} memory neurons ({perc}%)", mem, ((double)mem/count));
-		// _logger.LogInformation("{neurons} internal+mem neurons ({perc}%)", mem+internals, ((double)(mem+internals)/count));
-
-
+		await Task.WhenAll(gifTasks.ToArray());
 		_applicationLifetime.StopApplication();
-		return Task.CompletedTask;
+	}
+
+	private async Task SolveGeneration(IServiceScope scope) {
+		var solver = scope.ServiceProvider.GetRequiredService<GenerationSolver>();
+		await solver.Solve();
+	}
+
+	private void InitializeScope(IServiceScope scope, int generation) {
+		InitializeRandomProvider(scope, generation);
+		InitializeContext(scope, generation);
+	}
+
+	private void InitializeContext(IServiceScope scope, int generation) {
+		var contextProvider = scope.ServiceProvider.GetRequiredService<ContextProvider>();
+		contextProvider.Initialize(generation);
+	}
+
+	private void InitializeRandomProvider(IServiceScope scope, int generation) {
+		if (!_randomMonitor.CurrentValue.UseSeed) {
+			return;
+		}
+
+		var randomProvider = scope.ServiceProvider.GetRequiredService<IRandomProvider>();
+		randomProvider.SetSeed($"{_randomMonitor.CurrentValue.Seed}_{generation.ToString().PadLeft(4, '0')}");
+	}
+
+	public async Task CreateGif(string[] frames, string path, CancellationToken cancellationToken) {
+		_logger.LogInformation("Creating gif with {frameCount} frames", frames.Count());
+		await Giffer.CreateGif(frames, path, 7);
+		_logger.LogInformation("Created gif with {frameCount} frames", frames.Count());
 	}
 
 	public Task StopAsync(CancellationToken cancellationToken) {
@@ -80,21 +161,21 @@ public class SimulationHost : IHostedService {
 	}
 
 
-	private async Task LoopModus(CancellationToken cancellationToken) {
-		try {
-			while (true) {
-				LogCurrent(_brainMonitor);
-				LogCurrent(_creatureMonitor);
-				LogCurrent(_randomMonitor);
-				LogCurrent(_renderMonitor);
-				LogCurrent(_simulatorMonitor);
-				LogCurrent(_worldMonitor);
-				await Task.Delay(5000, cancellationToken);
-			}
-		} catch (Exception e) {
-			_logger.LogError(e, "this is what happens..");
-		}
-	}
+	// private async Task LoopModus(CancellationToken cancellationToken) {
+	// 	try {
+	// 		while (true) {
+	// 			LogCurrent(_brainMonitor);
+	// 			LogCurrent(_creatureMonitor);
+	// 			LogCurrent(_randomMonitor);
+	// 			LogCurrent(_renderMonitor);
+	// 			LogCurrent(_simulatorMonitor);
+	// 			LogCurrent(_worldMonitor);
+	// 			await Task.Delay(5000, cancellationToken);
+	// 		}
+	// 	} catch (Exception e) {
+	// 		_logger.LogError(e, "this is what happens..");
+	// 	}
+	// }
 
 	private void LogCurrent<T>(IOptionsMonitor<T> options) {
 		var opts = options.CurrentValue;

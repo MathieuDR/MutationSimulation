@@ -1,3 +1,4 @@
+using Common.Helpers;
 using Graphics.Helpers;
 using ImageMagick;
 
@@ -5,7 +6,7 @@ namespace Graphics;
 
 public static class Giffer {
 
-	public static string CreateGif(IEnumerable<string> paths, string outputPath, int delay = 7) {
+	public static async Task CreateGif(IEnumerable<string> paths, string outputPath, int delay = 7) {
 		FileHelper.EnsurePath(outputPath);
 		var pathsList = paths.ToArray();
 		
@@ -25,7 +26,6 @@ public static class Giffer {
 		collection.Quantize(settings);
 
 		// Save gif
-		collection.Write(outputPath);
-		return outputPath;
+		await collection.WriteAsync(outputPath);
 	}
 }

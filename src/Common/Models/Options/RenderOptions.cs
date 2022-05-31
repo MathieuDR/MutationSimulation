@@ -15,6 +15,7 @@ public record RenderOptions : ConfigurationOptions {
 		OutputDirectory = outputDirectory;
 	}
 
+	public int TicksPerFrame { get; init; } = 5;
 	public int? RenderMod { get; init; } = 5;
 	public int? GifRenderMod { get; init; } = 2;
 	public bool OutputAllBrain { get; init; }

@@ -1,3 +1,4 @@
+using Common.Helpers;
 using Common.Models.Genetic;
 using Common.Models.Genetic.Components.Neurons;
 using MathieuDR.Common.Extensions;
@@ -10,10 +11,7 @@ public static class BrainHelper {
 	public static string CreateDotFile(this Brain brain, string outputDir = "./output/brains/", string? fileName = null) {
 		var dot = CreateDotContent(brain);
 		
-		// create output directory if it doesn't exist
-		if (!Directory.Exists(outputDir)) {
-			Directory.CreateDirectory(outputDir);
-		}
+		FileHelper.EnsurePath(outputDir);
 		
 		var filePath = Path.Combine(outputDir, ToValidFileName(fileName ?? $"{brain.Genome.HexSequence}.dot"));
 

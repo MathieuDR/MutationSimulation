@@ -1,61 +1,64 @@
 using Common.Models;
 using Common.Models.Options;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Common.Factories;
 
-public static class WorldFactory {
-	public static World CreateWorld(IServiceProvider serviceProvider) {
-		var worldOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<WorldOptions>>().Value;
-		
-		var walls = worldOptions.CreateWalls().ToArray();
-		var creatures = CreatureFactory.CreateCreatures(serviceProvider, worldOptions.CreaturesAmount, walls);
-		var world = worldOptions.FromOptions(creatures, walls);
+public class WorldFactory {
+	private readonly CreatureFactory _creatureFactory;
+	private Line[]? _walls;
+	private Creature[]? _creatures;
+	private WorldOptions WorldOptions { get; init; }
 
-		return world;
+	private Line[] Walls => _walls ??= CreateWalls();
+
+	private Creature[] Creatures => _creatures ??= CreateCreatures();
+
+	public WorldFactory(IOptionsSnapshot<WorldOptions> worldOptions, CreatureFactory creatureFactory) {
+		_creatureFactory = creatureFactory;
+		WorldOptions = worldOptions.Value;
 	}
 
-	private static World FromOptions(this WorldOptions options, IEnumerable<Creature> creatures, IEnumerable<Line>? walls = null) {
-		walls ??= options.CreateWalls();
-		var result = new World(options.Width, options.Height, creatures.ToArray(), walls.ToArray());
-		return result;
-	}
+	public World Create() => new World(WorldOptions.Width, WorldOptions.Height, Creatures, Walls);
 
-	private static IEnumerable<Line> CreateWalls(this WorldOptions options) {
+	private Creature[] CreateCreatures() {
+		return _creatureFactory.Create(WorldOptions.CreaturesAmount, Walls).ToArray();
+	}
+	
+	private Line[] CreateWalls() {
 		var worldWalls = new List<Line>();
 		
 		// wall offset so whole wall is visible
 		// on the edge of the wall
-		var wallOffset = options.WallWidth / 2;
+		var wallOffset = WorldOptions.WallWidth / 2;
 
 		// top horizontal wall
 		worldWalls.Add(new Line(
 			new Vector(0, wallOffset),
-			new Vector(options.Width, wallOffset)
+			new Vector(WorldOptions.Width, wallOffset)
 		));
 
 		// bottom horizontal wall
 		worldWalls.Add(new Line(
-			new Vector(0, options.Height - wallOffset),
-			new Vector(options.Width, options.Height - wallOffset)
+			new Vector(0, WorldOptions.Height - wallOffset),
+			new Vector(WorldOptions.Width, WorldOptions.Height - wallOffset)
 		));
 
 		// left vertical wall
 		worldWalls.Add(new Line(
 			new Vector(wallOffset, 0),
-			new Vector(wallOffset, options.Height)
+			new Vector(wallOffset, WorldOptions.Height)
 		));
 
 		// right vertical wall
 		worldWalls.Add(new Line(
-			new Vector(options.Width - wallOffset, 0),
-			new Vector(options.Width - wallOffset, options.Height)
+			new Vector(WorldOptions.Width - wallOffset, 0),
+			new Vector(WorldOptions.Width - wallOffset, WorldOptions.Height)
 		));
 
-		if (options.ExtraWalls) {
-			var xPoints = GetWallPoints(options.Width);
-			var yPoints = GetWallPoints(options.Height);
+		if (WorldOptions.ExtraWalls) {
+			var xPoints = GetWallPoints(WorldOptions.Width);
+			var yPoints = GetWallPoints(WorldOptions.Height);
 
 			worldWalls.Add(new Line(
 				new Vector(xPoints.Eight, yPoints.Half),
@@ -82,10 +85,10 @@ public static class WorldFactory {
 				new Vector(xPoints.SevenEights, yPoints.Half - yPoints.Eight)));
 		}
 
-		return worldWalls;
+		return worldWalls.ToArray();
 	}
-
-	private static (int Half, int Quarter, int Eight, int ThreeQuarter, int SevenEights) GetWallPoints(int size) {
+	
+	private (int Half, int Quarter, int Eight, int ThreeQuarter, int SevenEights) GetWallPoints(int size) {
 		var half = size / 2;
 		var quarter = size / 4;
 		var eight = quarter / 2;

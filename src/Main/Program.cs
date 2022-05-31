@@ -1,4 +1,8 @@
 ﻿using CommandLine;
+using Common.Factories;
+using Common.Models;
+using Common.Models.Genetic;
+using Common.Models.Genetic.Components;
 using Common.Models.Options;
 using Common.Services;
 using Main.Models;
@@ -51,7 +55,16 @@ static IHostBuilder CreateHostBuilder(CmdArgs options, string[] args) {
 			services.AddOptions<WorldOptions>().Bind(customOptions.GetSection(WorldOptions.SectionName)).Validate(ValidateOptions);
 
 
-			services.AddSingleton<IRandomProvider, RandomProvider>();
+			services.AddScoped<IRandomProvider, RandomProvider>();
+			services.AddScoped<ContextProvider>();
+			services.AddScoped<GenerationSolver>();
+			services.AddScoped<WorldFactory>();
+			services.AddScoped<CreatureFactory>();
+			services.AddScoped<GenomeFactory>();
+			services.AddScoped<GenerationContext>(provider => {
+				var ctxProvider = provider.GetRequiredService<ContextProvider>();
+				return ctxProvider.Context ?? throw new InvalidOperationException("Context has not been initialized yet");
+			});
 			services.AddHostedService<SimulationHost>();
 		})
 		.UseSerilog();
@@ -69,6 +82,31 @@ static bool ValidateOptions(ConfigurationOptions options) {
 
 static void CreateLogger() {
 	Log.Logger = new LoggerConfiguration()
+		.Destructure.ByTransforming<Genome>(
+			g=> g.HexSequence ?? g.ToHex())
+		.Destructure.ByTransforming<Brain>(
+			b=> new {
+				Edges = b.BrainGraph.Edges.Count(),
+				Vertices = b.BrainGraph.Vertices.Count()
+			})
+		.Destructure.ByTransforming<Creature>(
+			c=> {
+
+				if (Log.IsEnabled(LogEventLevel.Verbose)) {
+					return new {
+						Genome = c.Genome,
+						Brain = c.Brain,
+						Id = c.Id,
+						Score = 0,
+						Age = c.Age
+					};
+				}
+				
+				return new {
+					Id = c.Id,
+					Score = 0,
+				};
+			})
 		.Enrich.FromLogContext()
 		.MinimumLevel.Debug()
 		.WriteTo.File(new JsonFormatter(), "logs/output.log", rollingInterval: RollingInterval.Day)

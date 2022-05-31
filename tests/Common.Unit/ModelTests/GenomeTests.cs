@@ -22,30 +22,6 @@ public class GenomeTests {
 	}
 	
 	[Fact]
-	public void Ctor_ShouldThrowArgumentException_WhenNeuronConnectionAreEmpty() {
-		//Arrange
-		//Act
-		var act = () =>  _ = new Genome(Array.Empty<NeuronConnection>());
-
-		//Assert
-		act.Should().Throw<ArgumentException>();
-	}
-	
-	[Fact]
-	public void WithKeyword_ShouldThrowArgumentException_WhenNeuronConnectionAreEmpty() {
-		//Arrange
-		var sequence = new Genome(new[] {
-			new NeuronConnection(new InputNeuron(1), new Neuron(2, NeuronType.Action), 2f)
-		});
-		
-		//Act
-		var act = () => _ = sequence with { NeuronConnections = Array.Empty<NeuronConnection>() };
-
-		//Assert
-		act.Should().Throw<ArgumentException>();
-	}
-
-	[Fact]
 	public void FromHex_ShouldReturnSameGenome_WhenProvided() {
 		//Arrange
 		var connections = new[] {
