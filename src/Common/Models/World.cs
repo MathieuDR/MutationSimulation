@@ -13,8 +13,6 @@ public class World {
 		Tick = tick;
 	}
 
-	// public int Width { get; init; }
-	// public int Height { get; init; }
 	public Creature[] Creatures { get; init; }
 	public ulong Tick { get; private set; }
 	public Line[] Walls { get; init; }
@@ -25,12 +23,6 @@ public class World {
 		creatures = Creatures;
 		tick = Tick;
 	}
-
-	public void NextTick() {
-		Tick++;
-		foreach (var creature in Creatures) {
-			creature.Simulate(this);
-		}
-	}
+	
 	public Line GetClosestWallInDirection(Vector vector, Direction direction) => Walls.First();
 }

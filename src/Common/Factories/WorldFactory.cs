@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 namespace Common.Factories;
 
 public class WorldFactory {
+	private readonly RenderOptions _renderOptions;
 	private readonly CreatureFactory _creatureFactory;
 	private Line[]? _walls;
 	private Creature[]? _creatures;
@@ -14,7 +15,8 @@ public class WorldFactory {
 
 	private Creature[] Creatures => _creatures ??= CreateCreatures();
 
-	public WorldFactory(IOptionsSnapshot<WorldOptions> worldOptions, CreatureFactory creatureFactory) {
+	public WorldFactory(IOptionsSnapshot<WorldOptions> worldOptions, IOptionsSnapshot<RenderOptions> renderOptions, CreatureFactory creatureFactory) {
+		_renderOptions = renderOptions.Value;
 		_creatureFactory = creatureFactory;
 		WorldOptions = worldOptions.Value;
 	}
@@ -30,7 +32,7 @@ public class WorldFactory {
 		
 		// wall offset so whole wall is visible
 		// on the edge of the wall
-		var wallOffset = WorldOptions.WallWidth / 2;
+		var wallOffset = _renderOptions.WallWidth / 2;
 
 		// top horizontal wall
 		worldWalls.Add(new Line(

@@ -1,78 +1,96 @@
+using System.Security.AccessControl;
+using Common.Helpers;
 using Common.Models;
+using Common.Models.Options;
 using Graphics.Helpers;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SkiaSharp;
 
 namespace Graphics;
 
-public class WorldRenderMachine {
-	private readonly int _multiplier;
-	private readonly int _wallWidth;
-	private readonly string _fileName;
-	private readonly string _filePath;
-	private readonly SKEncodedImageFormat _format;
-	private readonly int _quality;
-	private ulong _frameCount;
+public class RenderMachine {
+	private readonly GenerationContext _context;
+	private readonly ILogger<RenderMachine> _logger;
+	private readonly GifRenderer _gifRenderer;
+	private readonly RenderOptions _renderOptions;
 
-	public WorldRenderMachine(string path, string filename, int wallWidth = 4, SKEncodedImageFormat format = SKEncodedImageFormat.Png,
-		int quality = 100, int multiplier = 1) {
-		_wallWidth = wallWidth;
-		_format = format;
-		_quality = quality;
-		_filePath = path;
-		_fileName = filename;
-		_multiplier = multiplier;
+	private string? _path;
+
+	private readonly List<string>? _frames;
+	public RenderMachine(GenerationContext context, ILogger<RenderMachine> logger, IOptionsSnapshot<RenderOptions> renderOptions, GifRenderer gifRenderer) {
+		_context = context;
+		_logger = logger;
+		_gifRenderer = gifRenderer;
+		_renderOptions = renderOptions.Value;
+		if (!context.RenderFrames) {
+			_logger.LogInformation("Not rendering generation {gen}", _context.Generation);
+			return;
+		}
+		
+		_frames = context.RenderGif ? new() : null;
+		_path = Path.Combine(_context.BaseOutputPath, "frames");
+		_logger.LogInformation("Rendering generation {gen} in {path}", _context.Generation, _path);
+		FileHelper.EnsurePath(_path);
 	}
 
-	public string RenderWorld(World world) {
+	public async Task RenderFrame() {
+		if(!_context.RenderFrames) {
+			return;
+		}
+		
 		using var surface =
-			SKSurface.Create(new SKImageInfo(World.Width * _multiplier , World.Height * _multiplier ));
+			SKSurface.Create(new SKImageInfo(World.Width * _renderOptions.PixelMultiplier , World.Height * _renderOptions.PixelMultiplier ));
 		using var canvas = surface.Canvas;
 
 		canvas.Clear(SKColors.White);
 
-		DrawBlobs(canvas, world.Creatures);
-		DrawWalls(canvas, SKColors.DarkRed, world.Walls);
-
-		return SaveFrame(surface);
+		DrawBlobs(canvas, _context.Creatures);
+		DrawWalls(canvas, SKColors.DarkRed, _context.World.Walls);
+		await Task.Run(() => SaveFrame(surface));
 	}
 
-	private readonly ulong[] _ids = new ulong[]{};
+	public Task QueueGifRender() {
+		if (!_context.RenderGif) {
+			return Task.CompletedTask;
+		}
+		_gifRenderer.StartGifRender(_frames!.ToArray());
+		return Task.CompletedTask;
+	}
+	
+	private Task SaveFrame(SKSurface surface) {
+		var filePath = Path.Combine(_path!, _context.World.Tick.ToString("D5") + ".png");
+		surface.SaveToPath(filePath, SKEncodedImageFormat.Png, 100);
+
+		if (_context.RenderGif) {
+			_frames!.Add(filePath);
+		}
+
+		return Task.CompletedTask;
+	}
 
 	private void DrawBlobs(SKCanvas canvas, Creature[] worldBlobs) {
 		foreach (var creature in worldBlobs) {
-			if(!_ids.Any() || _ids.Contains(creature.Id)) 
-				creature.Draw(canvas, GetImagePosition, GetPixelSize);
+			creature.Draw(canvas, GetImagePosition, GetPixelSize);
 		}
 	}
 	
-	private int GetPixelSize(int size) => size * _multiplier;
-
-	private (int X, int Y) GetImagePosition(Vector vector) =>
-		(vector.PixelX * _multiplier , vector.PixelY * _multiplier );
-
-	private string SaveFrame(SKSurface surface) {
-		var path = GetCurrentPath();
-		surface.SaveToPath(path, _format, _quality);
-		_frameCount++;
-		return path;
-	}
-
 	private void DrawWalls(SKCanvas canvas, SKColor color, Line[] walls) {
 		var borderPaint = new SKPaint {
 			Style = SKPaintStyle.Stroke,
-			StrokeWidth = _wallWidth,
+			StrokeWidth = _renderOptions.WallWidth,
 			Color = color
 		};
-		
-		var halfWidth = _wallWidth / 2;
 
-		// Draw the world.
 		foreach (var wall in walls) {
 			canvas.DrawLine((float)wall.StartPoint.X, (float)wall.StartPoint.Y , (float)wall.EndPoint.X, (float)wall.EndPoint.Y,
 				borderPaint);
 		}
 	}
+	
+	private int GetPixelSize(int size) => size * _renderOptions.PixelMultiplier;
 
+	private (int X, int Y) GetImagePosition(Vector vector) => (vector.PixelX * _renderOptions.PixelMultiplier , vector.PixelY * _renderOptions.PixelMultiplier );
 
-	private string GetCurrentPath() => $"{_filePath}/{_fileName}_{_frameCount.ToString("D8")}.{_format.ToString().ToLower()}";
+	
 }

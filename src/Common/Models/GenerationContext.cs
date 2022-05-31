@@ -10,7 +10,6 @@ public class GenerationContext {
 		Random = random;
 		RenderFrames = renderFrames;
 		RenderGif = renderGif;
-		FileHelper.EnsurePath(BaseOutputPath);
 	}
 
 	public GenerationContext(string baseOutputPath, World world, int generation, Random random, string seed, bool renderFrames, bool renderGif) :
@@ -19,10 +18,10 @@ public class GenerationContext {
 
 	public string BaseOutputPath { get; init; }
 	public World World { get; init; }
+	public Creature[] Creatures => World.Creatures;
 	public int Generation { get; init; }
 	public Random Random { get; init; }
 	public string? Seed { get; init; }
-
 	public bool RenderFrames { get; init; }
 	public bool RenderGif { get; init; }
 }
