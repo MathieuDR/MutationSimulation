@@ -4,18 +4,17 @@ using Common.Models;
 namespace Common.FitnessTests;
 
 internal class FitnessScorer : IFitnessScorer {
-	private readonly IFitnessPart[] _parts;
+	private readonly IFitnessPart _startPart;
 
-	public FitnessScorer(IEnumerable<IFitnessPart> parts) {
-		_parts = parts.ToArray();
+	public FitnessScorer(IFitnessPart startPart) {
+		_startPart = startPart;
+		
 	}
 
-	public (int CreatureIndex, double score)[] Score(Creature[] creatures) {
-		var result = new (int index, double score)[creatures.Length];
+	public CreatureScore[] Score(Creature[] creatures) {
+		var result = new CreatureScore[creatures.Length];
 		for (var index = 0; index < creatures.Length; index++) {
-			var creature = creatures[index];
-			var score = _parts.Sum(part => part.Score(creature));
-			result[index] = (index, score);
+			result[index] = new CreatureScore(index, _startPart.Score(creatures[index]));
 		}
 
 		return result;

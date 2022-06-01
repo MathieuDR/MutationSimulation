@@ -3,5 +3,5 @@ using Common.Models;
 namespace Common.FitnessTests;
 
 public interface IFitnessScorer {
-	public (int CreatureIndex, double score)[] Score(Creature[] creatures);
+	public CreatureScore[] Score(Creature[] creatures);
 }

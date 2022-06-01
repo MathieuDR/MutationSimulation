@@ -1,10 +1,13 @@
 ﻿using CommandLine;
 using Common.Factories;
+using Common.FitnessTests.Parts;
+using Common.Helpers;
 using Common.Models;
 using Common.Models.Genetic;
 using Common.Models.Genetic.Components;
 using Common.Models.Options;
 using Common.Services;
+using Graphics;
 using Main.Models;
 using Main.Services;
 using Microsoft.Extensions.Configuration;
@@ -45,22 +48,39 @@ static IHostBuilder CreateHostBuilder(CmdArgs options, string[] args) {
 					return isValid;
 				});
 
-			// services
-			// 	.Configure<BrainOptions>(customOptions.GetSection(BrainOptions.SectionName));
-			//
+			
 			services.AddOptions<CreatureOptions>().Bind(customOptions.GetSection(CreatureOptions.SectionName)).Validate(ValidateOptions);
 			services.AddOptions<RandomOptions>().Bind(customOptions.GetSection(RandomOptions.SectionName)).Validate(ValidateOptions);
 			services.AddOptions<RenderOptions>().Bind(customOptions.GetSection(RenderOptions.SectionName)).Validate(ValidateOptions);
 			services.AddOptions<SimulatorOptions>().Bind(customOptions.GetSection(SimulatorOptions.SectionName)).Validate(ValidateOptions);
 			services.AddOptions<WorldOptions>().Bind(customOptions.GetSection(WorldOptions.SectionName)).Validate(ValidateOptions);
+			services.AddOptions<FitnessOptions>().Bind(customOptions.GetSection(FitnessOptions.SectionName)).Validate(ValidateOptions);
 
 
+			var opts = new FitnessOptions();
+			customOptions.Bind(FitnessOptions.SectionName, opts);
+
+			services.AddSingleton<IFitnessPart, FitnessStart>();
+			foreach (var part in opts.Chain) {
+				Func<IFitnessPart, IFitnessPart> decorator = part.Part switch {
+					FitnessPart.DistanceFromStart => inner => new DistanceFromStartFitnessDecorator(inner, part.Multiplier),
+					FitnessPart.Distance => inner => new DistanceTravelledFitnessDecorator(inner, part.Multiplier),
+					FitnessPart.UniqueDistance => inner => new UniqueDistanceTravelledFitnessDecorator(inner, part.Multiplier),
+					FitnessPart.NoCollisions => inner => new NoCollisionsFitnessDecorator(inner, part.Multiplier),
+					_ => throw new ArgumentOutOfRangeException()
+				};
+
+				services.Decorate(decorator);
+			}
+			
 			services.AddScoped<IRandomProvider, RandomProvider>();
 			services.AddScoped<ContextProvider>();
-			services.AddScoped<GenerationSolver>();
+			services.AddScoped<Simulator>();
 			services.AddScoped<WorldFactory>();
 			services.AddScoped<CreatureFactory>();
 			services.AddScoped<GenomeFactory>();
+			services.AddScoped<RenderMachine>();
+			services.AddSingleton<GifRenderer>();
 			services.AddScoped<GenerationContext>(provider => {
 				var ctxProvider = provider.GetRequiredService<ContextProvider>();
 				return ctxProvider.Context ?? throw new InvalidOperationException("Context has not been initialized yet");
