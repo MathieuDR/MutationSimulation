@@ -21,7 +21,7 @@ public class ContextProvider {
 		_renderOptions = renderOptions.Value;
 	}
 
-	public void Initialize(int generation) {
+	public void Initialize(int generation, CancellationToken cancellationToken) {
 		var world = _worldFactory.Create();
 		var shouldRender = CalculateRenderFlags(generation, out var shouldRenderGif);
 		var outputDir = CreateOutputPath(generation);

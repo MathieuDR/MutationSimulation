@@ -1,4 +1,3 @@
-using Common.FitnessTests.Parts;
 using Common.Models.Options;
 using Graphics;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,24 +7,33 @@ using Microsoft.Extensions.Options;
 
 namespace Main.Services;
 
-public class SimulationHost : IHostedService {
+public class SimulationHost : IHostedService
+{
 	private readonly IHostApplicationLifetime _applicationLifetime;
 	private readonly ILogger<SimulationHost> _logger;
+	private readonly SimulatorOptions _options;
 	private readonly IServiceProvider _serviceProvider;
 
 	public SimulationHost(ILogger<SimulationHost> logger, IHostApplicationLifetime applicationLifetime,
-		IServiceProvider serviceProvider) {
+		IServiceProvider serviceProvider, IOptionsSnapshot<SimulatorOptions> options)
+	{
 		_logger = logger;
 		_applicationLifetime = applicationLifetime;
 		_serviceProvider = serviceProvider;
+		_options = options.Value;
 	}
 
-	public Task StartAsync(CancellationToken cancellationToken) {
+	public Task StartAsync(CancellationToken cancellationToken)
+	{
 		_logger.LogInformation("Starting the host");
-		Task.Run(() => {
-			try {
+		Task.Run(() =>
+		{
+			try
+			{
 				return StartSimulation(cancellationToken);
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				_logger.LogError(e, "Error in sim");
 				return Task.FromException(e);
 			}
@@ -33,20 +41,26 @@ public class SimulationHost : IHostedService {
 		return Task.CompletedTask;
 	}
 
-	public async Task StartSimulation(CancellationToken cancellationToken) {
+	public Task StopAsync(CancellationToken cancellationToken)
+	{
+		_logger.LogInformation("Stopping the host");
+		return Task.CompletedTask;
+	}
 
+	private async Task StartSimulation(CancellationToken cancellationToken)
+	{
 		var scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
-		
-		var maxGenerations = 11;
-		var gifTasks = new List<Task>();
-		var render = 0;
-		for (var gen = 0; gen < maxGenerations; gen++) {
-			try {
-				using var scope = scopeFactory.CreateScope();
-				CreateContext(scope, gen);
-				await SolveGeneration(scope);
 
-			} catch (Exception e) {
+		for (var gen = 0; gen < _options.Generations; gen++)
+		{
+			try
+			{
+				using var scope = scopeFactory.CreateScope();
+				CreateContext(scope, gen, cancellationToken);
+				await SolveGeneration(scope);
+			}
+			catch (Exception e)
+			{
 				_logger.LogError(e, "Error in sim");
 			}
 
@@ -90,32 +104,30 @@ public class SimulationHost : IHostedService {
 			// _logger.LogInformation("We {verb} creating a gif", gifVerb);
 		}
 
-		await Task.WhenAll(gifTasks.ToArray());
 		_applicationLifetime.StopApplication();
 	}
 
-	private async Task SolveGeneration(IServiceScope scope) {
+	private async Task SolveGeneration(IServiceScope scope)
+	{
 		var solver = scope.ServiceProvider.GetRequiredService<Simulator>();
 		await solver.Solve();
 	}
 
-	private void CreateContext(IServiceScope scope, int generation) {
+	private void CreateContext(IServiceScope scope, int generation, CancellationToken cancellationToken)
+	{
 		var contextProvider = scope.ServiceProvider.GetRequiredService<ContextProvider>();
-		contextProvider.Initialize(generation);
+		contextProvider.Initialize(generation, cancellationToken);
 	}
 
-	public async Task CreateGif(string[] frames, string path, CancellationToken cancellationToken) {
+	public async Task CreateGif(string[] frames, string path, CancellationToken cancellationToken)
+	{
 		_logger.LogInformation("Creating gif with {frameCount} frames", frames.Count());
-		await Giffer.CreateGif(frames, path, 7);
+		await Giffer.CreateGif(frames, path);
 		_logger.LogInformation("Created gif with {frameCount} frames", frames.Count());
 	}
 
-	public Task StopAsync(CancellationToken cancellationToken) {
-		_logger.LogInformation("Stopping the host");
-		return Task.CompletedTask;
-	}
-
-	private void LogCurrent<T>(IOptionsMonitor<T> options) {
+	private void LogCurrent<T>(IOptionsMonitor<T> options)
+	{
 		var opts = options.CurrentValue;
 		_logger.LogInformation("{T} Options: {@opts}", typeof(T), opts);
 	}
