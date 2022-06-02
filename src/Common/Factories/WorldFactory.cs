@@ -1,5 +1,7 @@
 using Common.Models;
+using Common.Models.Genetic.Components;
 using Common.Models.Options;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Common.Factories;
@@ -7,26 +9,37 @@ namespace Common.Factories;
 public class WorldFactory {
 	private readonly RenderOptions _renderOptions;
 	private readonly CreatureFactory _creatureFactory;
+	private readonly IServiceProvider _provider;
 	private Line[]? _walls;
-	private Creature[]? _creatures;
 	private WorldOptions WorldOptions { get; init; }
 
 	private Line[] Walls => _walls ??= CreateWalls();
 
-	private Creature[] Creatures => _creatures ??= CreateCreatures();
 
-	public WorldFactory(IOptionsSnapshot<WorldOptions> worldOptions, IOptionsSnapshot<RenderOptions> renderOptions, CreatureFactory creatureFactory) {
+	public WorldFactory(IOptionsSnapshot<WorldOptions> worldOptions, IOptionsSnapshot<RenderOptions> renderOptions, CreatureFactory creatureFactory, IServiceProvider provider) {
 		_renderOptions = renderOptions.Value;
 		_creatureFactory = creatureFactory;
+		_provider = provider;
 		WorldOptions = worldOptions.Value;
 	}
 
-	public World Create() => new World(WorldOptions.Width, WorldOptions.Height, Creatures, Walls);
-
-	private Creature[] CreateCreatures() {
-		return _creatureFactory.Create(WorldOptions.CreaturesAmount, Walls).ToArray();
+	public World Create(Genome[] genomes) {
+		var creatures = GetCreatures(genomes);
+		return new World(WorldOptions.Width, WorldOptions.Height, creatures , Walls);
 	}
-	
+
+	private Creature[] GetCreatures(Genome[] genomes) {
+		// Ensure we have genomes for the first gen.
+		if (genomes.Length == 0) {
+			// Service locator anti pattern
+			var factory = _provider.GetRequiredService<GenomeFactory>();
+			genomes = factory.Create(WorldOptions.CreaturesAmount).ToArray();
+		}
+
+		var creatures = _creatureFactory.Create(genomes, Walls).ToArray();
+		return creatures;
+	}
+
 	private Line[] CreateWalls() {
 		var worldWalls = new List<Line>();
 		

@@ -35,7 +35,7 @@ public class RenderMachine {
 	}
 
 	public async Task RenderFrame() {
-		if(!_context.RenderFrames) {
+		if(!_context.RenderFrames || _context.Tick % _renderOptions.TicksPerFrame != 0) {
 			return;
 		}
 		
@@ -54,12 +54,16 @@ public class RenderMachine {
 		if (!_context.RenderGif) {
 			return Task.CompletedTask;
 		}
-		_gifRenderer.StartGifRender(_frames!.ToArray());
+		
+		var path =  Path.Combine(_context.BaseOutputPath, "gif.gif");
+		
+		_gifRenderer.StartGifRender(_frames!.ToArray(), path);
 		return Task.CompletedTask;
 	}
 	
 	private Task SaveFrame(SKSurface surface) {
-		var filePath = Path.Combine(_path!, _context.World.Tick.ToString("D5") + ".png");
+		var frame = _context.Tick / _renderOptions.TicksPerFrame;
+		var filePath = Path.Combine(_path!, frame.ToString("D5") + ".png");
 		surface.SaveToPath(filePath, SKEncodedImageFormat.Png, 100);
 
 		if (_context.RenderGif) {

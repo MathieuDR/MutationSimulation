@@ -293,8 +293,6 @@ public record Creature {
 		// 1 = nothing infront
 		float closestObj = 1;
 
-		var closestWallInDirection = world.GetClosestWallInDirection(Position, direction);
-
 
 		// check which is in the fov of the creature
 

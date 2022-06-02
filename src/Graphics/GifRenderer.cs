@@ -21,5 +21,10 @@ public class GifRenderer   {
 		});
 	}
 
-	public void StartGifRender(string[] frames) { }
+	public void StartGifRender(string[] frames, string path) {
+		_tasks.Add(Task.Run(async () => {
+			await Giffer.CreateGif(frames, path, 7);
+		})
+			.ContinueWith(t => _tasks.Remove(t))); // Todo removing of tasks.
+	}
 }

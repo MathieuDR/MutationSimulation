@@ -1,6 +1,7 @@
 using Common.Factories;
 using Common.Helpers;
 using Common.Models;
+using Common.Models.Genetic.Components;
 using Common.Models.Options;
 using Common.Services;
 using Microsoft.Extensions.Options;
@@ -9,6 +10,7 @@ namespace Main.Services;
 
 public class ContextProvider {
 	private readonly WorldFactory _worldFactory;
+	private readonly GenomeFactory _genomeFactory;
 	private readonly RandomOptions _randomOptions;
 	private readonly IRandomProvider _randomProvider;
 	private readonly RenderOptions _renderOptions;
@@ -21,8 +23,8 @@ public class ContextProvider {
 		_renderOptions = renderOptions.Value;
 	}
 
-	public void Initialize(int generation, CancellationToken cancellationToken) {
-		var world = _worldFactory.Create();
+	public void Initialize(int generation, Genome[] genomes, CancellationToken cancellationToken) {
+		var world = _worldFactory.Create(genomes);
 		var shouldRender = CalculateRenderFlags(generation, out var shouldRenderGif);
 		var outputDir = CreateOutputPath(generation);
 		
@@ -34,7 +36,7 @@ public class ContextProvider {
 		var seed = $"{_randomOptions.Seed}_{generation:D4}";
 		_randomProvider.SetSeed(seed);
 		
-		Context = new GenerationContext(outputDir, world, generation, _randomProvider.GetRandom(), shouldRender, shouldRenderGif) {
+		Context = new GenerationContext(outputDir, world, generation, _randomProvider.GetRandom(), shouldRender, shouldRenderGif, cancellationToken) {
 			Seed = seed
 		};
 	}
