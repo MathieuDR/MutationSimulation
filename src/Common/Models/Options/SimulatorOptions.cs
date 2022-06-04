@@ -20,6 +20,8 @@ public record SimulatorOptions : ConfigurationOptions {
 
 	public bool ValidateStartPositions { get; init; } = true;
 
+	public double MutationRate { get; init; }
+
 	public void Deconstruct(out int? generations, out int steps, out bool validateStartPositions) {
 		generations = Generations;
 		steps = Steps;

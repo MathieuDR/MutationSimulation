@@ -20,7 +20,7 @@ public class Simulator {
 	}
 	public async Task Simulate() {
 		_logger.LogInformation("Solving generation {gen}", _context.Generation);
-		_logger.LogInformation("Outputting in {path}", _context.BaseOutputPath);
+		_logger.LogTrace("Outputting in {path}", _context.BaseOutputPath);
 
 		// Simulates
 		await DoSimulation();

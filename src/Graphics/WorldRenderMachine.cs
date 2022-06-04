@@ -24,13 +24,13 @@ public class RenderMachine {
 		_gifRenderer = gifRenderer;
 		_renderOptions = renderOptions.Value;
 		if (!context.RenderFrames) {
-			_logger.LogInformation("Not rendering generation {gen}", _context.Generation);
+			_logger.LogTrace("Not rendering generation {gen}", _context.Generation);
 			return;
 		}
 		
 		_frames = context.RenderGif ? new() : null;
 		_path = Path.Combine(_context.BaseOutputPath, "frames");
-		_logger.LogInformation("Rendering generation {gen} in {path}", _context.Generation, _path);
+		_logger.LogTrace("Rendering generation {gen} in {path}", _context.Generation, _path);
 		FileHelper.EnsurePath(_path);
 	}
 
@@ -55,7 +55,7 @@ public class RenderMachine {
 			return Task.CompletedTask;
 		}
 		
-		var path =  Path.Combine(_context.BaseOutputPath, "gif.gif");
+		var path =  Path.Combine(_renderOptions.OutputDirectory, "gifs", $"gen_{_context.Generation:D4}.gif");
 		
 		_gifRenderer.StartGifRender(_frames!.ToArray(), path);
 		return Task.CompletedTask;

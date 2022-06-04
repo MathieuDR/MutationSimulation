@@ -24,7 +24,7 @@ public class CreatureFactory {
 	}
 
 	public IEnumerable<Creature> Create(Genome[] genomes, Line[] walls) {
-		_logger.LogInformation("Creating {length} creatures", genomes.Length);
+		_logger.LogTrace("Creating {length} creatures", genomes.Length);
 		var currentPositions = new List<(Vector position, int radius)>();
 		
 		foreach (var genome in genomes) {

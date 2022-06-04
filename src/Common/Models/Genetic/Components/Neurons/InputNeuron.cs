@@ -3,8 +3,8 @@ namespace Common.Models.Genetic.Components.Neurons;
 public record InputNeuron : Neuron{
 	public static readonly int NeuronInputAmount = Enum.GetValues<InputType>().Length;
 
-	public InputNeuron(ushort id): base(id, NeuronType.Input) {
-		if (id >= NeuronInputAmount) {
+	public InputNeuron(ushort id): base((ushort)(id % NeuronInputAmount), NeuronType.Input) {
+		if (Id >= NeuronInputAmount) {
 			throw new ArgumentException("Id must be in range of input types", nameof(id));
 		}
 		

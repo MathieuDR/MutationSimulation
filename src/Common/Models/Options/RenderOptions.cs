@@ -7,11 +7,11 @@ public record RenderOptions : ConfigurationOptions {
 
 	public RenderOptions() { }
 
-	public RenderOptions(int? renderMod, int? gifRenderMod, bool outputAllBrain, bool outputTopBrains, int topBrainsAmount,
+	public RenderOptions(int? renderMod, int? gifRenderMod, bool outputAllBrains, bool outputTopBrains, int topBrainsAmount,
 		string outputDirectory) {
 		RenderMod = renderMod;
 		GifRenderMod = gifRenderMod;
-		OutputAllBrain = outputAllBrain;
+		OutputAllBrains = outputAllBrains;
 		OutputTopBrains = outputTopBrains;
 		TopBrainsAmount = topBrainsAmount;
 		OutputDirectory = outputDirectory;
@@ -20,7 +20,7 @@ public record RenderOptions : ConfigurationOptions {
 	public int TicksPerFrame { get; init; } = 5;
 	public int? RenderMod { get; init; } = 5;
 	public int? GifRenderMod { get; init; } = 2;
-	public bool OutputAllBrain { get; init; }
+	public bool OutputAllBrains { get; init; }
 	public bool OutputTopBrains { get; init; } = true;
 	public int TopBrainsAmount { get; init; } = 3;
 	public string OutputDirectory { get; init; } = "output";
@@ -47,7 +47,7 @@ public record RenderOptions : ConfigurationOptions {
 		out string outputDirectory) {
 		renderMod = RenderMod;
 		gifRenderMod = GifRenderMod;
-		outputAllBrain = OutputAllBrain;
+		outputAllBrain = OutputAllBrains;
 		outputTopBrains = OutputTopBrains;
 		topBrainsAmount = TopBrainsAmount;
 		outputDirectory = OutputDirectory;
