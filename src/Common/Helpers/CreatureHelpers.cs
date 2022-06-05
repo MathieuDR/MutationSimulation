@@ -24,7 +24,7 @@ public static class CreatureHelpers {
 		return closestPoint.CalculateAngleBetweenPositions(creature2.Position, direction);
 	}
 
-	private static Vector GetClosestPointWithinRadius(this Creature moveTo, Creature moveFrom) {
+	public static Vector GetClosestPointWithinRadius(this Creature moveTo, Creature moveFrom) {
 		var moveAmount = moveFrom.Radius;
 
 		var x = MoveTo(moveTo.Position.X, moveFrom.Position.X, moveAmount);

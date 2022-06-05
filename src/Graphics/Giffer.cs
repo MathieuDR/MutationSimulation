@@ -1,5 +1,4 @@
 using Common.Helpers;
-using Graphics.Helpers;
 using ImageMagick;
 
 namespace Graphics; 

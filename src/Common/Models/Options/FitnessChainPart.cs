@@ -1,5 +1,3 @@
-using Common.FitnessTests.Parts;
-
 namespace Common.Models.Options;
 
 public struct FitnessChainPart {

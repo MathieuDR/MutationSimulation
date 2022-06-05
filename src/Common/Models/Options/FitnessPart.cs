@@ -4,5 +4,7 @@ public enum FitnessPart {
 	DistanceFromStart,
 	Distance,
 	UniqueDistance,
-	NoCollisions
+	NoCollisions,
+	HotspotCollector,
+	UniqueDistanceCombo
 }

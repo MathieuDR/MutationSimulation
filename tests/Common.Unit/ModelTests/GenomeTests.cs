@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Common.Models.Genetic.Components;
 using Common.Models.Genetic.Components.Neurons;

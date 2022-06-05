@@ -13,7 +13,7 @@ public class Mutator {
 	private readonly double _mutationRate;
 	private int _mutationCount = 0;
 
-	public Mutator(ILogger<Mutator> logger,IOptionsSnapshot<SimulatorOptions> options, IRandomProvider randomProvider) {
+	public Mutator(ILogger<Mutator> logger,IOptions<SimulatorOptions> options, IRandomProvider randomProvider) {
 		_logger = logger;
 		_mutationRate = options.Value.MutationRate;
 		_random = randomProvider.GetRandom();

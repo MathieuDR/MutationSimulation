@@ -1,6 +1,8 @@
+using Common.Helpers;
 using Common.Models;
 using Common.Models.Genetic.Components;
 using Common.Models.Options;
+using Common.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -10,22 +12,42 @@ public class WorldFactory {
 	private readonly RenderOptions _renderOptions;
 	private readonly CreatureFactory _creatureFactory;
 	private readonly IServiceProvider _provider;
+	private readonly Random _random;
 	private Line[]? _walls;
+	private Hotspot[]? _hotspots;
 	private WorldOptions WorldOptions { get; init; }
 
 	private Line[] Walls => _walls ??= CreateWalls();
+	private Hotspot[] Hotspots => _hotspots ??= CreateHotspots();
+
+	private Hotspot[]? CreateHotspots() {
+		var count = _random.Next(3, 10);
+		var hotspots = new Hotspot[count];
+		for (int i = 0; i < count; i++) {
+			hotspots[i] = new Hotspot() {
+				Position =  _random.GetRandomPosition(WorldOptions.Width, WorldOptions.Height),
+				Radius = _random.Next(10, 20)
+			};
+		}
+
+		return hotspots;
+	}
 
 
-	public WorldFactory(IOptionsSnapshot<WorldOptions> worldOptions, IOptionsSnapshot<RenderOptions> renderOptions, CreatureFactory creatureFactory, IServiceProvider provider) {
+	public WorldFactory(IOptionsSnapshot<WorldOptions> worldOptions, IOptionsSnapshot<RenderOptions> renderOptions, CreatureFactory creatureFactory, IServiceProvider provider, IRandomProvider randomProvider) {
 		_renderOptions = renderOptions.Value;
 		_creatureFactory = creatureFactory;
 		_provider = provider;
+		_random = randomProvider.GetRandom();
 		WorldOptions = worldOptions.Value;
 	}
 
 	public World Create(Genome[] genomes) {
 		var creatures = GetCreatures(genomes);
-		return new World(WorldOptions.Width, WorldOptions.Height, creatures , Walls);
+		return new World(WorldOptions.Width, WorldOptions.Height, creatures) {
+			Walls = Walls,
+			Hotspots = Hotspots
+		};
 	}
 
 	private Creature[] GetCreatures(Genome[] genomes) {

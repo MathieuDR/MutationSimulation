@@ -1,6 +1,5 @@
 using Common.Models.Genetic.Components;
 using Common.Models.Options;
-using Graphics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

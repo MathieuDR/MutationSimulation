@@ -29,7 +29,6 @@ public record Creature {
 	}
 
 	public ulong Id { get; }
-
 	public int Age { get; private set; }
 	public float OscillatorFrequency => 5000f;
 	public float OscillatorPhaseOffset => 5000f;
@@ -40,12 +39,11 @@ public record Creature {
 	
 	public Vector StartPosition { get; init; }
 
-	public int Collisions { get; private set; } = 0;
 	public bool Collided { get; private set; } = false;
-	public List<Vector> UniquePositions = new();
-
 	public Brain Brain { get; private set; }
-	public double Distance { get; private set; } = 0;
+
+	public Dictionary<ValueMetric, double> ValueMetrics { get; init; } = new();
+	public Dictionary<ListMetric, List<object>> ListMetrics { get; init; } = new();
 
 	private Func<float, float> InternalActivationFunction { get; } = ActivationFunctions.Relu;
 
@@ -108,6 +106,56 @@ public record Creature {
 				throw new ArgumentOutOfRangeException(nameof(actionType), actionType, null);
 		}
 	}
+	
+	public double GetValueMetric(ValueMetric valueMetric) {
+		return ValueMetrics.TryGetValue(valueMetric, out var value) ? value : 0;
+	}
+
+	private void SetValueMetric(ValueMetric valueMetric, double value) {
+		if (ValueMetrics.ContainsKey(valueMetric)) {
+			ValueMetrics[valueMetric] = value;
+		} else {
+			ValueMetrics.Add(valueMetric, value);
+		}
+	}
+	
+	private void AddValueMetric(ValueMetric valueMetric, double value) {
+		if (ValueMetrics.ContainsKey(valueMetric)) {
+			ValueMetrics[valueMetric] += value;
+		} else {
+			ValueMetrics.Add(valueMetric, value);
+		}
+	}
+
+	public int CountListMetric(ListMetric listMetric) {
+		return ListMetrics.TryGetValue(listMetric, out var value) ? value.Count : 0;
+	}
+
+	public List<T> GetListMetric<T>(ListMetric listMetric) {
+		return ListMetrics.TryGetValue(listMetric, out var value) ? value.Cast<T>().ToList() : new List<T>();
+	}
+	
+	public bool ContainsListMetric<T>(ListMetric listMetric, T value) {
+		return GetListMetric<T>(listMetric).Contains(value);
+	}
+
+	private void SetListMetric<T>(ListMetric listMetric, List<T> value) {
+		var toInsert = value.Cast<object>().ToList();
+		if (ListMetrics.ContainsKey(listMetric)) {
+			ListMetrics[listMetric] = toInsert;
+		} else {
+			ListMetrics.Add(listMetric, toInsert);
+		}
+	}
+	
+	private void AddListMetric<T>(ListMetric listMetric, T value) {
+		if (ListMetrics.ContainsKey(listMetric)) {
+			var list = GetListMetric<T>(listMetric);
+			list.Add(value);
+		} else {
+			ListMetrics.Add(listMetric, new List<object> {value});
+		}
+	}
 
 	private void Walk(World world, bool forward = true) {
 		var xMovement = Direction switch {
@@ -142,7 +190,7 @@ public record Creature {
 			
 			var dist = Math.Max(0, movementLine.Distance(creature.Position) - creature.Radius - Radius);
 			if (dist <= 0.5d) {
-				Collisions++;
+				AddValueMetric(ValueMetric.Collisions, 1);
 				Collided = true;
 				// TODO calculate last position before collision
 				
@@ -153,7 +201,7 @@ public record Creature {
 		foreach (var wall in world.Walls) {
 			var intersect = wall.GetIntersectionWithinLines(movementLine);
 			if (intersect is not null) {
-				Collisions++;
+				AddValueMetric(ValueMetric.Collisions, 1);
 				Collided = true;
 				// TODO calculate last position before collision
 				return;
@@ -161,7 +209,7 @@ public record Creature {
 
 			var endDist = Math.Max(wall.Distance(proposedPosition) - Radius, 0);
 			if (endDist <= 0.5d) {
-				Collisions++;
+				AddValueMetric(ValueMetric.Collisions, 1);
 				Collided = true;
 				// TODO calculate last position before collision
 				return;
@@ -170,9 +218,29 @@ public record Creature {
 
 		Collided = false;
 		Position = proposedPosition;
-		Distance += Speed;
-		if (!UniquePositions.Contains(Position)) {
-			UniquePositions.Add(Position);
+		AddValueMetric(ValueMetric.Distance, Speed);
+		if (!ContainsListMetric(ListMetric.Visited, Position)) {
+			AddListMetric(ListMetric.Visited, Position);
+			AddValueMetric(ValueMetric.CurrentCombo, 1);
+		} else {
+			if (GetValueMetric(ValueMetric.MaxCombo) < GetValueMetric(ValueMetric.CurrentCombo)) {
+				SetValueMetric(ValueMetric.MaxCombo, GetValueMetric(ValueMetric.CurrentCombo));	
+			}
+			SetValueMetric(ValueMetric.CurrentCombo, 0);
+		}
+		
+		// check if we're in a hotspot
+		foreach (var hotspot in world.Hotspots) {
+			if(ContainsListMetric(ListMetric.VisitedHotspots, hotspot)) {
+				continue;
+			}
+			
+			var dist = hotspot.Position.CalculateDistanceBetweenPositions(Position) - Radius - hotspot.Radius;
+			dist = Math.Max(0, dist);
+			
+			if(dist <= 0.5d) {
+				AddListMetric(ListMetric.VisitedHotspots, hotspot);
+			}
 		}
 	}
 
@@ -275,7 +343,7 @@ public record Creature {
 			InputType.IsEmittingPheromone => 0,
 			InputType.Age => Age,
 			InputType.Speed => 1,
-			InputType.Collisions => Collisions,
+			InputType.Collisions => (float)GetValueMetric(ValueMetric.Collisions),
 			InputType.DistanceFromStart => ActivationFunctions.Sigmoid((float)StartPosition.CalculateDistanceBetweenPositions(Position)),
 			InputType.StartX => (float)StartPosition.X / World.Width,
 			InputType.StartY => (float)StartPosition.Y / World.Height,
@@ -288,10 +356,33 @@ public record Creature {
 
 	private float Oscillate() => Oscillator.OscillateAnalog(OscillatorPhaseOffset + (float)Age / OscillatorAgeDivider, OscillatorFrequency);
 
+	private float LookToPoint(Vector point, Direction direction) {
+		var distance = Math.Max(0, point.CalculateDistanceBetweenPositions(Position) - Radius);
+			
+		if (distance > EyeSightStrength) {
+			// we cannot see
+			return 1;
+		}
+
+		var angle = point.CalculateAngleBetweenPositions(Position, direction);
+
+		if (angle >= ViewingAngle) {
+			return 1;
+		}
+
+		return 1 - (float)(distance / EyeSightStrength);
+	}
 
 	private float Look(World world, Direction direction) {
 		// 1 = nothing infront
 		float closestObj = 1;
+
+		foreach (var wall in world.Walls) {
+			var closest = wall.ClosestPoint(Position);
+
+			var strength = LookToPoint(closest, direction);
+			closestObj = Math.Min(strength, closestObj);
+		}
 
 
 		// check which is in the fov of the creature
@@ -301,20 +392,8 @@ public record Creature {
 				continue;
 			}
 
-			var distance = GetDistanceToCreature(worldCreature);
-
-			if (distance > EyeSightStrength) {
-				// we cannot see
-				continue;
-			}
-
-			var angle = this.CalculateAngleBetweenCreatures(worldCreature, direction);
-
-			if (angle >= ViewingAngle) {
-				continue; // ?
-			}
-
-			var strength = 1 - (float)(distance / EyeSightStrength);
+			var closest = this.GetClosestPointWithinRadius(worldCreature);
+			var strength = LookToPoint(closest, direction);
 			closestObj = Math.Min(strength, closestObj);
 		}
 
