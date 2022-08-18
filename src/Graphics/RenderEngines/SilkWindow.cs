@@ -6,19 +6,20 @@ using Silk.NET.Maths;
 using Silk.NET.Windowing;
 using SkiaSharp;
 
-namespace Graphics.Renderer;
+namespace Graphics.RenderEngines;
 
-// example: https://github.com/davidwengier/Trains.NET/blob/main/src/SilkTrains/Program.cs
-public class SilkRenderer {
-	private readonly ILogger<SilkRenderer> _logger;
+public class SilkWindow {
+	private readonly ILogger<SilkWindow> _logger;
 	private readonly IHostApplicationLifetime _lifetime;
 	private readonly RenderOptions _renderOptions;
 	private readonly WorldOptions _worldOptions;
 	private IWindow? _window;
 	private SKSurface? _surface;
+	private bool _isReady = false;
 
+		
 	public SKSurface SKSurface {
-		get { return _surface ??= GetRenderTarget(); }
+		get { return _surface ?? throw new NullReferenceException(nameof(_surface)); }
 	}
 	
 	public GRContext? GrContext { get; private set; }
@@ -27,16 +28,17 @@ public class SilkRenderer {
 	// SKSurface surface = null!;
 	// SKCanvas canvas = null!;
 
-	private IWindow Window => _window ??= CreateWindow();
+	private IWindow Window => _window ?? throw new NullReferenceException(nameof(_window));
+	
 
-	public SilkRenderer(ILogger<SilkRenderer> logger, IOptionsSnapshot<RenderOptions> renderOptions, IOptionsSnapshot<WorldOptions> worldOptions, IHostApplicationLifetime lifetime) {
+	public SilkWindow(ILogger<SilkWindow> logger, IOptionsSnapshot<RenderOptions> renderOptions, IOptionsSnapshot<WorldOptions> worldOptions, IHostApplicationLifetime lifetime) {
 		_logger = logger;
 		_lifetime = lifetime;
 		_renderOptions = renderOptions.Value;
 		_worldOptions = worldOptions.Value;
 	}
 
-	public IWindow CreateWindow() {
+	public void Create() {
 		// create size
 		Vector2D<int> size = new(_worldOptions.Width * _renderOptions.PixelMultiplier, _worldOptions.Height* _renderOptions.PixelMultiplier);
 
@@ -46,13 +48,22 @@ public class SilkRenderer {
 			Title = "Mutating is fun",
 			PreferredStencilBufferBits = 8,
 			PreferredBitDepth = new Vector4D<int>(8),
-			FramesPerSecond = 30
+			FramesPerSecond = 30,
+			//IsEventDriven = true
 		};
 
-		return Silk.NET.Windowing.Window.Create(options);
+		_window = Silk.NET.Windowing.Window.Create(options);
+		_window.Load += OnWindowOnLoad;
+	}
+
+	private void OnWindowOnLoad() {
+		_logger.LogInformation("Window loaded");
+		_surface = GetRenderTarget();
+		_isReady = true;
 	}
 
 	private SKSurface GetRenderTarget() {
+		_logger.LogInformation("Creating render target");
 		var renderTarget = new GRBackendRenderTarget(_worldOptions.Width* _renderOptions.PixelMultiplier, _worldOptions.Height* _renderOptions.PixelMultiplier, 0, 8, new GRGlFramebufferInfo(0, 32856));
 		
 		var grGlInterface = GRGlInterface.Create(name => !name.StartsWith("egl") && Window.GLContext!.TryGetProcAddress(name, out var addr) ? addr : 0);
@@ -69,7 +80,19 @@ public class SilkRenderer {
 		Window.Render -= hook;
 	}
 
-	public void StartWindow() {
+	public async Task WaitOnLoad() {
+		int i = 0;
+		while (!_isReady) {
+			await Task.Delay(100);
+			i++;
+			if(i > 100) {
+				// 10 seconds
+				throw new Exception("Window failed to load");
+			}
+		}
+	}
+
+	public void Start() {
 		Window.Closing += () => {
 			_logger.LogInformation("Window closing");
 			_lifetime.StopApplication();
@@ -80,6 +103,8 @@ public class SilkRenderer {
 	}
 
 	public void Render() {
-		Window.DoRender();
+		// Window.DoRender();
+		// //Window.DoUpdate();
+		// Window.ContinueEvents();
 	}
 }

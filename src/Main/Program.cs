@@ -8,7 +8,7 @@ using Common.Models.Genetic.Components;
 using Common.Models.Options;
 using Common.Services;
 using Graphics;
-using Graphics.Renderer;
+using Graphics.RenderEngines;
 using Main.Models;
 using Main.Services;
 using Microsoft.Extensions.Configuration;
@@ -53,7 +53,7 @@ public class Program {
 				services.AddOptions<WorldOptions>().Bind(customOptions.GetSection(WorldOptions.SectionName)).Validate(ValidateOptions);
 				services.AddOptions<FitnessOptions>().Bind(customOptions.GetSection(FitnessOptions.SectionName)).Validate(ValidateOptions);
 
-				services.AddSingleton<SilkRenderer>();
+				services.AddSingleton<SilkWindow>();
 
 
 				var opts = new FitnessOptions();

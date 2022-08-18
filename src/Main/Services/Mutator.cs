@@ -11,7 +11,8 @@ public class Mutator {
 	private readonly ILogger<Mutator> _logger;
 	private readonly Random _random;
 	private readonly double _mutationRate;
-	private int _mutationCount = 0;
+	private int _flippedCount = 0;
+	private int _addedBytes = 0;
 
 	public Mutator(ILogger<Mutator> logger,IOptions<SimulatorOptions> options, IRandomProvider randomProvider) {
 		_logger = logger;
@@ -23,7 +24,8 @@ public class Mutator {
 		var doubled = DoubleGenomes(creatures.Select(x => x.Genome).ToArray());
 		var mutated = doubled.Select(MutateGenome).ToArray();
 		_logger.LogTrace("Mutated {count} genomes", mutated.Length);
-		_logger.LogInformation("Flipped {bits} bits with a {rate} mutation rate", _mutationCount, _mutationRate);
+		_logger.LogInformation("Flipped {bits} bits with a {rate} mutation rate", _flippedCount, _mutationRate);
+		_logger.LogInformation("Added {bytes} bytes with a {rate} mutation rate", _addedBytes, _mutationRate);
 		
 		return Task.FromResult(mutated);
 	}
@@ -31,13 +33,30 @@ public class Mutator {
 	private Genome MutateGenome(Genome g) {
 		var bytes = g.GetBytes();
 		var flipBytes = MutateBytesByFlip(bytes);
-		return Genome.FromBytes(flipBytes);
+		var mutated = AddRandomByte(flipBytes);
+		return Genome.FromBytes(mutated);
+	}
+
+	private byte[] AddRandomByte(byte[] flipBytes) {
+		var r = _random.NextDouble();
+
+		if (!(r < _mutationRate)) {
+			return flipBytes;
+		}
+
+		var buffer = new byte[1];
+		_random.NextBytes(buffer);
+		var result = new byte[flipBytes.Length + 1];
+		flipBytes.CopyTo(result, 0);
+		result[^1] = buffer[0];
+		_addedBytes++;
+		return result;
+
 	}
 
 	private byte[] MutateBytesByFlip(byte[] bytes) {
 		var mutatedBytes = new byte[bytes.Length];
 		for (var i = 0; i < bytes.Length; i++) {
-			
 			mutatedBytes[i] = bytes[i];
 			for(var j = 0; j < 8; j++) {
 				if (!(_random.NextDouble() < _mutationRate)) {
@@ -45,7 +64,7 @@ public class Mutator {
 				}
 
 				mutatedBytes[i] ^= (byte)(1 << j);
-				_mutationCount++;
+				_flippedCount++;
 			}
 		}
 		return mutatedBytes;

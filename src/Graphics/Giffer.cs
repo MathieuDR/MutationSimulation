@@ -4,7 +4,6 @@ using ImageMagick;
 namespace Graphics; 
 
 public static class Giffer {
-
 	public static async Task CreateGif(IEnumerable<string> paths, string outputPath, int delay = 7) {
 		FileHelper.EnsurePath(outputPath);
 		var pathsList = paths.ToArray();

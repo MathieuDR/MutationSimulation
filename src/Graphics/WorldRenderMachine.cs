@@ -2,7 +2,7 @@ using Common.Helpers;
 using Common.Models;
 using Common.Models.Options;
 using Graphics.Helpers;
-using Graphics.Renderer;
+using Graphics.RenderEngines;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SkiaSharp;
@@ -13,17 +13,17 @@ public class RenderMachine : IDisposable{
 	private readonly GenerationContext _context;
 	private readonly ILogger<RenderMachine> _logger;
 	private readonly GifRenderer _gifRenderer;
-	private readonly SilkRenderer _silkRenderer;
+	private readonly SilkWindow _silkWindow;
 	private readonly RenderOptions _renderOptions;
 
 	private string? _path;
 
 	private readonly List<string>? _frames;
-	public RenderMachine(GenerationContext context, ILogger<RenderMachine> logger, IOptionsSnapshot<RenderOptions> renderOptions, GifRenderer gifRenderer, SilkRenderer silkRenderer) {
+	public RenderMachine(GenerationContext context, ILogger<RenderMachine> logger, IOptionsSnapshot<RenderOptions> renderOptions, GifRenderer gifRenderer, SilkWindow silkWindow) {
 		_context = context;
 		_logger = logger;
 		_gifRenderer = gifRenderer;
-		_silkRenderer = silkRenderer;
+		_silkWindow = silkWindow;
 		_renderOptions = renderOptions.Value;
 		
 		if (!context.RenderFrames) {
@@ -33,34 +33,35 @@ public class RenderMachine : IDisposable{
 
 		if (_context.Generation == 0) {
 			try {
-				_silkRenderer.CreateWindow();
+				_silkWindow.Create();
 				
-				Task.Run(() => _silkRenderer.StartWindow());
+				Task.Run(() => _silkWindow.Start());
+				_silkWindow.WaitOnLoad().GetAwaiter().GetResult();
 			} catch (Exception e) {
 				_logger.LogError(e, "Failed to create window");
 			}
 		}
 		
-		_silkRenderer.HookRenderer(Render);
+		_silkWindow.HookRenderer(Render);
 		_frames = context.RenderGif ? new() : null;
 		_path = Path.Combine(_context.BaseOutputPath, "frames");
 		_logger.LogTrace("Rendering generation {gen} in {path}", _context.Generation, _path);
-		
-		
 		
 		FileHelper.EnsurePath(_path);
 	}
 
 	private void Render(double delta) {
 		try {
-			var canvas = _silkRenderer.SKSurface.Canvas;
+			//_logger.LogInformation("Rendering delta time {delta}", delta);
+			lock (_silkWindow.SKSurface.Canvas) {
+				var canvas = _silkWindow.SKSurface.Canvas;
+				canvas.Clear(SKColors.White);
 
-			canvas.Clear(SKColors.White);
-
-			DrawBlobs(canvas, _context.Creatures);
-			DrawWalls(canvas, SKColors.DarkRed, _context.World.Walls);
-			DrawHotspots(canvas, SKColors.OrangeRed, _context.World.Hotspots);
-			canvas.Flush();
+				DrawBlobs(canvas, _context.Creatures);
+				DrawWalls(canvas, SKColors.DarkRed, _context.World.Walls);
+				DrawHotspots(canvas, SKColors.OrangeRed, _context.World.Hotspots);
+				canvas.Flush();
+			}
 		}catch (Exception e) {
 			_logger.LogError(e, "Failed to render generation {gen}", _context.Generation);
 		}
@@ -80,11 +81,11 @@ public class RenderMachine : IDisposable{
 	}
 
 	public async Task RenderFrame() {
-		if(!_context.RenderFrames || _context.Tick % _renderOptions.TicksPerFrame != 0) {
+		if(!_context.RenderFrames) {
 			return;
 		}
 
-		//_silkRenderer.Render();
+		_silkWindow.Render();
 
 		//
 		// var canvas = _silkRenderer.SKSurface.Canvas;
@@ -143,6 +144,6 @@ public class RenderMachine : IDisposable{
 	private (int X, int Y) GetImagePosition(Vector vector) => (vector.PixelX * _renderOptions.PixelMultiplier , vector.PixelY * _renderOptions.PixelMultiplier );
 
 	public void Dispose() {
-		_silkRenderer.UnhookRenderer(Render);
+		_silkWindow.UnhookRenderer(Render);
 	}
 }
