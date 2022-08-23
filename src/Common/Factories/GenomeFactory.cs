@@ -18,7 +18,7 @@ public class GenomeFactory {
 		_random = randomProvider.GetRandom();
 	}
 
-	public IEnumerable<Genome> Create(int count) {
+	public IEnumerable<OldGenome> Create(int count) {
 		for (var i = 0; i < count; i++) {
 			var neuronsAmount = _brainOptions.MinStartNeurons.HasValue
 				? _random.Next(_brainOptions.MinStartNeurons.Value, _brainOptions.StartNeurons + 1)
@@ -26,7 +26,7 @@ public class GenomeFactory {
 
 			var neurons = CreateNeurons(neuronsAmount).ToArray();
 			var connections = CreateConnections(neurons).ToArray();
-			yield return new Genome(connections);
+			yield return new OldGenome(connections);
 		}
 	}
 
@@ -73,6 +73,12 @@ public class GenomeFactory {
 		var f = (float)random.NextDouble() * 8 - 4;
 		return NeuronConnection.WeightToFloat(f);
 	}
+	
+	private static float NextBias(Random random) {
+		// number between -4 and 4 
+		var f = (float)random.NextDouble() * 2 - 1;
+		return NeuronConnection.WeightToFloat(f);
+	}
 
 	private IEnumerable<Neuron> CreateNeurons(int count) {
 		if (!_brainOptions.EnabledInputNeurons.Any()) {
@@ -89,7 +95,7 @@ public class GenomeFactory {
 			var isInternal = randNum < _brainOptions.InternalRate;
 
 			if (isInternal) {
-				yield return new Neuron(id, NeuronType.Internal);
+				yield return new Neuron(id, NextBias(_random), NeuronType.Internal);
 				continue;
 			}
 
@@ -112,10 +118,11 @@ public class GenomeFactory {
 		}
 
 		id = (ushort)(id % mod);
+		var bias = NextBias(_random);
 
 		return nonInternalType switch {
-			NeuronType.Input => new InputNeuron(id),
-			NeuronType.Action => new ActionNeuron(id),
+			NeuronType.Input => new InputNeuron(id, bias),
+			NeuronType.Action => new ActionNeuron(id, bias),
 			_ => throw new ArgumentOutOfRangeException(nameof(nonInternalType))
 		};
 	}

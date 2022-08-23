@@ -9,9 +9,9 @@ using QuikGraph.Algorithms.Search;
 namespace Common.Models.Genetic;
 
 public record Brain {
-	private readonly Genome _genome;
+	private readonly OldGenome _genome;
 
-	public Brain(Genome genome) => Genome = genome;
+	public Brain(OldGenome genome) => Genome = genome;
 
 	public NeuronConnection[] MemoryConnections { get; private set; }
 	public Neuron[] SortedNeurons { get; private set; }
@@ -19,7 +19,7 @@ public record Brain {
 	public AdjacencyGraph<Neuron, NeuronConnection> BrainGraph { get; private set; }
 	public Dictionary<Neuron, NeuronConnection[]> Dependencies { get; private set; } = new();
 
-	public Genome Genome {
+	public OldGenome Genome {
 		get => _genome;
 		init {
 			CreateGraph(value.NeuronConnections);
@@ -178,7 +178,7 @@ public record Brain {
 		return neuronsToCheck;
 	}
 
-	public void Deconstruct(out Genome Genome) {
+	public void Deconstruct(out OldGenome Genome) {
 		Genome = this.Genome;
 	}
 }

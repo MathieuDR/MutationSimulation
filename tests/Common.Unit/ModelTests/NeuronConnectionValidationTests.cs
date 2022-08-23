@@ -11,8 +11,8 @@ public class NeuronConnectionValidationTests {
 	[Fact]
 	public void Ctor_ShouldCreateNeuronConnection_WhenGivenValidParams() {
 		//Arrange
-		var n1 = new Neuron(1, NeuronType.Input);
-		var n2 = new Neuron(2, NeuronType.Internal);
+		var n1 = new Neuron(1, 1f, NeuronType.Input);
+		var n2 = new Neuron(2, 2f, NeuronType.Internal);
 
 		//Act
 		var neuronConnection = new NeuronConnection(n1, n2, float.MaxValue);
@@ -29,8 +29,8 @@ public class NeuronConnectionValidationTests {
 	[InlineData(NeuronType.Action, NeuronType.Internal)]
 	public void Ctor_ShouldThrowArgumentException_WhenWrongNeuronTypesConnectToEachOther(NeuronType neuronType1, NeuronType neuronType2) {
 		//Arrange
-		var n1 = new Neuron(1, neuronType1);
-		var n2 = new Neuron(2, neuronType2);
+		var n1 = new Neuron(1, 1f, neuronType1);
+		var n2 = new Neuron(2, 9f, neuronType2);
 
 		//Act
 		Action act = () => new NeuronConnection(n1, n2, 1f);
@@ -47,12 +47,12 @@ public class NeuronConnectionValidationTests {
 	[InlineData(NeuronType.Action, NeuronType.Internal)]
 	public void WithKeyword_ShouldThrowArgumentException_WhenWrongNeuronTypesConnectToEachOther(NeuronType neuronType1, NeuronType neuronType2 ) {
 		//Arrange
-		var n1 = new Neuron(1, NeuronType.Input);
-		var n2 = new Neuron(2, NeuronType.Internal);
+		var n1 = new Neuron(1, 0f, NeuronType.Input);
+		var n2 = new Neuron(2, 0f, NeuronType.Internal);
 		var neuronConnection = new NeuronConnection(n1, n2, 1f);
 		
-		var n3 = new Neuron(1, neuronType1);
-		var n4 = new Neuron(2, neuronType2);
+		var n3 = new Neuron(1, 0f, neuronType1);
+		var n4 = new Neuron(2, 0f, neuronType2);
 
 		//Act
 		Action act = () => neuronConnection = neuronConnection with {Source = n3, Target = n4};
@@ -67,8 +67,8 @@ public class NeuronConnectionValidationTests {
 	[InlineData(NeuronType.Internal, NeuronType.Action)]
 	public void Ctor_ShouldNotThrowArgumentException_WhenCorrectNeuronTypesConnectToEachOther(NeuronType neuronType1, NeuronType neuronType2) {
 		//Arrange
-		var n1 = new Neuron(1, neuronType1);
-		var n2 = new Neuron(2, neuronType2);
+		var n1 = new Neuron(1, 0f, neuronType1);
+		var n2 = new Neuron(2, 0f, neuronType2);
 
 		//Act
 		Action act = () => new NeuronConnection(n1, n2, 1f);
@@ -83,12 +83,12 @@ public class NeuronConnectionValidationTests {
 	[InlineData(NeuronType.Internal, NeuronType.Action)]
 	public void WithKeyword_ShouldNotThrowArgumentException_WhenCorrectNeuronTypesConnectToEachOther(NeuronType neuronType1, NeuronType neuronType2 ) {
 		//Arrange
-		var n1 = new Neuron(1, NeuronType.Input);
-		var n2 = new Neuron(2, NeuronType.Internal);
+		var n1 = new Neuron(1, 0f, NeuronType.Input);
+		var n2 = new Neuron(2, 0f, NeuronType.Internal);
 		var neuronConnection = new NeuronConnection(n1, n2, 1f);
 		
-		var n3 = new Neuron(1, neuronType1);
-		var n4 = new Neuron(2, neuronType2);
+		var n3 = new Neuron(1, 0f, neuronType1);
+		var n4 = new Neuron(2, 0f, neuronType2);
 
 		//Act
 		Action act = () => neuronConnection = neuronConnection with {Source = n3, Target = n4};
@@ -106,8 +106,8 @@ public class NeuronConnectionValidationTests {
 	[InlineData(-4.00001f)]
 	public void Ctor_ShouldPutWeightInRange_WhenWeightIsOutOfRange(float weight) {
 		//Arrange
-		var n1 = new Neuron(1, NeuronType.Input);
-		var n2 = new Neuron(2, NeuronType.Internal);
+		var n1 = new Neuron(1, 0f, NeuronType.Input);
+		var n2 = new Neuron(2, 0f, NeuronType.Internal);
 
 		//Act
 		var neuronConnection = new NeuronConnection(n1, n2, weight);
@@ -125,8 +125,8 @@ public class NeuronConnectionValidationTests {
 	[InlineData(-4.00001f)]
 	public void WithKeyword_ShouldPutWeightInRange_WhenWeightIsOutOfRange(float weight) {
 		//Arrange
-		var n1 = new Neuron(1, NeuronType.Input);
-		var n2 = new Neuron(2, NeuronType.Internal);
+		var n1 = new Neuron(1, 0f, NeuronType.Input);
+		var n2 = new Neuron(2, 0f, NeuronType.Internal);
 		var neuronConnection = new NeuronConnection(n1, n2, 1f);
 
 		//Act
@@ -139,8 +139,8 @@ public class NeuronConnectionValidationTests {
 	[Fact]
 	public void Ctor_ShouldHaveWeight0_WhenGivenWeight0() {
 		//Arrange
-		var n1 = new Neuron(1, NeuronType.Input);
-		var n2 = new Neuron(2, NeuronType.Internal);
+		var n1 = new Neuron(1, 0f, NeuronType.Input);
+		var n2 = new Neuron(2, 0f, NeuronType.Internal);
 
 		//Act
 		var neuronConnection = new NeuronConnection(n1, n2, 0f);

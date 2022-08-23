@@ -23,7 +23,7 @@ public class ContextProvider {
 		_renderOptions = renderOptions.Value;
 	}
 
-	public void Initialize(int generation, Genome[] genomes, CancellationToken cancellationToken) {
+	public void Initialize(int generation, OldGenome[] genomes, CancellationToken cancellationToken) {
 		var world = _worldFactory.Create(genomes);
 		var shouldRender = CalculateRenderFlags(generation, out var shouldRenderGif);
 		var outputDir = CreateOutputPath(generation);

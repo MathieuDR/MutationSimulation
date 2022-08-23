@@ -62,8 +62,8 @@ public static class RandomExtensions {
 		return new Vector(random.Next(x+1), random.Next(y+1));
 	}
 
-	public static Genome[] GetRandomGenomes(this Random random, int count) {
-		var genomes = new Genome[count];
+	public static OldGenome[] GetRandomGenomes(this Random random, int count) {
+		var genomes = new OldGenome[count];
 
 		for (int i = 0; i < count; i++) {
 			var connectionCount = random.Next(MinConnections, MaxConnections);
@@ -88,24 +88,24 @@ public static class RandomExtensions {
 				// 	}
 				// }
 				
-				connections[c] = new NeuronConnection(n1, n2, random.NextFloat());
+				connections[c] = new NeuronConnection(n1, n2, random.NextWeight());
 			}
-			genomes[i] = new Genome(connections.Where(x=> x is not null).Cast<NeuronConnection>().ToArray());
+			genomes[i] = new OldGenome(connections.Where(x=> x is not null).Cast<NeuronConnection>().ToArray());
 		}
 
 		return genomes;
 	}
 
-	private static float NextFloat(this Random random) {
+	private static float NextWeight(this Random random) {
 		// number between -4 and 4 
 		var f = (float)random.NextDouble() * 8 - 4;
 		return NeuronConnection.WeightToFloat(f);
-		
-		// // return float between min float and max float
-		// double mantissa = (random.NextDouble() * 2.0) - 1.0;
-		// // choose -149 instead of -126 to also generate subnormal floats (*)
-		// double exponent = Math.Pow(2.0, random.Next(-126, 128));
-		// return (float)(mantissa * exponent);
+	}
+	
+	private static float NextBias(this Random random) {
+		// number between -4 and 4 
+		var f = (float)random.NextDouble() * 2 - 1;
+		return Neuron.BiasToFloat(f);
 	}
 
 	public static Neuron NextValidNeuron(this Random random, NeuronType nonInternalType, double neuronRate = 0.5d, int maxId = 25) {
@@ -125,11 +125,12 @@ public static class RandomExtensions {
 	public static Neuron NextNeuron(this Random random, NeuronType nonInternalType, double neuronRate = 0.5d, int maxId = 25) {
 		var type = random.NextDouble() > neuronRate ? NeuronType.Internal : nonInternalType;
 		var id = (ushort)random.Next(0, maxId);
+		var bias = NextBias(random);
 
 		return type switch {
-			NeuronType.Input => new InputNeuron(id),
-			NeuronType.Action => new ActionNeuron(id),
-			NeuronType.Internal => new Neuron(id, NeuronType.Internal),
+			NeuronType.Input => new InputNeuron(id, bias),
+			NeuronType.Action => new ActionNeuron(id, bias),
+			NeuronType.Internal => new Neuron(id, bias, NeuronType.Internal),
 			NeuronType.Memory => throw new NotSupportedException(),
 			_ => throw new ArgumentOutOfRangeException()
 		};

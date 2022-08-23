@@ -26,7 +26,7 @@ public class GenerationSolver {
 		_renderOptions = renderOptions.Value;
 	}
 
-	public async Task<Genome[]> SolveGeneration() {
+	public async Task<OldGenome[]> SolveGeneration() {
 		_logger.LogTrace("Starting generation {generation}", _context.Generation);
 		await _simulator.Simulate();
 		_logger.LogTrace("Simulation complete");

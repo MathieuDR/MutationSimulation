@@ -23,7 +23,7 @@ public class CreatureFactory {
 		_creatureOptions = creatureOptions.Value;
 	}
 
-	public IEnumerable<Creature> Create(Genome[] genomes, Line[] walls) {
+	public IEnumerable<Creature> Create(OldGenome[] genomes, Line[] walls) {
 		_logger.LogTrace("Creating {length} creatures", genomes.Length);
 		var currentPositions = new List<(Vector position, int radius)>();
 		
@@ -39,7 +39,7 @@ public class CreatureFactory {
 		}
 	}
 
-	private Color GenerateColorFromGenome(Genome genome) {
+	private Color GenerateColorFromGenome(OldGenome genome) {
 		return new Color(_random);
 	}
 	

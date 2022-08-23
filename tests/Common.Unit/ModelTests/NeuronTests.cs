@@ -11,7 +11,7 @@ public class NeuronTests {
 		//Arrange;
 		//Act
 		Action act = () => {
-			_ = new Neuron(32768, NeuronType.Input);
+			_ = new Neuron(32768, 0f, NeuronType.Input);
 		};
 		
 		//Assert
@@ -21,7 +21,7 @@ public class NeuronTests {
 	[Fact]
 	public void ConstructorWith_ShouldThrowsError_WhenIdIsOver32768() {
 		//Arrange;
-		var neuron = new Neuron(5, NeuronType.Internal);
+		var neuron = new Neuron(5, 0f,NeuronType.Internal);
 		//Act
 		Action act = () => {
 			neuron = neuron with { Id = 32768 };
@@ -36,7 +36,7 @@ public class NeuronTests {
 		//Arrange;
 		//Act
 		Action act = () => {
-			_ = new Neuron(127, NeuronType.Input);
+			_ = new Neuron(127, 0f,NeuronType.Input);
 		};
 		
 		//Assert
@@ -46,7 +46,7 @@ public class NeuronTests {
 	[Fact]
 	public void ToBytes_ShouldHaveSetLeftMostBit_ForInputNeuronType() {
 		//Arrange
-		var neuron = new Neuron(1, NeuronType.Input);
+		var neuron = new Neuron(1, 0f,NeuronType.Input);
 
 		//Act
 		var b = neuron.GetBytes()[^1];
@@ -58,7 +58,7 @@ public class NeuronTests {
 	[Fact]
 	public void ToBytes_ShouldHaveSetLeftMostBit_ForOutputNeuronType() {
 		//Arrange
-		var neuron = new Neuron(1, NeuronType.Action);
+		var neuron = new Neuron(1, 0f,NeuronType.Action);
 
 		//Act
 		var b = neuron.GetBytes()[^1];
@@ -70,7 +70,7 @@ public class NeuronTests {
 	[Fact]
 	public void ToBytes_ShouldHaveUnsetLeftMostBit_ForInternalNeuronType() {
 		//Arrange
-		var neuron = new Neuron(1, NeuronType.Internal);
+		var neuron = new Neuron(1, 0f,NeuronType.Internal);
 
 		//Act
 		var b = neuron.GetBytes()[^1];
@@ -85,7 +85,7 @@ public class NeuronTests {
 	[InlineData(32767, 32767)]
 	public void ToBytes_ShouldHaveCorrectByteValue_WhenNeuronIsInternal(ushort id, ushort expected) {
 		//Arrange
-		var neuron = new Neuron(id, NeuronType.Internal);
+		var neuron = new Neuron(id, 0f,NeuronType.Internal);
 
 		//Act
 		var b = neuron.GetBytes();
@@ -101,7 +101,7 @@ public class NeuronTests {
 	[InlineData(32767, 32767+32768)]
 	public void ToBytes_ShouldHaveCorrectByteValue_WhenNeuronIsExternal(ushort id, ushort expected) {
 		//Arrange
-		var neuron = new Neuron(id, NeuronType.Action);
+		var neuron = new Neuron(id, 1f, NeuronType.Action);
 
 		//Act
 		var b = neuron.GetBytes();
@@ -119,7 +119,7 @@ public class NeuronTests {
 	[InlineData(0x79, NeuronType.Internal, "7900")]
 	public void ToHex_ShouldHaveCorrectHexValue_ForValidParams(ushort id, NeuronType type, string expected) {
 		//Arrange
-		var neuron = new Neuron(id, type);
+		var neuron = new Neuron(id,0f, type);
 
 		//Act
 		var b = neuron.ToHex();
@@ -151,7 +151,7 @@ public class NeuronTests {
 	[InlineData(9, NeuronType.Action, NeuronType.Action)]
 	public void FromHex_ShouldHaveCorrectNeuron_WhenEncodedBefore(ushort id, NeuronType type, NeuronType externalType) {
 		//Arrange
-		var original = new Neuron(id, type);
+		var original = new Neuron(id, 0f,type);
 		var hex = original.ToHex();
 
 		//Act

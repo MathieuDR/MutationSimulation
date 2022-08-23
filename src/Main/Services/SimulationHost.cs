@@ -41,7 +41,7 @@ public class SimulationHost : IHostedService {
 
 	private async Task StartSimulation(CancellationToken cancellationToken) {
 		var scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
-		var genomes = Array.Empty<Genome>();
+		var genomes = Array.Empty<OldGenome>();
 
 		for (var gen = 0; gen < _options.Generations; gen++) {
 			try {
@@ -56,12 +56,12 @@ public class SimulationHost : IHostedService {
 		_applicationLifetime.StopApplication();
 	}
 
-	private async Task<Genome[]> SolveGeneration(IServiceScope scope) {
+	private async Task<OldGenome[]> SolveGeneration(IServiceScope scope) {
 		var solver = scope.ServiceProvider.GetRequiredService<GenerationSolver>();
 		return await solver.SolveGeneration();
 	}
 
-	private void CreateContext(IServiceScope scope, int generation, Genome[] genomes, CancellationToken cancellationToken) {
+	private void CreateContext(IServiceScope scope, int generation, OldGenome[] genomes, CancellationToken cancellationToken) {
 		var contextProvider = scope.ServiceProvider.GetRequiredService<ContextProvider>();
 		contextProvider.Initialize(generation, genomes, cancellationToken);
 	}

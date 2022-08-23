@@ -20,7 +20,7 @@ public class Mutator {
 		_random = randomProvider.GetRandom();
 	}
 
-	public Task<Genome[]> Mutate(Creature[] creatures) {
+	public Task<OldGenome[]> Mutate(Creature[] creatures) {
 		var doubled = DoubleGenomes(creatures.Select(x => x.Genome).ToArray());
 		var mutated = doubled.Select(MutateGenome).ToArray();
 		_logger.LogTrace("Mutated {count} genomes", mutated.Length);
@@ -30,11 +30,11 @@ public class Mutator {
 		return Task.FromResult(mutated);
 	}
 
-	private Genome MutateGenome(Genome g) {
+	private OldGenome MutateGenome(OldGenome g) {
 		var bytes = g.GetBytes();
 		var flipBytes = MutateBytesByFlip(bytes);
 		var mutated = AddRandomByte(flipBytes);
-		return Genome.FromBytes(mutated);
+		return OldGenome.FromBytes(mutated);
 	}
 
 	private byte[] AddRandomByte(byte[] flipBytes) {
@@ -70,8 +70,8 @@ public class Mutator {
 		return mutatedBytes;
 	}
 
-	public Genome[] DoubleGenomes(Genome[] genomes) {
-		var result = new Genome[genomes.Length * 2];
+	public OldGenome[] DoubleGenomes(OldGenome[] genomes) {
+		var result = new OldGenome[genomes.Length * 2];
 		
 		// duplicate array
 		for (var i = 0; i < genomes.Length; i++) {

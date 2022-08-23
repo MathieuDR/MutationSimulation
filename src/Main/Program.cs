@@ -106,7 +106,7 @@ public class Program {
 
 	static void CreateLogger() {
 		Log.Logger = new LoggerConfiguration()
-			.Destructure.ByTransforming<Genome>(
+			.Destructure.ByTransforming<OldGenome>(
 				g => g.HexSequence ?? g.ToHex())
 			.Destructure.ByTransforming<Brain>(
 				b => new {

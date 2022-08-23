@@ -11,13 +11,13 @@ namespace Common.Models;
 public record Creature {
 	private readonly Random _random;
 	private readonly Dictionary<ActionCategory, Dictionary<ActionType, float>> _actionValues;
-	private readonly Genome _genome;
+	private readonly OldGenome _genome;
 	private readonly Dictionary<Neuron, float> _neuronValues = new();
 
 
 	private Dictionary<Creature, double> _creatureDistances = new();
 
-	public Creature(Genome genome, Vector position, int radius, Color color, Random random) {
+	public Creature(OldGenome genome, Vector position, int radius, Color color, Random random) {
 		_random = random;
 		Id = (ulong)_random.NextInt64(long.MinValue, long.MaxValue);
 		Direction = _random.NextEnum<Direction>();
@@ -49,7 +49,7 @@ public record Creature {
 
 	public Direction Direction { get; private set; }
 
-	public Genome Genome {
+	public OldGenome Genome {
 		get => _genome;
 		init {
 			_genome = value;
@@ -420,7 +420,7 @@ public record Creature {
 		canvas.DrawCircle(pixelPosition.X, pixelPosition.Y, pixelSize(Radius), fillPaint);
 	}
 
-	public void Deconstruct(out Genome genome, out Vector vector, out int radius, out Color color) {
+	public void Deconstruct(out OldGenome genome, out Vector vector, out int radius, out Color color) {
 		genome = Genome;
 		vector = Position;
 		radius = Radius;

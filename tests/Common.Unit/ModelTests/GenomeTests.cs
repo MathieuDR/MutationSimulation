@@ -12,8 +12,8 @@ public class GenomeTests {
 	public void Ctor_ShouldCreateGenome_WhenProvidedNeuronConnection() {
 		//Arrange
 		//Act
-		var sequence = new Genome(new[] {
-			new NeuronConnection(new InputNeuron(1), new Neuron(2, NeuronType.Action), 2f)
+		var sequence = new OldGenome(new[] {
+			new NeuronConnection(new InputNeuron(1, 9f), new Neuron(2, 9f, NeuronType.Action), 2f)
 		});
 
 		//Assert
@@ -24,26 +24,26 @@ public class GenomeTests {
 	public void FromHex_ShouldReturnSameGenome_WhenProvided() {
 		//Arrange
 		var connections = new[] {
-			new NeuronConnection(new InputNeuron(1), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
-			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal),  NeuronConnection.WeightToFloat(-1f)),
-			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(3, NeuronType.Internal),  NeuronConnection.WeightToFloat(1.02f)),
-			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(3.02f)),
-			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), NeuronConnection.WeightToFloat(-1.02f)),
-			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(4, NeuronType.Internal), NeuronConnection.WeightToFloat(3.29f)),
-			new NeuronConnection(new Neuron(3, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1.92f)),
-			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
-			new NeuronConnection(new Neuron(4, NeuronType.Internal), new Neuron(5, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
-			new NeuronConnection(new Neuron(5, NeuronType.Internal), new ActionNeuron(1), NeuronConnection.WeightToFloat(-2.73f)),
-			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(2, NeuronType.Action), NeuronConnection.WeightToFloat(1.02f)),
-			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Action), NeuronConnection.WeightToFloat(-1.02f)),
-			new NeuronConnection(new Neuron(5, NeuronType.Internal), new Neuron(3, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
+			new NeuronConnection(new InputNeuron(1, 9f), new Neuron(1, 9f, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new Neuron(1, 9f, NeuronType.Internal), new Neuron(2, 9f, NeuronType.Internal),  NeuronConnection.WeightToFloat(-1f)),
+			new NeuronConnection(new Neuron(1, 2f, NeuronType.Internal), new Neuron(3, 9f, NeuronType.Internal),  NeuronConnection.WeightToFloat(1.02f)),
+			new NeuronConnection(new Neuron(2, 9f, NeuronType.Internal), new Neuron(1, 9f, NeuronType.Internal), NeuronConnection.WeightToFloat(3.02f)),
+			new NeuronConnection(new Neuron(2, 1f, NeuronType.Internal), new Neuron(3, 0, NeuronType.Internal), NeuronConnection.WeightToFloat(-1.02f)),
+			new NeuronConnection(new Neuron(3, 9f, NeuronType.Internal), new Neuron(4, 9f, NeuronType.Internal), NeuronConnection.WeightToFloat(3.29f)),
+			new NeuronConnection(new Neuron(3, 9f, NeuronType.Internal), new Neuron(1, 9f, NeuronType.Internal), NeuronConnection.WeightToFloat(1.92f)),
+			new NeuronConnection(new Neuron(4, 1f, NeuronType.Internal), new Neuron(1, 9f, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
+			new NeuronConnection(new Neuron(4, 9f, NeuronType.Internal), new Neuron(5, -23f, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
+			new NeuronConnection(new Neuron(5, 9f, NeuronType.Internal), new ActionNeuron(1, 9f), NeuronConnection.WeightToFloat(-2.73f)),
+			new NeuronConnection(new Neuron(5, 9f, NeuronType.Internal), new Neuron(2, 119f, NeuronType.Action), NeuronConnection.WeightToFloat(1.02f)),
+			new NeuronConnection(new Neuron(5, 9f, NeuronType.Internal), new Neuron(3, 8f, NeuronType.Action), NeuronConnection.WeightToFloat(-1.02f)),
+			new NeuronConnection(new Neuron(5, -1f, NeuronType.Internal), new Neuron(3, 9f, NeuronType.Internal), NeuronConnection.WeightToFloat(1.02f)),
 		};
 
-		var genome = new Genome(connections);
+		var genome = new OldGenome(connections);
 
 		//Act
 		var hex = genome.ToHex();
-		var genome2 = Genome.FromHex(hex);
+		var genome2 = OldGenome.FromHex(hex);
 
 		//Assert
 		genome.Should().BeEquivalentTo(genome2, options => options.Excluding(x => x.HexSequence));
@@ -53,14 +53,14 @@ public class GenomeTests {
 	public void CreateGenome() {
 		//Arrange
 		var connections = new[] {
-			new NeuronConnection(new InputNeuron(1), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
-			new NeuronConnection(new Neuron(1, NeuronType.Internal), new Neuron(2, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
-			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(3, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
-			new NeuronConnection(new Neuron(2, NeuronType.Internal), new Neuron(1, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
-			new NeuronConnection(new Neuron(2, NeuronType.Internal), new ActionNeuron(1), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new InputNeuron(1,0), new Neuron(1, 0, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new Neuron(1,0, NeuronType.Internal), new Neuron(2,0, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new Neuron(2,0, NeuronType.Internal), new Neuron(3,0, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new Neuron(2,2f, NeuronType.Internal), new Neuron(1,0, NeuronType.Internal), NeuronConnection.WeightToFloat(1f)),
+			new NeuronConnection(new Neuron(2, 0,NeuronType.Internal), new ActionNeuron(1,0), NeuronConnection.WeightToFloat(1f)),
 		};
 
-		var genome = new Genome(connections);
+		var genome = new OldGenome(connections);
 
 		//Act
 		var hex = genome.ToHex();
@@ -70,11 +70,11 @@ public class GenomeTests {
 	[Fact]
 	public void GetBytes_ShouldGiveCorrectByte_WhenGivenValidSequence() {
 		//Arrange
-		var n1 = new Neuron(50, NeuronType.Input);
-		var n2 = new Neuron(900, NeuronType.Internal);
+		var n1 = new Neuron(50,2f, NeuronType.Input);
+		var n2 = new Neuron(900,2f, NeuronType.Internal);
 		var genome = new NeuronConnection(n1, n2, -300f);
 		var genome2 = new NeuronConnection(n2, n2, 100f);
-		var sequence = new Genome(new[] { genome, genome2 });
+		var sequence = new OldGenome(new[] { genome, genome2 });
 		var genome1Bytes = genome.GetBytes();
 		var genome2Bytes = genome2.GetBytes();
 		var expectedArr = genome1Bytes.Concat(genome2Bytes).ToArray();
@@ -89,11 +89,11 @@ public class GenomeTests {
 	[Fact]
 	public void ToHex_ShouldGiveCorrectHex_WhenGivenValidSequence() {
 		//Arrange
-		var n1 = new Neuron(50, NeuronType.Input);
-		var n2 = new Neuron(900, NeuronType.Internal);
+		var n1 = new Neuron(50,2f, NeuronType.Input);
+		var n2 = new Neuron(900,2f, NeuronType.Internal);
 		var genome = new NeuronConnection(n1, n2, -300f);
 		var genome2 = new NeuronConnection(n2, n2, 100f);
-		var sequence = new Genome(new[] { genome, genome2 });
+		var sequence = new OldGenome(new[] { genome, genome2 });
 		var genome1Hex = genome.ToHex();
 		var genome2Hex = genome2.ToHex();
 		
@@ -108,12 +108,12 @@ public class GenomeTests {
 	[Fact]
 	public void ToHex_ShouldGiveCorrectHex_WhenGivenValidSequenceWithThreeConnections() {
 		//Arrange
-		var n1 = new Neuron(50, NeuronType.Input);
-		var n2 = new Neuron(900, NeuronType.Internal);
+		var n1 = new Neuron(50,2f, NeuronType.Input);
+		var n2 = new Neuron(900,1f, NeuronType.Internal);
 		var genome = new NeuronConnection(n1, n2, -300f);
 		var genome2 = new NeuronConnection(n2, n2, 100f);
 		var genome3 = new NeuronConnection(n1, n2, 800f);
-		var sequence = new Genome(new[] { genome, genome2, genome3 });
+		var sequence = new OldGenome(new[] { genome, genome2, genome3 });
 		var genome1Hex = genome.ToHex();
 		var genome2Hex = genome2.ToHex();
 		var genome3Hex = genome3.ToHex();
@@ -129,10 +129,10 @@ public class GenomeTests {
 	[Fact]
 	public void ToHex_ShouldGiveCorrectHex_WhenGivenValidSequenceWithOneGenome() {
 		//Arrange
-		var n1 = new Neuron(50, NeuronType.Input);
-		var n2 = new Neuron(900, NeuronType.Internal);
+		var n1 = new Neuron(50,2f, NeuronType.Input);
+		var n2 = new Neuron(900,2f, NeuronType.Internal);
 		var connection = new NeuronConnection(n1, n2, -300f);
-		var genome = new Genome(new[] { connection });
+		var genome = new OldGenome(new[] { connection });
 		var connectionHex = connection.ToHex();
 
 		//Act

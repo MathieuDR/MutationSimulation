@@ -42,7 +42,7 @@ public class WorldFactory {
 		WorldOptions = worldOptions.Value;
 	}
 
-	public World Create(Genome[] genomes) {
+	public World Create(OldGenome[] genomes) {
 		var creatures = GetCreatures(genomes);
 		return new World(WorldOptions.Width, WorldOptions.Height, creatures) {
 			Walls = Walls,
@@ -50,7 +50,7 @@ public class WorldFactory {
 		};
 	}
 
-	private Creature[] GetCreatures(Genome[] genomes) {
+	private Creature[] GetCreatures(OldGenome[] genomes) {
 		// Ensure we have genomes for the first gen.
 		if (genomes.Length == 0) {
 			// Service locator anti pattern

@@ -11,9 +11,9 @@ namespace Common.Unit.ModelTests;
 
 public class CreatureTests {
 
-	private Genome EmptyGenome() {
-		return new Genome(new NeuronConnection[] {
-			new NeuronConnection(new InputNeuron(1), new ActionNeuron(2), 3f)
+	private OldGenome EmptyGenome() {
+		return new OldGenome(new NeuronConnection[] {
+			new NeuronConnection(new InputNeuron(1, 9f), new ActionNeuron(2, 9f), 3f)
 		});
 	}
 
