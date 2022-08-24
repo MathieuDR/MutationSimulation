@@ -1,23 +1,31 @@
 using Bogus;
 using ByteEncoder.Attributes;
 
-namespace ByteEncoder.Unit.TestModels; 
+namespace ByteEncoder.Unit.TestModels;
 
 public record SimpleModel {
+    [BytePiece(5)]
+    public int MyField;
+
+    [BytePiece(0)]
+    public float OtherField;
+
     [BytePiece(1)]
     public int MyInteger { get; set; }
+
     public int IgnoredInteger { get; set; }
+
     [BytePiece(2)]
     public string StringValue { get; set; } = "NotNullable";
+
     [BytePiece(40)]
     public float FloatValue { get; set; }
+
     [BytePiece(20)]
     public string? NullableString { get; set; }
 
-    [BytePiece(5)]
-    public int MyField;
-    [BytePiece(0)]
-    public float OtherField;
+    [BytePiece(9)]
+    public TestEnum EnumValue { get; set; } = TestEnum.Testing;
 
     public static Faker<SimpleModel> Generator => new Faker<SimpleModel>()
         .RuleFor(x => x.MyInteger, f => f.Random.Int())

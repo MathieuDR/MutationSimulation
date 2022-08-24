@@ -1,3 +1,4 @@
+using System.Collections;
 using ByteEncoder.Attributes;
 using ByteEncoder.Helpers;
 
@@ -7,19 +8,32 @@ internal record MemberInfo<T>(string Name, T Value);
 
 internal class Encoder {
     public static byte[] Encode<T>(T toEncode) {
+        if (toEncode is IEnumerable collection) {
+            IEnumerable<byte> result = Array.Empty<byte>();
+            foreach (var something in collection) {
+                result = result.Concat(EncodeObject(something));
+            }
+
+            return result.ToArray();
+        }
+
+        return EncodeObject(toEncode);
+    }
+
+    private static byte[] EncodeObject<T>(T toEncode) {
         List<(string Name, Type Type, object? Value, BytePiece Attribute)> members = GetMembersWithValues(toEncode);
 
 
         IEnumerable<byte> result = Array.Empty<byte>();
         foreach (var member in members) {
-            result = result.AddBytes(member.Value);
+            result = result.AddBytes(member.Value, member.Type);
         }
 
         return result.ToArray();
     }
 
     private static List<(string Name, Type Type, object? Value, BytePiece Attribute)> GetMembersWithValues<T>(T toEncode) {
-        var t = typeof(T);
+        var t = toEncode?.GetType() ?? typeof(object);
 
         var fields = t.GetFields()
             .Where(x => Attribute.IsDefined(x, typeof(BytePiece)))
