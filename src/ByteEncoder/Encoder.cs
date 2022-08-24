@@ -9,17 +9,21 @@ internal record MemberInfo<T>(string Name, T Value);
 internal class Encoder {
     public static byte[] Encode<T>(T toEncode) {
         if (toEncode is IEnumerable collection) {
-            int count = 0;
-            IEnumerable<byte> result = Array.Empty<byte>();
-            foreach (var something in collection) {
-                result = result.Concat(EncodeObject(something));
-                count++;
-            }
-
-            return count.GetBytes().Concat(result).ToArray();
+            return EncodeCollection(collection);
         }
 
         return EncodeObject(toEncode);
+    }
+
+    private static byte[] EncodeCollection(IEnumerable collection) {
+        int count = 0;
+        IEnumerable<byte> result = Array.Empty<byte>();
+        foreach (var something in collection) {
+            result = result.Concat(EncodeObject(something));
+            count++;
+        }
+
+        return count.GetBytes().Concat(result).ToArray();
     }
 
     private static byte[] EncodeObject<T>(T toEncode) {
